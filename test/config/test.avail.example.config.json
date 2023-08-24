@@ -1,0 +1,5 @@
+{
+    "seed": "test test test test test test test test test test test junk",
+    "api_url": "wss://kate.avail.tools:443/ws",
+    "app_id": 1
+}

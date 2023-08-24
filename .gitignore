@@ -19,3 +19,5 @@ out.dat
 cmd/__debug_bin
 
 .venv
+avail/config.json
+test/config/test.avail.config.json

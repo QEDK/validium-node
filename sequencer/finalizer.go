@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	avail "github.com/0xPolygonHermez/zkevm-node/avail"
 	"github.com/0xPolygonHermez/zkevm-node/event"
 	"github.com/0xPolygonHermez/zkevm-node/hex"
 	"github.com/0xPolygonHermez/zkevm-node/log"
@@ -1046,6 +1047,8 @@ func (f *finalizer) closeBatch(ctx context.Context) error {
 		BatchResources:       usedResources,
 		ClosingReason:        f.batch.closingReason,
 	}
+	// post batch to Avail
+	avail.PostData(transactions)
 	return f.dbManager.CloseBatch(ctx, receipt)
 }
 

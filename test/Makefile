@@ -1,4 +1,4 @@
-DOCKERCOMPOSE := docker-compose -f docker-compose.yml
+DOCKERCOMPOSE := docker compose -f docker-compose.yml
 DOCKERCOMPOSEAPPSEQ := zkevm-sequencer
 DOCKERCOMPOSEAPPSEQSENDER := zkevm-sequence-sender
 DOCKERCOMPOSEAPPL2GASP := zkevm-l2gaspricer
@@ -328,7 +328,7 @@ stop-zkprover: ## Stops zkprover
 	$(STOPZKPROVER)
 
 .PHONY: run-l1-explorer
-run-l1-explorer: ## Runs L1 blockscan explorer 
+run-l1-explorer: ## Runs L1 blockscan explorer
 	$(RUNEXPLORERL1DB)
 	$(RUNEXPLORERL1)
 
@@ -382,7 +382,7 @@ run-seqsender: ## runs the sequencer sender
 .PHONY: stop-seqsender
 stop-seqsender: ## stops the sequencer sender
 	$(STOPSEQUENCESENDER)
-	
+
 .PHONY: run-sync
 run-sync: ## runs the synchronizer
 	$(RUNSYNC)
@@ -414,7 +414,7 @@ run-eth-tx-manager: ## Runs the eth tx manager service
 .PHONY: stop-eth-tx-manager
 stop-eth-tx-manager: ## Stops the eth tx manager service
 	$(STOPETHTXMANAGER)
-	
+
 .PHONY: run-agg
 run-agg: ## Runs the aggregator service
 	$(RUNAGGREGATOR)

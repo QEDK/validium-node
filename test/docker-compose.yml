@@ -2,7 +2,7 @@ version: "3.5"
 networks:
   default:
     name: zkevm
-    
+
 services:
   grafana:
     container_name: grafana
@@ -58,6 +58,7 @@ services:
     volumes:
       - ./config/test.node.config.toml:/app/config.toml
       - ./config/test.genesis.config.json:/app/genesis.json
+      - ./config/test.avail.config.json:/app/avail-config.json
     command:
       - "/bin/sh"
       - "-c"
@@ -440,7 +441,7 @@ services:
   zkevm-sh:
     container_name: zkevm-sh
     image: zkevm-node
-    stdin_open: true 
+    stdin_open: true
     tty: true
     environment:
       - ZKEVM_NODE_STATE_DB_HOST=zkevm-state-db
