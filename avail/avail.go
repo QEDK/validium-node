@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/0xPolygonHermez/zkevm-node/avail/internal/config"
+	"github.com/0xPolygonHermez/zkevm-node/log"
 	evmTypes "github.com/ethereum/go-ethereum/core/types"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
@@ -12,33 +13,34 @@ import (
 )
 
 // The following example shows how submit data blob and track transaction status
-func PostData(txData []evmTypes.Transaction) {
+func PostData(txData []evmTypes.Transaction) error {
 	var config config.Config
 
 	err := config.GetConfig("/app/avail-config.json")
 	if err != nil {
-		panic(fmt.Sprintf("cannot get config:%v", err))
+		return fmt.Errorf("cannot get config: ", err)
 	}
 
 	api, err := gsrpc.NewSubstrateAPI(config.ApiURL)
 	if err != nil {
-		panic(fmt.Sprintf("cannot create api:%v", err))
+		return fmt.Errorf("cannot get api:%w", err)
 	}
 
 	meta, err := api.RPC.State.GetMetadataLatest()
 	if err != nil {
-		panic(fmt.Sprintf("cannot get metadata:%v", err))
+		return fmt.Errorf("cannot get metadata:%w", err)
 	}
 
 	var subData []byte
 	for i := 0; i < len(txData); i++ {
 		bytes, err := txData[i].MarshalBinary()
 		if err != nil {
-			panic(fmt.Sprintf("invalid tx from finalizer:%v", err))
+			return fmt.Errorf("invalid tx from finalizer:%w", err)
 		}
 		subData = append(subData, bytes...)
 	}
-	fmt.Println("⚡️ Submitting data to Avail...")
+
+	log.Infof("⚡️ Prepared data for Avail:%d bytes", len(subData))
 	appID := 0
 
 	// if app id is greater than 0 then it must be created before submitting data
@@ -48,7 +50,7 @@ func PostData(txData []evmTypes.Transaction) {
 
 	newCall, err := types.NewCall(meta, "DataAvailability.submit_data", types.NewBytes(subData))
 	if err != nil {
-		panic(fmt.Sprintf("cannot create new call:%v", err))
+		return fmt.Errorf("cannot create new call:%w", err)
 	}
 
 	// Create the extrinsic
@@ -56,31 +58,36 @@ func PostData(txData []evmTypes.Transaction) {
 
 	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
 	if err != nil {
-		panic(fmt.Sprintf("cannot get block hash:%v", err))
+		return fmt.Errorf("cannot get block hash:%w", err)
 	}
 
 	rv, err := api.RPC.State.GetRuntimeVersionLatest()
 	if err != nil {
-		panic(fmt.Sprintf("cannot get latest runtime version:%v", err))
+		return fmt.Errorf("cannot get runtime version:%w", err)
 	}
 
 	keyringPair, err := signature.KeyringPairFromSecret(config.Seed, 42)
 	if err != nil {
-		panic(fmt.Sprintf("cannot create KeyPair:%v", err))
+		return fmt.Errorf("cannot create keypair:%w", err)
 	}
 
 	key, err := types.CreateStorageKey(meta, "System", "Account", keyringPair.PublicKey)
 	if err != nil {
-		panic(fmt.Sprintf("cannot create storage key:%w", err))
+		return fmt.Errorf("cannot create storage key:%w", err)
 	}
 
 	var accountInfo types.AccountInfo
 	ok, err := api.RPC.State.GetStorageLatest(key, &accountInfo)
 	if err != nil || !ok {
-		panic(fmt.Sprintf("cannot get latest storage:%v", err))
+		return fmt.Errorf("cannot get latest storage:%w", err)
 	}
 
-	nonce := uint32(accountInfo.Nonce)
+	pendingExt, err := api.RPC.Author.PendingExtrinsics()
+	if err != nil {
+		return fmt.Errorf("cannot get pending extrinsics:%w", err)
+	}
+
+	nonce := uint32(accountInfo.Nonce) + uint32(len(pendingExt))
 	options := types.SignatureOptions{
 		BlockHash:          genesisHash,
 		Era:                types.ExtrinsicEra{IsMortalEra: false},
@@ -94,14 +101,16 @@ func PostData(txData []evmTypes.Transaction) {
 
 	err = ext.Sign(keyringPair, options)
 	if err != nil {
-		panic(fmt.Sprintf("cannot sign:%v", err))
+		return fmt.Errorf("cannot sign:%w", err)
 	}
 
 	// Send the extrinsic
 	hash, err := api.RPC.Author.SubmitAndWatchExtrinsic(ext)
 	if err != nil {
-		panic(fmt.Sprintf("cannot submit extrinsic:%v", err))
+		return fmt.Errorf("cannot submit extrinsic:%w", err)
 	}
 
-	fmt.Printf("Data submitted by sequencer: %v against appID %v  sent with hash %#x\n", subData, appID, hash)
+	log.Infof("✅ Data submitted by sequencer:%d bytes against AppID %v sent with hash %#x\n", len(subData), appID, hash)
+
+	return nil
 }
