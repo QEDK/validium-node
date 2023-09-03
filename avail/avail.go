@@ -2,6 +2,7 @@ package avail
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/0xPolygonHermez/zkevm-node/avail/internal/config"
 	"github.com/0xPolygonHermez/zkevm-node/log"
@@ -105,12 +106,69 @@ func PostData(txData []evmTypes.Transaction) error {
 	}
 
 	// Send the extrinsic
-	hash, err := api.RPC.Author.SubmitAndWatchExtrinsic(ext)
+	sub, err := api.RPC.Author.SubmitAndWatchExtrinsic(ext)
 	if err != nil {
 		return fmt.Errorf("cannot submit extrinsic:%w", err)
 	}
 
-	log.Infof("✅ Data submitted by sequencer:%d bytes against AppID %v sent with hash %#x\n", len(subData), appID, hash)
+	defer sub.Unsubscribe()
+	timeout := time.After(40 * time.Second)
+	var blockHash types.Hash
+out:
+	for {
+		select {
+		case status := <-sub.Chan():
+			if status.IsInBlock {
+				blockHash = status.AsInBlock
+				break out
+			} else if status.IsFinalized {
+				blockHash = status.AsFinalized
+				break out
+			}
+		case <-timeout:
+			return fmt.Errorf("⌛️ Timeout of 40 seconds reached without getting finalized status for extrinsic")
+		}
+	}
+
+	log.Infof("✅ Data submitted by sequencer:%d bytes against AppID %v sent with hash %#x\n", len(subData), appID, blockHash)
+
+	header, err := api.RPC.Chain.GetHeader(blockHash)
+
+	log.Infof("received header:%v", header)
+
+	if err != nil {
+		return fmt.Errorf("cannot get header:%v", header)
+	}
+
+	dispatchDataRootCall, err := types.NewCall(meta, "NomadDABridge.try_dispatch_data_root", types.NewU32(config.DestinationDomain), config.DestinationAddress, types.NewBytes([]byte(fmt.Sprintf("%v", header))))
+	if err != nil {
+		return fmt.Errorf("cannot create new call:%w", err)
+	}
+
+	dispatchDataRootExt := types.NewExtrinsic(dispatchDataRootCall)
+
+	nonce++
+	options = types.SignatureOptions{
+		BlockHash:          genesisHash,
+		Era:                types.ExtrinsicEra{IsMortalEra: false},
+		GenesisHash:        genesisHash,
+		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
+		SpecVersion:        rv.SpecVersion,
+		Tip:                types.NewUCompactFromUInt(100),
+		AppID:              types.NewUCompactFromUInt(uint64(appID)),
+		TransactionVersion: rv.TransactionVersion,
+	}
+	err = dispatchDataRootExt.Sign(keyringPair, options)
+	if err != nil {
+		return fmt.Errorf("cannot sign:%w", err)
+	}
+
+	dispatchDataRootHash, err := api.RPC.Author.SubmitAndWatchExtrinsic(dispatchDataRootExt)
+	if err != nil {
+		return fmt.Errorf("cannot dispatch data root:%w", err)
+	}
+
+	log.Infof("✅ Data root dispatched by sequencer with AppID %v sent with hash %#x\n", appID, dispatchDataRootHash)
 
 	return nil
 }
