@@ -5,12 +5,14 @@ import (
 	"math/big"
 	"time"
 
+	avail "github.com/0xPolygonHermez/zkevm-node/avail"
 	"github.com/0xPolygonHermez/zkevm-node/log"
 	"github.com/0xPolygonHermez/zkevm-node/pool"
 	"github.com/0xPolygonHermez/zkevm-node/state"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/jackc/pgx/v4"
+	"golang.org/x/crypto/sha3"
 )
 
 // Pool Loader and DB Updater
@@ -397,8 +399,17 @@ func (d *dbManager) CloseBatch(ctx context.Context, params ClosingBatchParameter
 	if err != nil {
 		return err
 	}
+	// post batch to Avail
+	err = avail.PostData(batchL2Data)
+	if err != nil {
+		return err
+	}
 
 	processingReceipt.BatchL2Data = batchL2Data
+	h := sha3.NewLegacyKeccak256()
+	h.Write(batchL2Data)
+	h.Sum(processingReceipt.BatchHash[:0])
+	log.Infof("Closing batch %v with hash %#x", processingReceipt.BatchNumber, processingReceipt.BatchHash)
 
 	dbTx, err := d.BeginStateTransaction(ctx)
 	if err != nil {

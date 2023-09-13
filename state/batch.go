@@ -75,6 +75,7 @@ type ProcessingReceipt struct {
 	AccInputHash  common.Hash
 	// Txs           []types.Transaction
 	BatchL2Data    []byte
+	BatchHash      [32]byte
 	ClosingReason  ClosingReason
 	BatchResources BatchResources
 }

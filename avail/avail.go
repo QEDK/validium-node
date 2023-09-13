@@ -1,25 +1,95 @@
 package avail
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"math/big"
+	"net/http"
+	"strings"
 	"time"
 
 	"github.com/0xPolygonHermez/zkevm-node/avail/internal/config"
 	"github.com/0xPolygonHermez/zkevm-node/log"
-	evmTypes "github.com/ethereum/go-ethereum/core/types"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
+// type DataLookupIndexItem struct {
+// 	AppId big.Int `json:"app_id"`
+// 	Start big.Int `json:"start"`
+// }
+// type DataLookup struct {
+// 	Size  big.Int               `json:"size"`
+// 	Index []DataLookupIndexItem `json:"index"`
+// }
+
+// type KateCommitment struct {
+// 	Rows       big.Int    `json:"rows"`
+// 	Cols       big.Int    `json:"cols"`
+// 	DataRoot   types.Hash `json:"dataRoot"`
+// 	Commitment []types.U8 `json:"commitment"`
+// }
+
+// type V1HeaderExtension struct {
+// 	Commitment KateCommitment `json:"commitment"`
+// 	AppLookup  DataLookup     `json:"app_lookup"`
+// }
+
+// type HeaderExtension struct {
+// 	V1 V1HeaderExtension `json:"V1"`
+// }
+
+// type Header struct {
+// 	ParentHash     types.Hash        `json:"parentHash"`
+// 	Number         types.BlockNumber `json:"number"`
+// 	StateRoot      types.Hash        `json:"stateRoot"`
+// 	ExtrinsicsRoot types.Hash        `json:"extrinsicsRoot"`
+// 	Digest         types.Digest      `json:"digest"`
+// 	Extension      HeaderExtension   `json:"extension"`
+// }
+
+type RPCResponse struct {
+	Result struct {
+		ParentHash     types.Hash        `json:"parentHash"`
+		Number         types.BlockNumber `json:"number"`
+		StateRoot      types.Hash        `json:"stateRoot"`
+		ExtrinsicsRoot types.Hash        `json:"extrinsicsRoot"`
+		Digest         types.Digest      `json:"digest"`
+		Extension      struct {
+			V1 struct {
+				Commitment struct {
+					Rows       big.Int    `json:"rows"`
+					Cols       big.Int    `json:"cols"`
+					DataRoot   types.Hash `json:"dataRoot"`
+					Commitment []types.U8 `json:"commitment"`
+				} `json:"commitment"`
+				AppLookup struct {
+					Size  big.Int `json:"size"`
+					Index []struct {
+						AppId big.Int `json:"app_id"`
+						Start big.Int `json:"start"`
+					}
+				} `json:"app_lookup"`
+			} `json:"V1"`
+		} `json:"extension"`
+	} `json:"result"`
+}
+
+// type RPCResponse struct {
+// 	Result Header `json:"result"`
+// 	Error  string `json:"error"`
+// }
+
 // The following example shows how submit data blob and track transaction status
-func PostData(txData []evmTypes.Transaction) error {
+func PostData(txData []byte) error {
 	var config config.Config
 
 	err := config.GetConfig("/app/avail-config.json")
 	if err != nil {
-		return fmt.Errorf("cannot get config: ", err)
+		return fmt.Errorf("cannot get config:%w", err)
 	}
 
 	api, err := gsrpc.NewSubstrateAPI(config.ApiURL)
@@ -32,16 +102,7 @@ func PostData(txData []evmTypes.Transaction) error {
 		return fmt.Errorf("cannot get metadata:%w", err)
 	}
 
-	var subData []byte
-	for i := 0; i < len(txData); i++ {
-		bytes, err := txData[i].MarshalBinary()
-		if err != nil {
-			return fmt.Errorf("invalid tx from finalizer:%w", err)
-		}
-		subData = append(subData, bytes...)
-	}
-
-	log.Infof("⚡️ Prepared data for Avail:%d bytes", len(subData))
+	log.Infof("⚡️ Prepared data for Avail:%d bytes", len(txData))
 	appID := 0
 
 	// if app id is greater than 0 then it must be created before submitting data
@@ -49,7 +110,7 @@ func PostData(txData []evmTypes.Transaction) error {
 		appID = config.AppID
 	}
 
-	newCall, err := types.NewCall(meta, "DataAvailability.submit_data", types.NewBytes(subData))
+	newCall, err := types.NewCall(meta, "DataAvailability.submit_data", types.NewBytes(txData))
 	if err != nil {
 		return fmt.Errorf("cannot create new call:%w", err)
 	}
@@ -95,7 +156,7 @@ func PostData(txData []evmTypes.Transaction) error {
 		GenesisHash:        genesisHash,
 		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
 		SpecVersion:        rv.SpecVersion,
-		Tip:                types.NewUCompactFromUInt(100),
+		Tip:                types.NewUCompactFromUInt(500),
 		AppID:              types.NewUCompactFromUInt(uint64(appID)),
 		TransactionVersion: rv.TransactionVersion,
 	}
@@ -112,7 +173,7 @@ func PostData(txData []evmTypes.Transaction) error {
 	}
 
 	defer sub.Unsubscribe()
-	timeout := time.After(40 * time.Second)
+	timeout := time.After(100 * time.Second)
 	var blockHash types.Hash
 out:
 	for {
@@ -124,51 +185,71 @@ out:
 			} else if status.IsFinalized {
 				blockHash = status.AsFinalized
 				break out
+			} else if status.IsDropped {
+				return fmt.Errorf("❌ Extrinsic dropped")
 			}
 		case <-timeout:
-			return fmt.Errorf("⌛️ Timeout of 40 seconds reached without getting finalized status for extrinsic")
+			return fmt.Errorf("⌛️ Timeout of 100 seconds reached without getting finalized status for extrinsic")
 		}
 	}
 
-	log.Infof("✅ Data submitted by sequencer:%d bytes against AppID %v sent with hash %#x\n", len(subData), appID, blockHash)
+	log.Infof("✅ Data submitted by sequencer:%d bytes against AppID %v sent with hash %#x", len(txData), appID, blockHash)
 
-	header, err := api.RPC.Chain.GetHeader(blockHash)
+	resp, err := http.Post("https://kate.avail.tools/rpc", "application/json", strings.NewReader(fmt.Sprintf("{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"chain_getHeader\",\"params\":[\"%#x\"]}", blockHash)))
+	if err != nil {
+		return fmt.Errorf("cannot post header request:%v", err)
+	}
+	defer resp.Body.Close()
 
-	log.Infof("received header:%v", header)
+	data, err := ioutil.ReadAll(resp.Body)
+	log.Infof("received header:%v", data)
 
 	if err != nil {
-		return fmt.Errorf("cannot get header:%v", header)
+		return fmt.Errorf("cannot read body:%v", err)
 	}
 
-	dispatchDataRootCall, err := types.NewCall(meta, "NomadDABridge.try_dispatch_data_root", types.NewU32(config.DestinationDomain), config.DestinationAddress, types.NewBytes([]byte(fmt.Sprintf("%v", header))))
+	var headerResp RPCResponse
+	json.Unmarshal(data, &headerResp)
+
+	log.Infof("received header:%+v", headerResp.Result)
+
+	// header, err := api.RPC.Chain.GetHeader(blockHash)
+	// log.Infof("received header:%+v", header)
+
 	if err != nil {
-		return fmt.Errorf("cannot create new call:%w", err)
+		return fmt.Errorf("cannot get header:%+v", err)
 	}
 
-	dispatchDataRootExt := types.NewExtrinsic(dispatchDataRootCall)
+	// dispatchDataRootCall, err := types.NewCall(meta, "NomadDABridge.try_dispatch_data_root", types.NewU32(config.DestinationDomain), config.DestinationAddress, headerResp.Result)
 
-	nonce++
-	options = types.SignatureOptions{
-		BlockHash:          genesisHash,
-		Era:                types.ExtrinsicEra{IsMortalEra: false},
-		GenesisHash:        genesisHash,
-		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
-		SpecVersion:        rv.SpecVersion,
-		Tip:                types.NewUCompactFromUInt(100),
-		AppID:              types.NewUCompactFromUInt(uint64(appID)),
-		TransactionVersion: rv.TransactionVersion,
-	}
-	err = dispatchDataRootExt.Sign(keyringPair, options)
-	if err != nil {
-		return fmt.Errorf("cannot sign:%w", err)
-	}
+	// if err != nil {
+	// 	return fmt.Errorf("cannot create new call:%w", err)
+	// }
 
-	dispatchDataRootHash, err := api.RPC.Author.SubmitAndWatchExtrinsic(dispatchDataRootExt)
-	if err != nil {
-		return fmt.Errorf("cannot dispatch data root:%w", err)
-	}
+	// dispatchDataRootExt := types.NewExtrinsic(dispatchDataRootCall)
 
-	log.Infof("✅ Data root dispatched by sequencer with AppID %v sent with hash %#x\n", appID, dispatchDataRootHash)
+	// nonce++
+	// options = types.SignatureOptions{
+	// 	BlockHash:          genesisHash,
+	// 	Era:                types.ExtrinsicEra{IsMortalEra: false},
+	// 	GenesisHash:        genesisHash,
+	// 	Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
+	// 	SpecVersion:        rv.SpecVersion,
+	// 	Tip:                types.NewUCompactFromUInt(100),
+	// 	AppID:              types.NewUCompactFromUInt(uint64(appID)),
+	// 	TransactionVersion: rv.TransactionVersion,
+	// }
+	// err = dispatchDataRootExt.Sign(keyringPair, options)
+	// if err != nil {
+	// 	return fmt.Errorf("cannot sign:%w", err)
+	// }
+
+	// dispatchDataRootHash, err := api.RPC.Author.SubmitAndWatchExtrinsic(dispatchDataRootExt)
+	// if err != nil {
+	// 	return fmt.Errorf("cannot dispatch data root:%w", err)
+	// }
+
+	// log.Infof("✅ Data root dispatched by sequencer with AppID %v sent with hash %#x\n", appID, dispatchDataRootHash)
 
 	return nil
 }

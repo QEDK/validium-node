@@ -9,7 +9,6 @@ import (
 	"sync"
 	"time"
 
-	avail "github.com/0xPolygonHermez/zkevm-node/avail"
 	"github.com/0xPolygonHermez/zkevm-node/event"
 	"github.com/0xPolygonHermez/zkevm-node/hex"
 	"github.com/0xPolygonHermez/zkevm-node/log"
@@ -1046,11 +1045,6 @@ func (f *finalizer) closeBatch(ctx context.Context) error {
 		EffectivePercentages: effectivePercentages,
 		BatchResources:       usedResources,
 		ClosingReason:        f.batch.closingReason,
-	}
-	// post batch to Avail
-	err = avail.PostData(transactions)
-	if err != nil {
-		return fmt.Errorf("failed to post data to Avail:%w", err)
 	}
 	return f.dbManager.CloseBatch(ctx, receipt)
 }
