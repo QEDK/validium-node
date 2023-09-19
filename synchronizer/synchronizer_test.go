@@ -172,7 +172,7 @@ func TestForcedBatch(t *testing.T) {
 				SequencerAddr: common.HexToAddress("0x00"),
 				TxHash:        common.HexToHash("0x333"),
 				PolygonZkEVMBatchData: polygonzkevm.PolygonZkEVMBatchData{
-					Transactions:       []byte{},
+					BatchHash:          [32]byte{},
 					GlobalExitRoot:     [32]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32},
 					Timestamp:          uint64(t.Unix()),
 					MinForcedTimestamp: 1000, //ForcedBatch
@@ -184,7 +184,7 @@ func TestForcedBatch(t *testing.T) {
 				ForcedBatchNumber: 1,
 				Sequencer:         sequencedBatch.Coinbase,
 				GlobalExitRoot:    sequencedBatch.GlobalExitRoot,
-				RawTxsData:        sequencedBatch.Transactions,
+				BatchHash:         sequencedBatch.BatchHash,
 				ForcedAt:          time.Unix(int64(sequencedBatch.MinForcedTimestamp), 0),
 			}}
 
@@ -242,7 +242,7 @@ func TestForcedBatch(t *testing.T) {
 				ForcedBatchNumber: 1,
 				Sequencer:         sequencedBatch.Coinbase,
 				GlobalExitRoot:    sequencedBatch.GlobalExitRoot,
-				RawTxsData:        sequencedBatch.Transactions,
+				BatchHash:         sequencedBatch.BatchHash,
 				ForcedAt:          time.Unix(int64(sequencedBatch.MinForcedTimestamp), 0),
 			}}
 
@@ -257,7 +257,7 @@ func TestForcedBatch(t *testing.T) {
 				Once()
 
 			trustedBatch := &state.Batch{
-				BatchL2Data:    sequencedBatch.Transactions,
+				BatchHash:      sequencedBatch.BatchHash,
 				GlobalExitRoot: sequencedBatch.GlobalExitRoot,
 				Timestamp:      time.Unix(int64(sequencedBatch.Timestamp), 0),
 				Coinbase:       sequencedBatch.Coinbase,
@@ -414,7 +414,7 @@ func TestSequenceForcedBatch(t *testing.T) {
 				Coinbase:    common.HexToAddress("0x222"),
 				TxHash:      common.HexToHash("0x333"),
 				PolygonZkEVMForcedBatchData: polygonzkevm.PolygonZkEVMForcedBatchData{
-					Transactions:       []byte{},
+					BatchHash:          [32]byte{},
 					GlobalExitRoot:     [32]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32},
 					MinForcedTimestamp: 1000, //ForcedBatch
 				},
@@ -425,7 +425,7 @@ func TestSequenceForcedBatch(t *testing.T) {
 				ForcedBatchNumber: 1,
 				Sequencer:         sequencedForceBatch.Coinbase,
 				GlobalExitRoot:    sequencedForceBatch.GlobalExitRoot,
-				RawTxsData:        sequencedForceBatch.Transactions,
+				BatchHash:         sequencedForceBatch.BatchHash,
 				ForcedAt:          time.Unix(int64(sequencedForceBatch.MinForcedTimestamp), 0),
 			}}
 
@@ -478,7 +478,7 @@ func TestSequenceForcedBatch(t *testing.T) {
 				ForcedBatchNumber: 1,
 				Sequencer:         sequencedForceBatch.Coinbase,
 				GlobalExitRoot:    sequencedForceBatch.GlobalExitRoot,
-				RawTxsData:        sequencedForceBatch.Transactions,
+				BatchHash:         sequencedForceBatch.BatchHash,
 				ForcedAt:          time.Unix(int64(sequencedForceBatch.MinForcedTimestamp), 0),
 			}}
 
@@ -509,11 +509,11 @@ func TestSequenceForcedBatch(t *testing.T) {
 				Timestamp:      ethBlock.ReceivedAt,
 				GlobalExitRoot: sequencedForceBatch.GlobalExitRoot,
 				ForcedBatchNum: &f,
-				BatchL2Data:    &sequencedForceBatch.Transactions,
+				BatchHash:      &sequencedForceBatch.BatchHash,
 			}
 
 			m.State.
-				On("ProcessAndStoreClosedBatch", ctx, processingContext, sequencedForceBatch.Transactions, m.DbTx, metrics.SynchronizerCallerLabel).
+				On("ProcessAndStoreClosedBatch", ctx, processingContext, sequencedForceBatch.BatchHash, m.DbTx, metrics.SynchronizerCallerLabel).
 				Return(common.Hash{}, uint64(1), cProverIDExecution, nil).
 				Once()
 

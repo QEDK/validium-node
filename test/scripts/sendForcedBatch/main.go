@@ -132,7 +132,7 @@ func sendForcedBatches(cliCtx *cli.Context) error {
 	}
 
 	// Send forceBatch
-	tx, err := poe.ForceBatch(auth, []byte{}, tip)
+	tx, err := poe.ForceBatch(auth, [32]byte{}, tip)
 	if err != nil {
 		log.Error("error sending forceBatch. Error: ", err)
 		return err

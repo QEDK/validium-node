@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/big"
 	"time"
 
 	"github.com/0xPolygonHermez/zkevm-node/hex"
@@ -32,6 +33,7 @@ type Batch struct {
 	AccInputHash   common.Hash
 	Timestamp      time.Time
 	Transactions   []types.Transaction
+	BatchHash      [32]byte
 	GlobalExitRoot common.Hash
 	ForcedBatchNum *uint64
 }
@@ -45,6 +47,7 @@ type ProcessingContext struct {
 	GlobalExitRoot common.Hash
 	ForcedBatchNum *uint64
 	BatchL2Data    *[]byte
+	BatchHash      *[32]byte
 }
 
 // ClosingReason represents the reason why a batch is closed.
@@ -78,6 +81,10 @@ type ProcessingReceipt struct {
 	BatchHash      [32]byte
 	ClosingReason  ClosingReason
 	BatchResources BatchResources
+	DABlockNumber  uint32
+	DAProof        [][32]byte
+	DAWidth        big.Int
+	DAIndex        big.Int
 }
 
 // VerifiedBatch represents a VerifiedBatch

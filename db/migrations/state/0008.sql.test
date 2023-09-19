@@ -1,0 +1,29 @@
+-- -- +migrate Up
+-- ALTER TABLE state.batch
+--     ADD COLUMN batch_hash VARCHAR,
+--     ADD COLUMN da_block_number BIGINT,
+--     ADD COLUMN da_proof VARCHAR,
+--     ADD COLUMN da_width BIGINT,
+--     ADD COLUMN da_index BIGINT;
+
+-- ALTER TABLE state.forced_batch
+--     ADD COLUMN batch_hash VARCHAR,
+--     ADD COLUMN da_block_number BIGINT,
+--     ADD COLUMN da_proof VARCHAR, 
+--     ADD COLUMN da_width BIGINT,
+--     ADD COLUMN da_index BIGINT;
+
+-- -- +migrate Down
+-- ALTER TABLE state.batch
+--     DROP COLUMN batch_hash,
+--     DROP COLUMN da_block_number,
+--     DROP COLUMN da_proof,
+--     DROP COLUMN da_width,
+--     DROP COLUMN da_index;
+
+-- ALTER TABLE state.forced_batch
+--     DROP COLUMN batch_hash,
+--     DROP COLUMN da_block_number,
+--     DROP COLUMN da_proof,
+--     DROP COLUMN da_width,
+--     DROP COLUMN da_index;

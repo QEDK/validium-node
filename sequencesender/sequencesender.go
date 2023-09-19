@@ -163,7 +163,7 @@ func (s *SequenceSender) getSequencesToSend(ctx context.Context) ([]types.Sequen
 		seq := types.Sequence{
 			GlobalExitRoot: batch.GlobalExitRoot,
 			Timestamp:      batch.Timestamp.Unix(),
-			BatchL2Data:    batch.BatchL2Data,
+			BatchHash:      batch.BatchHash,
 			BatchNumber:    batch.BatchNumber,
 		}
 

@@ -12,6 +12,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/urfave/cli/v2"
+	"golang.org/x/crypto/sha3"
 )
 
 const (
@@ -130,14 +131,18 @@ func sendForcedBatches(cliCtx *cli.Context) error {
 		log.Error("error decoding txs. Error: ", err)
 		return err
 	}
+	var batchHash [32]byte
+	h := sha3.NewLegacyKeccak256()
+	h.Write(transactions)
+	h.Sum(batchHash[:0])
 	fbData := []polygonzkevm.PolygonZkEVMForcedBatchData{{
-		Transactions:       transactions,
+		BatchHash:          batchHash,
 		GlobalExitRoot:     common.HexToHash(cliCtx.String(flagGerName)),
 		MinForcedTimestamp: cliCtx.Uint64(flagTimestampName),
 	}}
 	log.Warnf("%v, %+v", cliCtx.String(flagTransactionsName), fbData)
 	// Send forceBatch
-	tx, err := poe.SequenceForceBatches(auth, fbData)
+	tx, err := poe.SequenceForceBatches(auth, batchHash)
 	if err != nil {
 		log.Error("error sending forceBatch. Error: ", err)
 		return err

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	avail "github.com/0xPolygonHermez/zkevm-node/avail"
+	availTypes "github.com/0xPolygonHermez/zkevm-node/avail/types"
 	"github.com/0xPolygonHermez/zkevm-node/log"
 	"github.com/0xPolygonHermez/zkevm-node/pool"
 	"github.com/0xPolygonHermez/zkevm-node/state"
@@ -399,11 +400,21 @@ func (d *dbManager) CloseBatch(ctx context.Context, params ClosingBatchParameter
 	if err != nil {
 		return err
 	}
-	// post batch to Avail
-	err = avail.PostData(batchL2Data)
+
+	var batchDAData *availTypes.BatchDAData
+	batchDAData, err = avail.PostData(batchL2Data)
 	if err != nil {
 		return err
 	}
+
+	processingReceipt.DABlockNumber = uint32(batchDAData.BlockNumber)
+	for i, leaf := range batchDAData.Proof {
+		var proof [32]byte
+		copy(proof[:], common.FromHex(leaf))
+		processingReceipt.DAProof[i] = proof
+	}
+	processingReceipt.DAWidth = *big.NewInt(int64(batchDAData.Width))
+	processingReceipt.DAIndex = *big.NewInt(int64(batchDAData.LeafIndex))
 
 	processingReceipt.BatchL2Data = batchL2Data
 	h := sha3.NewLegacyKeccak256()

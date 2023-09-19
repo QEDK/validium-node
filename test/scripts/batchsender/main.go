@@ -174,7 +174,7 @@ func sendBatches(cliCtx *cli.Context) error {
 			// empty rollup
 			seqs = append(seqs, ethmanTypes.Sequence{
 				GlobalExitRoot: common.HexToHash("0x"),
-				BatchL2Data:    []byte{},
+				BatchHash:      [32]byte{},
 				Timestamp:      int64(currentBlock.Time() - 1), // fit in latest-sequence < > current-block rage
 			})
 		}

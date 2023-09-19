@@ -794,7 +794,7 @@ func (s *ClientSynchronizer) processSequenceBatches(sequencedBatches []etherman.
 			GlobalExitRoot: sbatch.GlobalExitRoot,
 			Timestamp:      time.Unix(int64(sbatch.Timestamp), 0),
 			Coinbase:       sbatch.Coinbase,
-			BatchL2Data:    sbatch.Transactions,
+			BatchHash:      sbatch.BatchHash,
 		}
 		// ForcedBatch must be processed
 		if sbatch.MinForcedTimestamp > 0 { // If this is true means that the batch is forced
@@ -821,9 +821,9 @@ func (s *ClientSynchronizer) processSequenceBatches(sequencedBatches []etherman.
 			}
 			if uint64(forcedBatches[0].ForcedAt.Unix()) != sbatch.MinForcedTimestamp ||
 				forcedBatches[0].GlobalExitRoot != sbatch.GlobalExitRoot ||
-				common.Bytes2Hex(forcedBatches[0].RawTxsData) != common.Bytes2Hex(sbatch.Transactions) {
+				forcedBatches[0].BatchHash != sbatch.BatchHash {
 				log.Warnf("ForcedBatch stored: %+v. RawTxsData: %s", forcedBatches, common.Bytes2Hex(forcedBatches[0].RawTxsData))
-				log.Warnf("ForcedBatch sequenced received: %+v. RawTxsData: %s", sbatch, common.Bytes2Hex(sbatch.Transactions))
+				log.Warnf("ForcedBatch sequenced received: %+v. batch hash: %s", sbatch, sbatch.BatchHash)
 				log.Errorf("error: forcedBatch received doesn't match with the next expected forcedBatch stored in db. Expected: %+v, Synced: %+v", forcedBatches, sbatch)
 				rollbackErr := dbTx.Rollback(s.ctx)
 				if rollbackErr != nil {
@@ -1035,7 +1035,7 @@ func (s *ClientSynchronizer) processSequenceForceBatch(sequenceForceBatch []ethe
 	for i, fbatch := range sequenceForceBatch {
 		if uint64(forcedBatches[i].ForcedAt.Unix()) != fbatch.MinForcedTimestamp ||
 			forcedBatches[i].GlobalExitRoot != fbatch.GlobalExitRoot ||
-			common.Bytes2Hex(forcedBatches[i].RawTxsData) != common.Bytes2Hex(fbatch.Transactions) {
+			forcedBatches[i].BatchHash != fbatch.BatchHash {
 			log.Warnf("ForcedBatch stored: %+v", forcedBatches)
 			log.Warnf("ForcedBatch sequenced received: %+v", fbatch)
 			log.Errorf("error: forcedBatch received doesn't match with the next expected forcedBatch stored in db. Expected: %+v, Synced: %+v", forcedBatches[i], fbatch)
@@ -1114,7 +1114,7 @@ func (s *ClientSynchronizer) processForcedBatch(forcedBatch etherman.ForcedBatch
 		ForcedBatchNumber: forcedBatch.ForcedBatchNumber,
 		Sequencer:         forcedBatch.Sequencer,
 		GlobalExitRoot:    forcedBatch.GlobalExitRoot,
-		RawTxsData:        forcedBatch.RawTxsData,
+		BatchHash:         forcedBatch.BatchHash,
 		ForcedAt:          forcedBatch.ForcedAt,
 	}
 	err := s.state.AddForcedBatch(s.ctx, &forcedB, dbTx)

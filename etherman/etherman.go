@@ -525,18 +525,27 @@ func (etherMan *Client) BuildSequenceBatchesTxData(sender common.Address, sequen
 
 func (etherMan *Client) sequenceBatches(opts bind.TransactOpts, sequences []ethmanTypes.Sequence, l2Coinbase common.Address) (*types.Transaction, error) {
 	var batches []polygonzkevm.PolygonZkEVMBatchData
+	var daDatas []polygonzkevm.PolygonZkEVMDAData
 	for _, seq := range sequences {
 		batch := polygonzkevm.PolygonZkEVMBatchData{
-			Transactions:       seq.BatchL2Data,
+			BatchHash:          seq.BatchHash,
 			GlobalExitRoot:     seq.GlobalExitRoot,
 			Timestamp:          uint64(seq.Timestamp),
 			MinForcedTimestamp: uint64(seq.ForcedBatchTimestamp),
 		}
 
+		daData := polygonzkevm.PolygonZkEVMDAData{
+			BlockNumber: seq.DABlockNumber,
+			Proof:       seq.DAProof,
+			Width:       &seq.DAWidth,
+			Index:       &seq.DAIndex,
+		}
+
 		batches = append(batches, batch)
+		daDatas = append(daDatas, daData)
 	}
 
-	tx, err := etherMan.ZkEVM.SequenceBatches(&opts, batches, l2Coinbase)
+	tx, err := etherMan.ZkEVM.SequenceBatches(&opts, batches, daDatas, l2Coinbase)
 	if err != nil {
 		if parsedErr, ok := tryParseError(err); ok {
 			err = parsedErr
@@ -667,9 +676,11 @@ func (etherMan *Client) forcedBatchEvent(ctx context.Context, vLog types.Log, bl
 			return err
 		}
 		bytedata := data[0].([]byte)
-		forcedBatch.RawTxsData = bytedata
+		h := sha3.NewLegacyKeccak256()
+		h.Write(bytedata)
+		h.Sum(forcedBatch.BatchHash[:0])
 	} else {
-		forcedBatch.RawTxsData = fb.Transactions
+		forcedBatch.BatchHash = fb.BatchHash
 	}
 	forcedBatch.Sequencer = fb.Sequencer
 	fullBlock, err := etherMan.EthClient.BlockByHash(ctx, vLog.BlockHash)
