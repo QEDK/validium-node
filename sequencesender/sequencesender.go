@@ -160,11 +160,17 @@ func (s *SequenceSender) getSequencesToSend(ctx context.Context) ([]types.Sequen
 			return nil, err
 		}
 
+		log.Infof("adding batch %+v to sequence", batch)
+
 		seq := types.Sequence{
 			GlobalExitRoot: batch.GlobalExitRoot,
 			Timestamp:      batch.Timestamp.Unix(),
-			BatchL2Data:    batch.BatchL2Data,
 			BatchNumber:    batch.BatchNumber,
+			BatchHash:      batch.BatchHash,
+			DABlockNumber:  batch.DABlockNumber,
+			DAProof:        batch.DAProof,
+			DAWidth:        batch.DAWidth,
+			DAIndex:        batch.DAIndex,
 		}
 
 		if batch.ForcedBatchNum != nil {

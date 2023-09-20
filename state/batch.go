@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/big"
 	"time"
 
 	"github.com/0xPolygonHermez/zkevm-node/hex"
@@ -35,6 +36,10 @@ type Batch struct {
 	GlobalExitRoot common.Hash
 	ForcedBatchNum *uint64
 	BatchHash      [32]byte
+	DABlockNumber  uint32
+	DAProof        [][32]byte
+	DAWidth        *big.Int
+	DAIndex        *big.Int
 }
 
 // ProcessingContext is the necessary data that a batch needs to provide to the runtime,

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/0xPolygonHermez/zkevm-node/hex"
+	"github.com/0xPolygonHermez/zkevm-node/log"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/jackc/pgx/v4"
@@ -568,7 +569,7 @@ func (p *PostgresStorage) SetInitSyncBatch(ctx context.Context, batchNumber uint
 // GetBatchByNumber returns the batch with the given number.
 func (p *PostgresStorage) GetBatchByNumber(ctx context.Context, batchNumber uint64, dbTx pgx.Tx) (*Batch, error) {
 	const getBatchByNumberSQL = `
-		SELECT batch_num, global_exit_root, local_exit_root, acc_input_hash, state_root, timestamp, coinbase, raw_txs_data, forced_batch_num
+		SELECT batch_num, global_exit_root, local_exit_root, acc_input_hash, state_root, timestamp, coinbase, raw_txs_data, forced_batch_num, batch_hash, da_block_number, da_proof, da_width, da_index
 		  FROM state.batch 
 		 WHERE batch_num = $1`
 
@@ -724,11 +725,14 @@ func (p *PostgresStorage) GetProcessingContext(ctx context.Context, batchNumber 
 func scanBatch(row pgx.Row) (Batch, error) {
 	batch := Batch{}
 	var (
-		gerStr      string
-		lerStr      *string
-		aihStr      *string
-		stateStr    *string
-		coinbaseStr string
+		gerStr         string
+		lerStr         *string
+		aihStr         *string
+		stateStr       *string
+		coinbaseStr    string
+		batchHashBytes *[]byte
+		daWidthInt     *int
+		daIndexInt     *int
 	)
 	err := row.Scan(
 		&batch.BatchNumber,
@@ -740,6 +744,11 @@ func scanBatch(row pgx.Row) (Batch, error) {
 		&coinbaseStr,
 		&batch.BatchL2Data,
 		&batch.ForcedBatchNum,
+		&batchHashBytes,
+		&batch.DABlockNumber,
+		&batch.DAProof,
+		&daWidthInt,
+		&daIndexInt,
 	)
 	if err != nil {
 		return batch, err
@@ -754,8 +763,14 @@ func scanBatch(row pgx.Row) (Batch, error) {
 	if aihStr != nil {
 		batch.AccInputHash = common.HexToHash(*aihStr)
 	}
+	if batchHashBytes != nil {
+		copy(batch.BatchHash[:], *batchHashBytes)
+	}
+	batch.DAWidth = big.NewInt(int64(*daWidthInt))
+	batch.DAIndex = big.NewInt(int64(*daIndexInt))
 
 	batch.Coinbase = common.HexToAddress(coinbaseStr)
+	log.Infof("Batch %d: %+v", batch.BatchNumber, batch)
 	return batch, nil
 }
 
