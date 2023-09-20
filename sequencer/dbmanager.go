@@ -39,6 +39,11 @@ type ClosingBatchParameters struct {
 	BatchResources       state.BatchResources
 	ClosingReason        state.ClosingReason
 	EffectivePercentages []uint8
+	BatchHash            [32]byte
+	DABlockNumber        uint
+	DAProof              []string
+	DAWidth              uint
+	DAIndex              uint
 }
 
 func newDBManager(ctx context.Context, config DBManagerCfg, txPool txPool, state stateInterface, worker *Worker, closingSignalCh ClosingSignalCh, batchConstraints state.BatchConstraintsCfg) *dbManager {

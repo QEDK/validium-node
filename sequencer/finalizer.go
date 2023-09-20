@@ -20,6 +20,7 @@ import (
 	"github.com/0xPolygonHermez/zkevm-node/state/runtime/executor"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/jackc/pgx/v4"
+	"golang.org/x/crypto/sha3"
 )
 
 const (
@@ -1051,7 +1052,15 @@ func (f *finalizer) closeBatch(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to encode transactions, err: %w", err)
 	}
-	_, err = avail.PostData(rawTxs)
+	batchDAData, err := avail.PostData(rawTxs)
+	h := sha3.NewLegacyKeccak256()
+	h.Write(rawTxs)
+	h.Sum(receipt.BatchHash[:0])
+	receipt.DABlockNumber = batchDAData.BlockNumber
+	receipt.DAProof = batchDAData.Proof
+	receipt.DAWidth = batchDAData.Width
+	receipt.DAIndex = batchDAData.LeafIndex
+	log.Infof("closeBatch: BatchNum: %d, BatchHash: %#x, DAProof: %v, DAIndex: %d, DAWidth: %d, DABlockNumber: %d", f.batch.batchNumber, receipt.BatchHash, receipt.DAProof, receipt.DAIndex, receipt.DAWidth, receipt.DABlockNumber)
 	if err != nil {
 		return fmt.Errorf("failed to post data to Avail:%w", err)
 	}
