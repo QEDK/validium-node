@@ -1060,7 +1060,7 @@ func (f *finalizer) closeBatch(ctx context.Context) error {
 	receipt.DAProof = batchDAData.Proof
 	receipt.DAWidth = batchDAData.Width
 	receipt.DAIndex = batchDAData.LeafIndex
-	log.Infof("closeBatch: BatchNum: %d, BatchHash: %#x, DAProof: %v, DAIndex: %d, DAWidth: %d, DABlockNumber: %d", f.batch.batchNumber, receipt.BatchHash, receipt.DAProof, receipt.DAIndex, receipt.DAWidth, receipt.DABlockNumber)
+	log.Infof("closing batch with DA data: BatchNum: %d, BatchHash: %#x, DAProof: %v, DAIndex: %d, DAWidth: %d, DABlockNumber: %d", f.batch.batchNumber, receipt.BatchHash, receipt.DAProof, receipt.DAIndex, receipt.DAWidth, receipt.DABlockNumber)
 	if err != nil {
 		return fmt.Errorf("failed to post data to Avail:%w", err)
 	}

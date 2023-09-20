@@ -981,8 +981,8 @@ func (p *PostgresStorage) openBatch(ctx context.Context, batchContext Processing
 
 func (p *PostgresStorage) closeBatch(ctx context.Context, receipt ProcessingReceipt, dbTx pgx.Tx) error {
 	const closeBatchSQL = `UPDATE state.batch 
-		SET state_root = $1, local_exit_root = $2, acc_input_hash = $3, raw_txs_data = $4, batch_resources = $5, closing_reason = $6
-		  WHERE batch_num = $7`
+		SET state_root = $1, local_exit_root = $2, acc_input_hash = $3, raw_txs_data = $4, batch_resources = $5, closing_reason = $6, batch_hash = $7, da_block_number = $8, da_proof = $9, da_width = $10, da_index = $11
+		  WHERE batch_num = $12`
 
 	e := p.getExecQuerier(dbTx)
 	batchResourcesJsonBytes, err := json.Marshal(receipt.BatchResources)
@@ -990,7 +990,7 @@ func (p *PostgresStorage) closeBatch(ctx context.Context, receipt ProcessingRece
 		return err
 	}
 	_, err = e.Exec(ctx, closeBatchSQL, receipt.StateRoot.String(), receipt.LocalExitRoot.String(),
-		receipt.AccInputHash.String(), receipt.BatchL2Data, string(batchResourcesJsonBytes), receipt.ClosingReason, receipt.BatchNumber)
+		receipt.AccInputHash.String(), receipt.BatchL2Data, string(batchResourcesJsonBytes), receipt.ClosingReason, receipt.BatchHash[:], receipt.DABlockNumber, receipt.DAProof, receipt.DAWidth, receipt.DAIndex, receipt.BatchNumber)
 
 	return err
 }
