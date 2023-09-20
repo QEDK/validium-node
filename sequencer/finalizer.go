@@ -1047,8 +1047,11 @@ func (f *finalizer) closeBatch(ctx context.Context) error {
 		BatchResources:       usedResources,
 		ClosingReason:        f.batch.closingReason,
 	}
-	// post batch to Avail
-	err = avail.PostData(transactions)
+	rawTxs, err := state.EncodeTransactions(transactions, effectivePercentages, f.dbManager.GetForkIDByBatchNumber(f.batch.batchNumber))
+	if err != nil {
+		return fmt.Errorf("failed to encode transactions, err: %w", err)
+	}
+	_, err = avail.PostData(rawTxs)
 	if err != nil {
 		return fmt.Errorf("failed to post data to Avail:%w", err)
 	}
