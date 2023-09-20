@@ -1,6 +1,7 @@
 package types
 
 import (
+	"math/big"
 	"reflect"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -16,6 +17,11 @@ type Sequence struct {
 	IsSequenceTooBig                         bool   // 8
 	BatchNumber                              uint64 // 64
 	ForcedBatchTimestamp                     int64  // 64
+	BatchHash                                common.Hash
+	DABlockNumber                            uint32
+	DAProof                                  [][32]byte
+	DAWidth                                  *big.Int
+	DAIndex                                  *big.Int
 }
 
 // IsEmpty checks is sequence struct is empty

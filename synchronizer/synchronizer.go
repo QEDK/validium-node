@@ -19,6 +19,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/jackc/pgx/v4"
+	"golang.org/x/crypto/sha3"
 )
 
 const (
@@ -794,7 +795,7 @@ func (s *ClientSynchronizer) processSequenceBatches(sequencedBatches []etherman.
 			GlobalExitRoot: sbatch.GlobalExitRoot,
 			Timestamp:      time.Unix(int64(sbatch.Timestamp), 0),
 			Coinbase:       sbatch.Coinbase,
-			BatchL2Data:    sbatch.Transactions,
+			BatchHash:      sbatch.BatchHash,
 		}
 		// ForcedBatch must be processed
 		if sbatch.MinForcedTimestamp > 0 { // If this is true means that the batch is forced
@@ -819,11 +820,15 @@ func (s *ClientSynchronizer) processSequenceBatches(sequencedBatches []etherman.
 				}
 				return fmt.Errorf("error: empty forcedBatches array read from db. BatchNumber: %d", sbatch.BatchNumber)
 			}
+			var forcedBatchHash [32]byte
+			h := sha3.NewLegacyKeccak256()
+			h.Write(forcedBatches[0].RawTxsData)
+			h.Sum(forcedBatchHash[:0])
 			if uint64(forcedBatches[0].ForcedAt.Unix()) != sbatch.MinForcedTimestamp ||
 				forcedBatches[0].GlobalExitRoot != sbatch.GlobalExitRoot ||
-				common.Bytes2Hex(forcedBatches[0].RawTxsData) != common.Bytes2Hex(sbatch.Transactions) {
+				forcedBatchHash != sbatch.BatchHash {
 				log.Warnf("ForcedBatch stored: %+v. RawTxsData: %s", forcedBatches, common.Bytes2Hex(forcedBatches[0].RawTxsData))
-				log.Warnf("ForcedBatch sequenced received: %+v. RawTxsData: %s", sbatch, common.Bytes2Hex(sbatch.Transactions))
+				log.Warnf("ForcedBatch sequenced received: %+v. batch hash: %s", sbatch, sbatch.BatchHash)
 				log.Errorf("error: forcedBatch received doesn't match with the next expected forcedBatch stored in db. Expected: %+v, Synced: %+v", forcedBatches, sbatch)
 				rollbackErr := dbTx.Rollback(s.ctx)
 				if rollbackErr != nil {
