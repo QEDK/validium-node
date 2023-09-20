@@ -77,6 +77,11 @@ type ProcessingReceipt struct {
 	BatchL2Data    []byte
 	ClosingReason  ClosingReason
 	BatchResources BatchResources
+	BatchHash      [32]byte
+	DABlockNumber  uint
+	DAProof        []string
+	DAWidth        uint
+	DAIndex        uint
 }
 
 // VerifiedBatch represents a VerifiedBatch

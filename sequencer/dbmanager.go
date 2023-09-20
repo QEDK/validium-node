@@ -395,6 +395,11 @@ func (d *dbManager) CloseBatch(ctx context.Context, params ClosingBatchParameter
 		AccInputHash:   params.AccInputHash,
 		BatchResources: params.BatchResources,
 		ClosingReason:  params.ClosingReason,
+		BatchHash:      params.BatchHash,
+		DABlockNumber:  params.DABlockNumber,
+		DAProof:        params.DAProof,
+		DAWidth:        params.DAWidth,
+		DAIndex:        params.DAIndex,
 	}
 
 	forkID := d.state.GetForkIDByBatchNumber(params.BatchNumber)
