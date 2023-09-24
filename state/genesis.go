@@ -131,6 +131,11 @@ func (s *State) SetGenesis(ctx context.Context, block Block, genesis Genesis, db
 		Transactions:   []types.Transaction{},
 		GlobalExitRoot: ZeroHash,
 		ForcedBatchNum: nil,
+		BatchHash:      [32]byte{},
+		DABlockNumber:  0,
+		DAProof:        [][32]byte{},
+		DAWidth:        big.NewInt(0),
+		DAIndex:        big.NewInt(0),
 	}
 
 	err = s.storeGenesisBatch(ctx, batch, dbTx)

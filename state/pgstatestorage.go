@@ -396,7 +396,7 @@ func (p *PostgresStorage) GetVerifiedBatch(ctx context.Context, batchNumber uint
 
 // GetLastNBatches returns the last numBatches batches.
 func (p *PostgresStorage) GetLastNBatches(ctx context.Context, numBatches uint, dbTx pgx.Tx) ([]*Batch, error) {
-	const getLastNBatchesSQL = "SELECT batch_num, global_exit_root, local_exit_root, acc_input_hash, state_root, timestamp, coinbase, raw_txs_data, forced_batch_num from state.batch ORDER BY batch_num DESC LIMIT $1"
+	const getLastNBatchesSQL = "SELECT batch_num, global_exit_root, local_exit_root, acc_input_hash, state_root, timestamp, coinbase, raw_txs_data, forced_batch_num, batch_hash, da_block_number, da_proof, da_width, da_index from state.batch ORDER BY batch_num DESC LIMIT $1"
 
 	e := p.getExecQuerier(dbTx)
 	rows, err := e.Query(ctx, getLastNBatchesSQL, numBatches)
@@ -731,6 +731,7 @@ func scanBatch(row pgx.Row) (Batch, error) {
 		stateStr       *string
 		coinbaseStr    string
 		batchHashBytes *[]byte
+		daProofString  *[]string
 		daWidthInt     *int
 		daIndexInt     *int
 	)
@@ -746,7 +747,7 @@ func scanBatch(row pgx.Row) (Batch, error) {
 		&batch.ForcedBatchNum,
 		&batchHashBytes,
 		&batch.DABlockNumber,
-		&batch.DAProof,
+		&daProofString,
 		&daWidthInt,
 		&daIndexInt,
 	)
@@ -765,6 +766,12 @@ func scanBatch(row pgx.Row) (Batch, error) {
 	}
 	if batchHashBytes != nil {
 		copy(batch.BatchHash[:], *batchHashBytes)
+	}
+	if daProofString != nil {
+		batch.DAProof = make([][32]byte, len(*daProofString))
+		for i, proof := range *daProofString {
+			batch.DAProof[i] = common.HexToHash(proof)
+		}
 	}
 	batch.DAWidth = big.NewInt(int64(*daWidthInt))
 	batch.DAIndex = big.NewInt(int64(*daIndexInt))
@@ -951,7 +958,7 @@ func (p *PostgresStorage) GetVirtualBatch(ctx context.Context, batchNumber uint6
 }
 
 func (p *PostgresStorage) storeGenesisBatch(ctx context.Context, batch Batch, dbTx pgx.Tx) error {
-	const addGenesisBatchSQL = "INSERT INTO state.batch (batch_num, global_exit_root, local_exit_root, acc_input_hash, state_root, timestamp, coinbase, raw_txs_data, forced_batch_num) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"
+	const addGenesisBatchSQL = "INSERT INTO state.batch (batch_num, global_exit_root, local_exit_root, acc_input_hash, state_root, timestamp, coinbase, raw_txs_data, forced_batch_num, batch_hash, da_block_number, da_proof, da_width, da_index) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)"
 
 	if batch.BatchNumber != 0 {
 		return fmt.Errorf("%w. Got %d, should be 0", ErrUnexpectedBatch, batch.BatchNumber)
@@ -969,6 +976,11 @@ func (p *PostgresStorage) storeGenesisBatch(ctx context.Context, batch Batch, db
 		batch.Coinbase.String(),
 		batch.BatchL2Data,
 		batch.ForcedBatchNum,
+		batch.BatchHash[:],
+		batch.DABlockNumber,
+		batch.DAProof,
+		batch.DAWidth.Int64(),
+		batch.DAIndex.Int64(),
 	)
 
 	return err
@@ -979,7 +991,7 @@ func (p *PostgresStorage) storeGenesisBatch(ctx context.Context, batch Batch, db
 // in this batch yet. In other words it's the creation of a WIP batch.
 // Note that this will add a batch with batch number N + 1, where N it's the greatest batch number on the state.
 func (p *PostgresStorage) openBatch(ctx context.Context, batchContext ProcessingContext, dbTx pgx.Tx) error {
-	const openBatchSQL = "INSERT INTO state.batch (batch_num, global_exit_root, timestamp, coinbase, forced_batch_num, raw_txs_data) VALUES ($1, $2, $3, $4, $5, $6)"
+	const openBatchSQL = "INSERT INTO state.batch (batch_num, global_exit_root, timestamp, coinbase, forced_batch_num, raw_txs_data, batch_hash, da_block_number, da_proof, da_width, da_index) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)"
 
 	e := p.getExecQuerier(dbTx)
 	_, err := e.Exec(
@@ -990,6 +1002,11 @@ func (p *PostgresStorage) openBatch(ctx context.Context, batchContext Processing
 		batchContext.Coinbase.String(),
 		batchContext.ForcedBatchNum,
 		batchContext.BatchL2Data,
+		[]byte{},
+		0,
+		[]string{},
+		0,
+		0,
 	)
 	return err
 }

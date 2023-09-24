@@ -543,7 +543,8 @@ func (etherMan *Client) sequenceBatches(opts bind.TransactOpts, sequences []ethm
 		batches = append(batches, batch)
 		daDatas = append(daDatas, daData)
 	}
-
+	log.Infof("Sending %d batches to L1: %+v", len(batches), batches)
+	log.Infof("Sending %d daDatas to L1: %+v", len(daDatas), daDatas)
 	tx, err := etherMan.ZkEVM.SequenceBatches(&opts, batches, daDatas, l2Coinbase)
 	if err != nil {
 		if parsedErr, ok := tryParseError(err); ok {
