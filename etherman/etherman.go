@@ -494,6 +494,7 @@ func (etherMan *Client) EstimateGasSequenceBatches(sender common.Address, sequen
 		return nil, ErrPrivateKeyNotFound
 	}
 	opts.NoSend = true
+	opts.GasPrice = big.NewInt(0)
 
 	tx, err := etherMan.sequenceBatches(opts, sequences, l2Coinbase)
 	if err != nil {

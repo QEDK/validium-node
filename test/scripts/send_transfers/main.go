@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/big"
+	"time"
 
 	"github.com/0xPolygonHermez/zkevm-node/hex"
 	"github.com/0xPolygonHermez/zkevm-node/log"
@@ -59,6 +60,7 @@ func main() {
 			to := common.HexToAddress(receiverAddr)
 			tx := ethTransfer(ctx, client, auth, to, transferAmount, &nonce)
 			fmt.Println("tx sent: ", tx.Hash().String())
+			time.Sleep(100 * time.Millisecond)
 			// lastTxHash = tx.Hash()
 		}
 
