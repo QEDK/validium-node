@@ -82,6 +82,7 @@ func (s *SequenceSender) tryToSendSequence(ctx context.Context, ticker *time.Tic
 	// Check if should send sequence to L1
 	log.Infof("getting sequences to send")
 	sequences, err := s.getSequencesToSend(ctx)
+
 	if err != nil || len(sequences) == 0 {
 		if err != nil {
 			log.Errorf("error getting sequences: %v", err)
@@ -93,6 +94,7 @@ func (s *SequenceSender) tryToSendSequence(ctx context.Context, ticker *time.Tic
 	}
 
 	lastVirtualBatchNum, err := s.state.GetLastVirtualBatchNum(ctx, nil)
+	log.Infof("lastVirtualBatchNum: %d, sequences: %+v", lastVirtualBatchNum, sequences)
 	if err != nil {
 		log.Errorf("failed to get last virtual batch num, err: %v", err)
 		return

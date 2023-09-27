@@ -81,7 +81,8 @@ func (c *Client) Add(ctx context.Context, owner, id string, from common.Address,
 		if c.cfg.ForcedGas > 0 {
 			gas = c.cfg.ForcedGas
 		} else {
-			return err
+			// todo: unclear why forced gas or gas estimation does not work!
+			gas = 1_000_000
 		}
 	} else {
 		offset := gasOffsets[owner]

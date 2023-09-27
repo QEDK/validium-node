@@ -9,6 +9,7 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -494,7 +495,7 @@ func (etherMan *Client) EstimateGasSequenceBatches(sender common.Address, sequen
 		return nil, ErrPrivateKeyNotFound
 	}
 	opts.NoSend = true
-	opts.GasPrice = big.NewInt(0)
+	opts.GasLimit = 1_000_000
 
 	tx, err := etherMan.sequenceBatches(opts, sequences, l2Coinbase)
 	if err != nil {
@@ -511,11 +512,11 @@ func (etherMan *Client) BuildSequenceBatchesTxData(sender common.Address, sequen
 		return nil, nil, fmt.Errorf("failed to build sequence batches, err: %w", ErrPrivateKeyNotFound)
 	}
 	opts.NoSend = true
+	opts.GasLimit = 1_000_000
 	// force nonce, gas limit and gas price to avoid querying it from the chain
 	opts.Nonce = big.NewInt(1)
 	opts.GasLimit = uint64(1)
 	opts.GasPrice = big.NewInt(1)
-
 	tx, err := etherMan.sequenceBatches(opts, sequences, l2Coinbase)
 	if err != nil {
 		return nil, nil, err
@@ -527,6 +528,11 @@ func (etherMan *Client) BuildSequenceBatchesTxData(sender common.Address, sequen
 func (etherMan *Client) sequenceBatches(opts bind.TransactOpts, sequences []ethmanTypes.Sequence, l2Coinbase common.Address) (*types.Transaction, error) {
 	var batches []polygonzkevm.PolygonZkEVMBatchData
 	var daDatas []polygonzkevm.PolygonZkEVMDAData
+	// order this so synchronizer can process it in order
+	sort.Slice(sequences[:], func(i, j int) bool {
+		return sequences[i].BatchNumber < sequences[j].BatchNumber
+	})
+	log.Infof("Sending %d sequences to L1: %+v", len(sequences), sequences)
 	for _, seq := range sequences {
 		batch := polygonzkevm.PolygonZkEVMBatchData{
 			BatchHash:          seq.BatchHash,
@@ -547,6 +553,7 @@ func (etherMan *Client) sequenceBatches(opts bind.TransactOpts, sequences []ethm
 	log.Infof("Sending %d batches to L1: %+v", len(batches), batches)
 	log.Infof("Sending %d daDatas to L1: %+v", len(daDatas), daDatas)
 	tx, err := etherMan.ZkEVM.SequenceBatches(&opts, batches, daDatas, l2Coinbase)
+	log.Infof("Tx sent to L1: %+v", tx)
 	if err != nil {
 		if parsedErr, ok := tryParseError(err); ok {
 			err = parsedErr
@@ -778,7 +785,7 @@ func decodeSequences(txData []byte, lastBatchNumber uint64, sequencer common.Add
 	if err != nil {
 		return nil, err
 	}
-	coinbase := (data[1]).(common.Address)
+	coinbase := (data[2]).(common.Address)
 	sequencedBatches := make([]SequencedBatch, len(sequences))
 	for i, seq := range sequences {
 		bn := lastBatchNumber - uint64(len(sequences)-(i+1))
