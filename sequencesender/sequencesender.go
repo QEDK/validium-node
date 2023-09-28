@@ -109,6 +109,7 @@ func (s *SequenceSender) tryToSendSequence(ctx context.Context, ticker *time.Tic
 	metrics.SequencesSentToL1(float64(sequenceCount))
 
 	// add sequence to be monitored
+	log.Infof("adding sequence to be monitored, %+v", sequences)
 	to, data, err := s.etherman.BuildSequenceBatchesTxData(s.cfg.SenderAddress, sequences, s.cfg.L2Coinbase)
 	if err != nil {
 		log.Error("error estimating new sequenceBatches to add to eth tx manager: ", err)
@@ -169,6 +170,7 @@ func (s *SequenceSender) getSequencesToSend(ctx context.Context) ([]types.Sequen
 			Timestamp:      batch.Timestamp.Unix(),
 			BatchNumber:    batch.BatchNumber,
 			BatchHash:      batch.BatchHash,
+			BatchL2Data:    batch.BatchL2Data,
 			DABlockNumber:  batch.DABlockNumber,
 			DAProof:        batch.DAProof,
 			DAWidth:        batch.DAWidth,

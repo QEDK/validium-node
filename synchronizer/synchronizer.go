@@ -782,6 +782,7 @@ func (s *ClientSynchronizer) processSequenceBatches(sequencedBatches []etherman.
 		log.Warn("Empty sequencedBatches array detected, ignoring...")
 		return nil
 	}
+	log.Infof("sequencedBatches: %+v", sequencedBatches)
 	for _, sbatch := range sequencedBatches {
 		virtualBatch := state.VirtualBatch{
 			BatchNumber:   sbatch.BatchNumber,
@@ -886,6 +887,7 @@ func (s *ClientSynchronizer) processSequenceBatches(sequencedBatches []etherman.
 			}
 		} else {
 			// Reprocess batch to compare the stateRoot with tBatch.StateRoot and get accInputHash
+			batch.BatchL2Data = tBatch.BatchL2Data
 			p, err := s.state.ExecuteBatch(s.ctx, batch, false, dbTx)
 			if err != nil {
 				log.Errorf("error executing L1 batch: %+v, error: %v", batch, err)
@@ -912,6 +914,7 @@ func (s *ClientSynchronizer) processSequenceBatches(sequencedBatches []etherman.
 			}
 		}
 
+		log.Infof("virtual state batch: %+v, trusted batch: %+v", batch, tBatch)
 		// Call the check trusted state method to compare trusted and virtual state
 		status := s.checkTrustedState(batch, tBatch, newRoot, dbTx)
 		if status {
