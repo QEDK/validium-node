@@ -20,7 +20,7 @@ import (
 )
 
 type HeaderRPCResponse struct {
-	Result Header `json:"result"`
+	Result types.Header `json:"result"`
 }
 
 type DataProofRPCResponse struct {
@@ -198,8 +198,6 @@ out:
 		var dataProofResp DataProofRPCResponse
 		json.Unmarshal(data, &dataProofResp)
 
-		log.Infof("💿 received data proof:%+v", dataProofResp.Result)
-
 		if dataProofResp.Result.Leaf == fmt.Sprintf("%#x", batchHash) {
 			dataProof = dataProofResp.Result
 			break
@@ -214,76 +212,51 @@ out:
 	batchDAData.Width = dataProof.NumberOfLeaves
 	batchDAData.LeafIndex = dataProof.LeafIndex
 
-	resp, err := http.Post("https://kate.avail.tools/rpc", "application/json", strings.NewReader(fmt.Sprintf("{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"chain_getHeader\",\"params\":[\"%#x\"]}", blockHash)))
-	if err != nil {
-		return nil, fmt.Errorf("cannot post header request:%v", err)
-	}
-	defer resp.Body.Close()
-
-	data, err := io.ReadAll(resp.Body)
-	log.Infof("👍 received header:%v", data)
-
-	if err != nil {
-		return nil, fmt.Errorf("cannot read body:%v", err)
-	}
-
-	var headerResp HeaderRPCResponse
-	json.Unmarshal(data, &headerResp)
-
-	batchDAData.BlockNumber = uint(headerResp.Result.Number)
 	log.Infof("🟢 prepared DA data:%+v", batchDAData)
 
+	header, err := api.RPC.Chain.GetHeader(blockHash)
+	log.Infof("🎩 received header:%+v", header)
+
+	batchDAData.BlockNumber = uint(header.Number)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot get header:%+v", err)
+	}
+
+	destAddress, err := types.NewHashFromHexString(config.DestinationAddress)
+	if err != nil {
+		return nil, fmt.Errorf("cannot decode destination address:%w", err)
+	}
+
+	dispatchDataRootCall, err := types.NewCall(meta, "NomadDABridge.try_dispatch_data_root", types.NewUCompactFromUInt(uint64(config.DestinationDomain)), destAddress, header)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot create new call:%w", err)
+	}
+
+	dispatchDataRootExt := types.NewExtrinsic(dispatchDataRootCall)
+
+	options = types.SignatureOptions{
+		BlockHash:          genesisHash,
+		Era:                types.ExtrinsicEra{IsMortalEra: false},
+		GenesisHash:        genesisHash,
+		Nonce:              types.NewUCompactFromUInt(uint64(nonce + 1)),
+		SpecVersion:        rv.SpecVersion,
+		Tip:                types.NewUCompactFromUInt(500),
+		TransactionVersion: rv.TransactionVersion,
+	}
+
+	err = dispatchDataRootExt.Sign(keyringPair, options)
+	if err != nil {
+		return nil, fmt.Errorf("cannot sign:%w", err)
+	}
+
+	dispatchDataRootHash, err := api.RPC.Author.SubmitAndWatchExtrinsic(dispatchDataRootExt)
+	if err != nil {
+		return nil, fmt.Errorf("cannot dispatch data root:%w", err)
+	}
+
+	log.Infof("✅ Data root dispatched by sequencer with AppID %v sent with hash %#x\n", appID, dispatchDataRootHash)
+
 	return &batchDAData, nil
-
-	// log.Infof("received header:%+v", headerResp.Result)
-	// encodedHeader, err := encodeHeaderAsScale(headerResp.Result)
-	// if err != nil {
-	// 	return fmt.Errorf("cannot encode header:%w", err)
-	// }
-	// log.Infof("received header:%+v", encodedHeader)
-
-	// header, err := api.RPC.Chain.GetHeader(blockHash)
-	// log.Infof("received header:%+v", header)
-
-	// if err != nil {
-	// 	return fmt.Errorf("cannot get header:%+v", err)
-	// }
-
-	// destAddress, err := types.NewHashFromHexString(config.DestinationAddress)
-	// if err != nil {
-	// 	return fmt.Errorf("cannot decode destination address:%w", err)
-	// }
-
-	// log.Infof("destination domain: %v, destination address: %v", types.NewUCompactFromUInt(uint64(config.DestinationDomain)), destAddress)
-
-	// dispatchDataRootCall, err := types.NewCall(meta, "NomadDABridge.try_dispatch_data_root", types.NewUCompactFromUInt(uint64(config.DestinationDomain)), destAddress, encodedHeader)
-
-	// if err != nil {
-	// 	return fmt.Errorf("cannot create new call:%w", err)
-	// }
-
-	// dispatchDataRootExt := types.NewExtrinsic(dispatchDataRootCall)
-
-	// nonce++
-	// options = types.SignatureOptions{
-	// 	BlockHash:          genesisHash,
-	// 	Era:                types.ExtrinsicEra{IsMortalEra: false},
-	// 	GenesisHash:        genesisHash,
-	// 	Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
-	// 	SpecVersion:        rv.SpecVersion,
-	// 	Tip:                types.NewUCompactFromUInt(100),
-	// 	AppID:              types.NewUCompactFromUInt(uint64(appID)),
-	// 	TransactionVersion: rv.TransactionVersion,
-	// }
-	// err = dispatchDataRootExt.Sign(keyringPair, options)
-	// if err != nil {
-	// 	return fmt.Errorf("cannot sign:%w", err)
-	// }
-
-	// dispatchDataRootHash, err := api.RPC.Author.SubmitAndWatchExtrinsic(dispatchDataRootExt)
-	// if err != nil {
-	// 	return fmt.Errorf("cannot dispatch data root:%w", err)
-	// }
-
-	// log.Infof("✅ Data root dispatched by sequencer with AppID %v sent with hash %#x\n", appID, dispatchDataRootHash)
 }
