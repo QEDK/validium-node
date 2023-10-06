@@ -19,5 +19,8 @@ out.dat
 cmd/__debug_bin
 
 .venv
-avail/config.json
+test/aggregator.keystore
+test/sequencer.keystore
 test/config/test.avail.config.json
+test/config/test.genesis.config.json
+test/config/test.node.config.toml
