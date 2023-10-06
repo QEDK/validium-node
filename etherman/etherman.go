@@ -17,6 +17,7 @@ import (
 	"github.com/0xPolygonHermez/zkevm-node/etherman/etherscan"
 	"github.com/0xPolygonHermez/zkevm-node/etherman/ethgasstation"
 	"github.com/0xPolygonHermez/zkevm-node/etherman/metrics"
+	"github.com/0xPolygonHermez/zkevm-node/etherman/smartcontracts/dabridgerouter"
 	"github.com/0xPolygonHermez/zkevm-node/etherman/smartcontracts/matic"
 	"github.com/0xPolygonHermez/zkevm-node/etherman/smartcontracts/polygonzkevm"
 	"github.com/0xPolygonHermez/zkevm-node/etherman/smartcontracts/polygonzkevmglobalexitroot"
@@ -125,6 +126,8 @@ type L1Config struct {
 	MaticAddr common.Address `json:"maticTokenAddress"`
 	// Address of the L1 GlobalExitRootManager contract
 	GlobalExitRootManagerAddr common.Address `json:"polygonZkEVMGlobalExitRootAddress"`
+	// Address of the L1 DA bridge router
+	DABridgeRouterAddr common.Address `json:"daBridgeRouterAddress"`
 }
 
 type externalGasProviders struct {
@@ -138,6 +141,7 @@ type Client struct {
 	ZkEVM                 *polygonzkevm.Polygonzkevm
 	GlobalExitRootManager *polygonzkevmglobalexitroot.Polygonzkevmglobalexitroot
 	Matic                 *matic.Matic
+	DABridgeRouter        *dabridgerouter.Dabridgerouter
 	SCAddresses           []common.Address
 
 	GasProviders externalGasProviders
@@ -167,6 +171,10 @@ func NewClient(cfg Config, l1Config L1Config) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
+	daBridgeRouter, err := dabridgerouter.NewDabridgerouter(l1Config.DABridgeRouterAddr, ethClient)
+	if err != nil {
+		return nil, err
+	}
 	var scAddresses []common.Address
 	scAddresses = append(scAddresses, l1Config.ZkEVMAddr, l1Config.GlobalExitRootManagerAddr)
 
@@ -187,6 +195,7 @@ func NewClient(cfg Config, l1Config L1Config) (*Client, error) {
 		ZkEVM:                 poe,
 		Matic:                 matic,
 		GlobalExitRootManager: globalExitRoot,
+		DABridgeRouter:        daBridgeRouter,
 		SCAddresses:           scAddresses,
 		GasProviders: externalGasProviders{
 			MultiGasProvider: cfg.MultiGasProvider,
@@ -638,6 +647,14 @@ func (etherMan *Client) GetSendSequenceFee(numBatches uint64) (*big.Int, error) 
 // TrustedSequencer gets trusted sequencer address
 func (etherMan *Client) TrustedSequencer() (common.Address, error) {
 	return etherMan.ZkEVM.TrustedSequencer(&bind.CallOpts{Pending: false})
+}
+
+func (etherMan *Client) GetDataRoot(DABlockNumber uint32) (*[32]byte, error) {
+	f, err := etherMan.DABridgeRouter.Roots(&bind.CallOpts{Pending: false}, DABlockNumber)
+	if err != nil {
+		return nil, err
+	}
+	return &f, nil
 }
 
 func (etherMan *Client) forcedBatchEvent(ctx context.Context, vLog types.Log, blocks *[]Block, blocksOrder *map[common.Hash][]Order) error {
