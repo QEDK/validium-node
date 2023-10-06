@@ -132,7 +132,7 @@ func PostData(txData []byte) (*availTypes.BatchDAData, error) {
 		GenesisHash:        genesisHash,
 		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
 		SpecVersion:        rv.SpecVersion,
-		Tip:                types.NewUCompactFromUInt(500),
+		Tip:                types.NewUCompactFromUInt(2000),
 		AppID:              types.NewUCompactFromUInt(uint64(appID)),
 		TransactionVersion: rv.TransactionVersion,
 	}
@@ -149,16 +149,13 @@ func PostData(txData []byte) (*availTypes.BatchDAData, error) {
 	}
 
 	defer sub.Unsubscribe()
-	timeout := time.After(100 * time.Second)
+	timeout := time.After(240 * time.Second)
 	var blockHash types.Hash
 out:
 	for {
 		select {
 		case status := <-sub.Chan():
-			if status.IsInBlock {
-				blockHash = status.AsInBlock
-				break out
-			} else if status.IsFinalized {
+			if status.IsFinalized {
 				blockHash = status.AsFinalized
 				break out
 			} else if status.IsDropped {
@@ -169,7 +166,7 @@ out:
 				return nil, fmt.Errorf("❌ Extrinsic invalid")
 			}
 		case <-timeout:
-			return nil, fmt.Errorf("⌛️ Timeout of 100 seconds reached without getting finalized status for extrinsic")
+			return nil, fmt.Errorf("⌛️ Timeout of 240 seconds reached without getting finalized status for extrinsic")
 		}
 	}
 
@@ -212,12 +209,11 @@ out:
 	batchDAData.Width = dataProof.NumberOfLeaves
 	batchDAData.LeafIndex = dataProof.LeafIndex
 
-	log.Infof("🟢 prepared DA data:%+v", batchDAData)
-
 	header, err := api.RPC.Chain.GetHeader(blockHash)
 	log.Infof("🎩 received header:%+v", header)
 
 	batchDAData.BlockNumber = uint(header.Number)
+	log.Infof("🟢 prepared DA data:%+v", batchDAData)
 
 	if err != nil {
 		return nil, fmt.Errorf("cannot get header:%+v", err)
@@ -228,7 +224,7 @@ out:
 		return nil, fmt.Errorf("cannot decode destination address:%w", err)
 	}
 
-	dispatchDataRootCall, err := types.NewCall(meta, "NomadDABridge.try_dispatch_data_root", types.NewUCompactFromUInt(uint64(config.DestinationDomain)), destAddress, header)
+	dispatchDataRootCall, err := types.NewCall(meta, "NomadDABridge.try_dispatch_data_root", types.NewUCompactFromUInt(uint64(config.DestinationDomain)), destAddress, types.Header(*header))
 
 	if err != nil {
 		return nil, fmt.Errorf("cannot create new call:%w", err)
@@ -236,11 +232,22 @@ out:
 
 	dispatchDataRootExt := types.NewExtrinsic(dispatchDataRootCall)
 
+	ok, err = api.RPC.State.GetStorageLatest(key, &accountInfo)
+	if err != nil || !ok {
+		return nil, fmt.Errorf("cannot get latest storage:%w", err)
+	}
+
+	pendingExt, err = api.RPC.Author.PendingExtrinsics()
+	if err != nil {
+		return nil, fmt.Errorf("cannot get pending extrinsics:%w", err)
+	}
+
+	nonce = uint32(accountInfo.Nonce) + uint32(len(pendingExt))
 	options = types.SignatureOptions{
 		BlockHash:          genesisHash,
 		Era:                types.ExtrinsicEra{IsMortalEra: false},
 		GenesisHash:        genesisHash,
-		Nonce:              types.NewUCompactFromUInt(uint64(nonce + 1)),
+		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
 		SpecVersion:        rv.SpecVersion,
 		Tip:                types.NewUCompactFromUInt(500),
 		TransactionVersion: rv.TransactionVersion,
