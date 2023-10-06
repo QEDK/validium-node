@@ -163,8 +163,6 @@ func (s *SequenceSender) getSequencesToSend(ctx context.Context) ([]types.Sequen
 			return nil, err
 		}
 
-		log.Infof("adding batch %+v to sequence", batch)
-
 		seq := types.Sequence{
 			GlobalExitRoot: batch.GlobalExitRoot,
 			Timestamp:      batch.Timestamp.Unix(),
@@ -185,7 +183,18 @@ func (s *SequenceSender) getSequencesToSend(ctx context.Context) ([]types.Sequen
 			seq.ForcedBatchTimestamp = forcedBatch.ForcedAt.Unix()
 		}
 
-		sequences = append(sequences, seq)
+		dataRoot, err := s.etherman.GetDataRoot(batch.DABlockNumber)
+		if err != nil {
+			return nil, err
+		} else if *dataRoot == [32]byte{} {
+			log.Infof("⏰ Data root is not available yet for batch %d, skipping", batch.BatchNumber)
+			time.Sleep(1 * time.Second)
+			continue
+		} else {
+			sequences = append(sequences, seq)
+		}
+
+		log.Infof("adding batch %+v to sequence", batch)
 		// Check if can be send
 		tx, err = s.etherman.EstimateGasSequenceBatches(s.cfg.SenderAddress, sequences, s.cfg.L2Coinbase)
 		if err == nil && tx.Size() > s.cfg.MaxTxSizeForL1 {

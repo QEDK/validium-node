@@ -22,6 +22,7 @@ type etherman interface {
 	GetLastBatchTimestamp() (uint64, error)
 	GetLatestBlockTimestamp(ctx context.Context) (uint64, error)
 	GetLatestBatchNumber() (uint64, error)
+	GetDataRoot(uint32) (*[32]byte, error)
 }
 
 // stateInterface gathers the methods required to interact with the state.
