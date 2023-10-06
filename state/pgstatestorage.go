@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/0xPolygonHermez/zkevm-node/hex"
-	"github.com/0xPolygonHermez/zkevm-node/log"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/jackc/pgx/v4"
@@ -777,7 +776,6 @@ func scanBatch(row pgx.Row) (Batch, error) {
 	batch.DAIndex = big.NewInt(int64(*daIndexInt))
 
 	batch.Coinbase = common.HexToAddress(coinbaseStr)
-	log.Infof("Batch %d: %+v", batch.BatchNumber, batch)
 	return batch, nil
 }
 
@@ -2156,7 +2154,12 @@ func (p *PostgresStorage) GetVirtualBatchToProve(ctx context.Context, lastVerfie
 			b.timestamp,
 			b.coinbase,
 			b.raw_txs_data,
-			b.forced_batch_num
+			b.forced_batch_num,
+			b.batch_hash,
+			b.da_block_number,
+			b.da_proof,
+			b.da_width,
+			b.da_index
 		FROM
 			state.batch b,
 			state.virtual_batch v
