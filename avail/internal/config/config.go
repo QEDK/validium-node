@@ -2,7 +2,7 @@ package config
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"os"
 )
 
@@ -12,6 +12,7 @@ type Config struct {
 	AppID              int    `json:"app_id"`
 	DestinationDomain  uint32 `json:"destination_domain"`
 	DestinationAddress string `json:"destination_address"`
+	Timeout            int    `json:"timeout"`
 }
 
 func (c *Config) GetConfig(configFileName string) error {
@@ -22,7 +23,7 @@ func (c *Config) GetConfig(configFileName string) error {
 	}
 	defer jsonFile.Close()
 
-	byteValue, err := ioutil.ReadAll(jsonFile)
+	byteValue, err := io.ReadAll(jsonFile)
 	if err != nil {
 		return err
 	}

@@ -3,5 +3,6 @@
     "api_url": "wss://kate.avail.tools:443/ws",
     "app_id": 1,
     "destination_domain": 1000,
-    "destination_address": "0x000000000000000000000000bD824890A51ed8bda53F51F27303b14EFfEbC152"
+    "destination_address": "0x000000000000000000000000bD824890A51ed8bda53F51F27303b14EFfEbC152",
+    "timeout": 120
 }

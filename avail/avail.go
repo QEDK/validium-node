@@ -35,31 +35,6 @@ type DataProof struct {
 	Leaf           string   `json:"leaf"`
 }
 
-type Header struct {
-	ParentHash     types.Hash        `json:"parentHash"`
-	Number         types.BlockNumber `json:"number"`
-	StateRoot      types.Hash        `json:"stateRoot"`
-	ExtrinsicsRoot types.Hash        `json:"extrinsicsRoot"`
-	Digest         types.Digest      `json:"digest"`
-	Extension      struct {
-		V1 struct {
-			Commitment struct {
-				Rows       uint       `json:"rows"`
-				Cols       uint       `json:"cols"`
-				DataRoot   types.Hash `json:"dataRoot"`
-				Commitment []types.U8 `json:"commitment"`
-			} `json:"commitment"`
-			AppLookup struct {
-				Size  uint `json:"size"`
-				Index []struct {
-					AppId uint `json:"app_id"`
-					Start uint `json:"start"`
-				} `json:"index"`
-			} `json:"app_lookup"`
-		} `json:"V1"`
-	} `json:"extension"`
-}
-
 func PostData(txData []byte) (*availTypes.BatchDAData, error) {
 	var config config.Config
 
@@ -132,7 +107,7 @@ func PostData(txData []byte) (*availTypes.BatchDAData, error) {
 		GenesisHash:        genesisHash,
 		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
 		SpecVersion:        rv.SpecVersion,
-		Tip:                types.NewUCompactFromUInt(2000),
+		Tip:                types.NewUCompactFromUInt(5000),
 		AppID:              types.NewUCompactFromUInt(uint64(appID)),
 		TransactionVersion: rv.TransactionVersion,
 	}
@@ -149,12 +124,15 @@ func PostData(txData []byte) (*availTypes.BatchDAData, error) {
 	}
 
 	defer sub.Unsubscribe()
-	timeout := time.After(240 * time.Second)
+	timeout := time.After(time.Duration(config.Timeout) * time.Second)
 	var blockHash types.Hash
 out:
 	for {
 		select {
 		case status := <-sub.Chan():
+			if status.IsInBlock {
+				log.Infof("Extrinsic included in block %v", status.AsInBlock.Hex())
+			}
 			if status.IsFinalized {
 				blockHash = status.AsFinalized
 				break out
@@ -166,7 +144,7 @@ out:
 				return nil, fmt.Errorf("❌ Extrinsic invalid")
 			}
 		case <-timeout:
-			return nil, fmt.Errorf("⌛️ Timeout of 240 seconds reached without getting finalized status for extrinsic")
+			return nil, fmt.Errorf("⌛️ Timeout of %d seconds reached without getting finalized status for extrinsic", config.Timeout)
 		}
 	}
 

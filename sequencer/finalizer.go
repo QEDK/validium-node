@@ -10,6 +10,7 @@ import (
 	"time"
 
 	avail "github.com/0xPolygonHermez/zkevm-node/avail"
+	availTypes "github.com/0xPolygonHermez/zkevm-node/avail/types"
 	"github.com/0xPolygonHermez/zkevm-node/event"
 	"github.com/0xPolygonHermez/zkevm-node/hex"
 	"github.com/0xPolygonHermez/zkevm-node/log"
@@ -1053,8 +1054,15 @@ func (f *finalizer) closeBatch(ctx context.Context) error {
 		return fmt.Errorf("failed to encode transactions, err: %w", err)
 	}
 	log.Infof("Posting rawTxs: %+v to Avail", rawTxs)
-	batchDAData, err := avail.PostData(rawTxs)
-	if err != nil {
+	var maxRetries = 3
+	var batchDAData = &availTypes.BatchDAData{}
+	for i := 0; i < maxRetries; i++ {
+		batchDAData, err = avail.PostData(rawTxs)
+		if err == nil && !batchDAData.IsEmpty() {
+			break
+		}
+	}
+	if err != nil || batchDAData.IsEmpty() {
 		return fmt.Errorf("failed to post data to Avail:%w", err)
 	}
 	h := sha3.NewLegacyKeccak256()

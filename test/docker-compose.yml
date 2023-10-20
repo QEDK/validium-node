@@ -269,6 +269,8 @@ services:
       - COIN=ETH
       - ETHEREUM_JSONRPC_VARIANT=geth
       - ETHEREUM_JSONRPC_HTTP_URL=http://zkevm-explorer-json-rpc:8124
+      - ETHEREUM_JSONRPC_TRACE_URL=http://zkevm-explorer-json-rpc:8124
+      - ETHEREUM_JSONRPC_WS_URL=ws://zkevm-explorer-json-rpc:8134
       - DATABASE_URL=postgres://l2_explorer_user:l2_explorer_password@zkevm-explorer-l2-db:5432/l2_explorer_db
       - ECTO_USE_SSL=false
       - MIX_ENV=prod
@@ -311,7 +313,7 @@ services:
 
   zkevm-mock-l1-network:
     container_name: zkevm-mock-l1-network
-    image: geth-zkevm-contracts
+    image: hermeznetwork/geth-zkevm-contracts
     ports:
       - 8545:8545
       - 8546:8546
