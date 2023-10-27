@@ -1,10 +1,10 @@
-# zkEVM Node
+# Avail Validium Node
 
-zkEVM Node is a Go implementation of a node that operates the Polygon zkEVM Network.
+The Avail Validium Node is a Go implementation of a node that operates a Validium zkEVM Network based on the Polygon zkEVM stack.
 
-## About the Polygon zkEVM network
+## About the Validium network
 
-Since this is an implementation of a protocol it's fundamental to understand it, [here](https://zkevm.polygon.technology/docs/zknode/zknode-overview) you can find the specification of the protocol.
+Since this is an implementation of a protocol it's fundamental to understand it.
 
 Glossary:
 
@@ -35,7 +35,7 @@ The diagram represents the main components of the software and how they interact
 - L2GasPricer: it fetches the L1 gas price and applies some formula to calculate the gas price that will be suggested for the users to use for paying fees on L2. The suggestions are stored on the `pool`, and will be consumed by the `rpc`
 - Pool: DB that stores transactions by the `RPC` to be selected/discarded by the `sequencer` later on
 - Sequencer: responsible for building the trusted state. To do so, it gets transactions from the pool and puts them in a specific order. It needs to take care of opening and closing batches while trying to make them as full as possible. To achieve this it needs to use the executor to actually process the transaction not only to execute the state transition (and update the hashDB) but also to check the consumed resources by the transactions and the remaining resources of the batch. After executing a transaction that fits into a batch, it gets stored on the `state`. Once transactions are added into the state, they are immediately available through the `rpc`.
-- SequenceSender: gets closed batches from the `state`, tries to aggregate as many of them as possible, and at some point, decides that it's time to send those batches to L1, turning the state from trusted to virtualized. In order to send the L1 tx, it uses the `ethtxmanager`
+- SequenceSender: gets closed batches from the `state`, tries to aggregate as many of them as possible, and at some point, decides that it's time to send those batches to L1, turning the state from trusted to virtualized. In order to send the L1 tx, it uses the `ethtxmanager` Before sending a batch, it will check if the DA inclusion data indicates that the data root for the tx data is finalized on Ethereum.
 - EthTxManager: handles requests to send L1 transactions from `sequencesender` and `aggregator`. It takes care of dealing with the nonce of the accounts, increasing the gas price, and other actions that may be needed to ensure that L1 transactions get mined
 - Etherman: abstraction that implements the needed methods to interact with the Ethereum network and the relevant smart contracts.
 - Synchronizer: Updates the `state` (virtual batches, verified batches, forced batches, ...) by fetching data from L1 through the `etherman`. If the node is not a `trusted sequencer` it also updates the state with the data fetched from the `rpc` of the `trusted sequencer`. It also detects and handles reorgs that can happen if the `trusted sequencer` sends different data in the rpc vs the sequences sent to L1 (trusted reorg aka L2 reorg). Also handles L1 reorgs (reorgs that happen on the L1 network)
@@ -46,6 +46,7 @@ The diagram represents the main components of the software and how they interact
   - Executor: Provides an EVM implementation that allows processing batches as well as getting metadata (state root, transaction receipts, logs, ...) of all the needed results.
   - Prover: Generates ZKPs for batches, batches aggregation, and final proofs.
   - HashDB: service that stores the Merkletree, containing all the account information (balances, nonces, smart contract code, and smart contract storage)
+- Avail Node: Can be a local full node or remote node communicating via RPC. This is treated as an external component that is used to make all chain data available on the Avail chain. We also dispatch data roots to the L1 chain, so we can verify DA inclusion.
 
 ## Roles of the network
 
@@ -116,5 +117,3 @@ It's recommended to use `make` for building, and testing the code, ... Run `make
 ## Contribute
 
 Before opening a pull request, please read this [guide](CONTRIBUTING.md).
-
-
