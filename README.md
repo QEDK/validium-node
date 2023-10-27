@@ -1,6 +1,6 @@
 # Avail Validium Node
 
-The Avail Validium Node is a Go implementation of a node that operates a Validium zkEVM Network based on the Polygon zkEVM stack.
+The Avail Validium Node is a Go implementation of a node that operates a Validium zkEVM Network based on the [Polygon zkEVM](https://polygon.technology/polygon-zkevm) for execution and the [Avail](https://www.availproject.org/) chain as the data availability layer.
 
 ## About the Validium network
 
