@@ -10,7 +10,7 @@ type Config struct {
 	Seed               string `json:"seed"`
 	ApiURL             string `json:"api_url"`
 	AppID              int    `json:"app_id"`
-	DestinationDomain  uint32 `json:"destination_domain"`
+	DestinationDomain  int    `json:"destination_domain"`
 	DestinationAddress string `json:"destination_address"`
 	Timeout            int    `json:"timeout"`
 }

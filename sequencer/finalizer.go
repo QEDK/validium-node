@@ -1053,26 +1053,43 @@ func (f *finalizer) closeBatch(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to encode transactions, err: %w", err)
 	}
-	log.Infof("Posting rawTxs: %+v to Avail", rawTxs)
-	var maxRetries = 3
-	var batchDAData = &availTypes.BatchDAData{}
-	for i := 0; i < maxRetries; i++ {
-		batchDAData, err = avail.PostData(rawTxs)
-		if err == nil && !batchDAData.IsEmpty() {
-			break
+	if len(rawTxs) != 0 {
+		log.Infof("Posting blob %#x to Avail for batch number %d", rawTxs, f.batch.batchNumber)
+		var maxRetries = 3
+		var batchDAData = &availTypes.BatchDAData{}
+		for i := 0; i < maxRetries; i++ {
+			batchDAData, err = avail.PostData(rawTxs)
+			if err == nil && !batchDAData.IsEmpty() {
+				break
+			}
 		}
+		if err != nil || batchDAData.IsEmpty() {
+			return fmt.Errorf("failed to post data to Avail:%w", err)
+		}
+		h := sha3.NewLegacyKeccak256()
+		h.Write(rawTxs)
+		h.Sum(receipt.BatchHash[:0])
+		receipt.DABlockNumber = batchDAData.BlockNumber
+		receipt.DAProof = batchDAData.Proof
+		receipt.DAWidth = batchDAData.Width
+		receipt.DAIndex = batchDAData.LeafIndex
+		for i := 0; i < maxRetries; i++ {
+			err = avail.DispatchDataRoot(uint64(batchDAData.BlockNumber))
+			if err == nil {
+				break
+			}
+		}
+		if err != nil {
+			return fmt.Errorf("failed to dispatch data root to Avail:%w", err)
+		}
+		log.Infof("closing batch with DA data: BatchNum: %d, BatchHash: %#x, DAProof: %v, DAIndex: %d, DAWidth: %d, DABlockNumber: %d", f.batch.batchNumber, receipt.BatchHash, receipt.DAProof, receipt.DAIndex, receipt.DAWidth, receipt.DABlockNumber)
+	} else {
+		receipt.DABlockNumber = 0
+		receipt.DAProof = []string{}
+		receipt.DAWidth = 0
+		receipt.DAIndex = 0
 	}
-	if err != nil || batchDAData.IsEmpty() {
-		return fmt.Errorf("failed to post data to Avail:%w", err)
-	}
-	h := sha3.NewLegacyKeccak256()
-	h.Write(rawTxs)
-	h.Sum(receipt.BatchHash[:0])
-	receipt.DABlockNumber = batchDAData.BlockNumber
-	receipt.DAProof = batchDAData.Proof
-	receipt.DAWidth = batchDAData.Width
-	receipt.DAIndex = batchDAData.LeafIndex
-	log.Infof("closing batch with DA data: BatchNum: %d, BatchHash: %#x, DAProof: %v, DAIndex: %d, DAWidth: %d, DABlockNumber: %d", f.batch.batchNumber, receipt.BatchHash, receipt.DAProof, receipt.DAIndex, receipt.DAWidth, receipt.DABlockNumber)
+	log.Infof("closing batch without DA data: BatchNum: %d", f.batch.batchNumber)
 	return f.dbManager.CloseBatch(ctx, receipt)
 }
 
