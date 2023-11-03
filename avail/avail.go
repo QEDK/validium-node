@@ -190,8 +190,6 @@ out:
 	batchDAData.Width = dataProof.NumberOfLeaves
 	batchDAData.LeafIndex = dataProof.LeafIndex
 
-	GetData(blockHash, dataProof.LeafIndex)
-
 	header, err := api.RPC.Chain.GetHeader(blockHash)
 	log.Infof("🎩 received header:%+v", header)
 	if err != nil {
@@ -199,6 +197,7 @@ out:
 	}
 
 	batchDAData.BlockNumber = uint(header.Number)
+	GetData(uint64(header.Number), dataProof.LeafIndex)
 	log.Infof("🟢 prepared DA data:%+v", batchDAData)
 	return &batchDAData, nil
 }
@@ -326,7 +325,7 @@ out:
 	return nil
 }
 
-func GetData(blockHash types.Hash, index uint) ([]byte, error) {
+func GetData(blockNumber uint64, index uint) ([]byte, error) {
 	var config config.Config
 
 	err := config.GetConfig("/app/avail-config.json")
@@ -337,6 +336,11 @@ func GetData(blockHash types.Hash, index uint) ([]byte, error) {
 	api, err := gsrpc.NewSubstrateAPI(config.ApiURL)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get api:%w", err)
+	}
+
+	blockHash, err := api.RPC.Chain.GetBlockHash(blockNumber)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get block hash:%w", err)
 	}
 
 	block, err := api.RPC.Chain.GetBlock(blockHash)

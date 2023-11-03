@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	avail "github.com/0xPolygonHermez/zkevm-node/avail"
 	"github.com/0xPolygonHermez/zkevm-node/etherman"
 	"github.com/0xPolygonHermez/zkevm-node/event"
 	"github.com/0xPolygonHermez/zkevm-node/hex"
@@ -887,7 +888,14 @@ func (s *ClientSynchronizer) processSequenceBatches(sequencedBatches []etherman.
 			}
 		} else {
 			// Reprocess batch to compare the stateRoot with tBatch.StateRoot and get accInputHash
-			batch.BatchL2Data = tBatch.BatchL2Data
+			rawTxs, err := avail.GetData(uint64(batch.DABlockNumber), uint(batch.DAIndex.Uint64()))
+			log.Infof("fetched RawTxs:%#x from Avail block:%d index %d", rawTxs, batch.DABlockNumber, batch.DAIndex)
+			// attempt to get data from Avail
+			if err != nil || len(rawTxs) == 0 {
+				batch.BatchL2Data = tBatch.BatchL2Data
+			} else { // something is wrong, maybe L2 data is in our trusted node instead
+				batch.BatchL2Data = rawTxs
+			}
 			p, err := s.state.ExecuteBatch(s.ctx, batch, false, dbTx)
 			if err != nil {
 				log.Errorf("error executing L1 batch: %+v, error: %v", batch, err)
