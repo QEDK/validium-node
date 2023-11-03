@@ -76,6 +76,7 @@ services:
       - ./sequencer.keystore:/pk/sequencer.keystore
       - ./config/test.node.config.toml:/app/config.toml
       - ./config/test.genesis.config.json:/app/genesis.json
+      - ./config/test.avail.config.json:/app/avail-config.json
     command:
       - "/bin/sh"
       - "-c"
@@ -95,6 +96,7 @@ services:
     volumes:
       - ./config/test.node.config.toml:/app/config.toml
       - ./config/test.genesis.config.json:/app/genesis.json
+      - ./config/test.avail.config.json:/app/avail-config.json
     command:
       - "/bin/sh"
       - "-c"
@@ -112,6 +114,7 @@ services:
     volumes:
       - ./config/test.node.config.toml:/app/config.toml
       - ./config/test.genesis.config.json:/app/genesis.json
+      - ./config/test.avail.config.json:/app/avail-config.json
     command:
       - "/bin/sh"
       - "-c"
@@ -127,6 +130,7 @@ services:
     volumes:
       - ./config/test.node.config.toml:/app/config.toml
       - ./config/test.genesis.config.json:/app/genesis.json
+      - ./config/test.avail.config.json:/app/avail-config.json
     command:
       - "/bin/sh"
       - "-c"
@@ -144,6 +148,7 @@ services:
       - ./aggregator.keystore:/pk/aggregator.keystore
       - ./config/test.node.config.toml:/app/config.toml
       - ./config/test.genesis.config.json:/app/genesis.json
+      - ./config/test.avail.config.json:/app/avail-config.json
     command:
       - "/bin/sh"
       - "-c"
@@ -158,6 +163,7 @@ services:
       - ./test.keystore:/pk/keystore
       - ./config/test.node.config.toml:/app/config.toml
       - ./config/test.genesis.config.json:/app/genesis.json
+      - ./config/test.avail.config.json:/app/avail-config.json
     command:
       - "/bin/sh"
       - "-c"
@@ -299,6 +305,7 @@ services:
     volumes:
       - ./config/test.node.config.toml:/app/config.toml
       - ./config/test.genesis.config.json:/app/genesis.json
+      - ./config/test.avail.config.json:/app/avail-config.json
     command:
       - "/bin/sh"
       - "-c"
@@ -365,6 +372,7 @@ services:
       - ./sequencer.keystore:/pk/keystore
       - ./config/test.node.config.toml:/app/config.toml
       - ./config/test.genesis.config.json:/app/genesis.json
+      - ./config/test.avail.config.json:/app/avail-config.json
     command:
       - "/bin/sh"
       - "-c"
@@ -414,6 +422,7 @@ services:
     volumes:
       - ./config/test.node.config.toml:/app/config.toml
       - ./config/test.genesis.config.json:/app/genesis.json
+      - ./config/test.avail.config.json:/app/avail-config.json
     command:
       - "/bin/sh"
       - "-c"
@@ -455,5 +464,6 @@ services:
     volumes:
       - ./config/test.node.config.toml:/app/config.toml
       - ./config/test.genesis.config.json:/app/genesis.json
+      - ./config/test.avail.config.json:/app/avail-config.json
     command:
       - "/bin/sh"

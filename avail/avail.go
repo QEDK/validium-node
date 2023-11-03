@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/0xPolygonHermez/zkevm-node/avail/internal/config"
+	availConfig "github.com/0xPolygonHermez/zkevm-node/avail/internal/config"
 	"github.com/0xPolygonHermez/zkevm-node/log"
 	"golang.org/x/crypto/sha3"
 
@@ -36,33 +36,57 @@ type DataProof struct {
 	Leaf           string   `json:"leaf"`
 }
 
-func PostData(txData []byte) (*availTypes.BatchDAData, error) {
-	var config config.Config
+var Config availConfig.Config
+var Api gsrpc.SubstrateAPI
+var Meta *types.Metadata
+var AppId int
+var GenesisHash types.Hash
+var Rv *types.RuntimeVersion
+var KeyringPair signature.KeyringPair
 
-	err := config.GetConfig("/app/avail-config.json")
+func init() {
+	err := Config.GetConfig("/app/avail-config.json")
 	if err != nil {
-		return nil, fmt.Errorf("cannot get config:%w", err)
+		log.Fatalf("cannot get config:%w", err)
 	}
 
-	api, err := gsrpc.NewSubstrateAPI(config.ApiURL)
+	Api, err := gsrpc.NewSubstrateAPI(Config.ApiURL)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get api:%w", err)
+		log.Fatalf("cannot get api:%w", err)
 	}
 
-	meta, err := api.RPC.State.GetMetadataLatest()
+	Meta, err = Api.RPC.State.GetMetadataLatest()
 	if err != nil {
-		return nil, fmt.Errorf("cannot get metadata:%w", err)
+		log.Fatalf("cannot get metadata:%w", err)
 	}
 
-	log.Infof("⚡️ Prepared data for Avail:%d bytes", len(txData))
-	appID := 0
+	AppId = 0
 
 	// if app id is greater than 0 then it must be created before submitting data
-	if config.AppID != 0 {
-		appID = config.AppID
+	if Config.AppID != 0 {
+		AppId = Config.AppID
 	}
 
-	newCall, err := types.NewCall(meta, "DataAvailability.submit_data", types.NewBytes(txData))
+	GenesisHash, err = Api.RPC.Chain.GetBlockHash(0)
+	if err != nil {
+		log.Fatalf("cannot get block hash:%w", err)
+	}
+
+	Rv, err = Api.RPC.State.GetRuntimeVersionLatest()
+	if err != nil {
+		log.Fatalf("cannot get runtime version:%w", err)
+	}
+
+	KeyringPair, err = signature.KeyringPairFromSecret(Config.Seed, 42)
+	if err != nil {
+		log.Fatalf("cannot create keypair:%w", err)
+	}
+}
+
+func PostData(txData []byte) (*availTypes.BatchDAData, error) {
+	log.Infof("⚡️ Prepared data for Avail:%d bytes", len(txData))
+
+	newCall, err := types.NewCall(Meta, "DataAvailability.submit_data", types.NewBytes(txData))
 	if err != nil {
 		return nil, fmt.Errorf("cannot create new call:%w", err)
 	}
@@ -70,62 +94,47 @@ func PostData(txData []byte) (*availTypes.BatchDAData, error) {
 	// Create the extrinsic
 	ext := types.NewExtrinsic(newCall)
 
-	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
-	if err != nil {
-		return nil, fmt.Errorf("cannot get block hash:%w", err)
-	}
-
-	rv, err := api.RPC.State.GetRuntimeVersionLatest()
-	if err != nil {
-		return nil, fmt.Errorf("cannot get runtime version:%w", err)
-	}
-
-	keyringPair, err := signature.KeyringPairFromSecret(config.Seed, 42)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create keypair:%w", err)
-	}
-
-	key, err := types.CreateStorageKey(meta, "System", "Account", keyringPair.PublicKey)
+	key, err := types.CreateStorageKey(Meta, "System", "Account", KeyringPair.PublicKey)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create storage key:%w", err)
 	}
 
 	var accountInfo types.AccountInfo
-	ok, err := api.RPC.State.GetStorageLatest(key, &accountInfo)
+	ok, err := Api.RPC.State.GetStorageLatest(key, &accountInfo)
 	if err != nil || !ok {
 		return nil, fmt.Errorf("cannot get latest storage:%w", err)
 	}
 
-	pendingExt, err := api.RPC.Author.PendingExtrinsics()
+	pendingExt, err := Api.RPC.Author.PendingExtrinsics()
 	if err != nil {
 		return nil, fmt.Errorf("cannot get pending extrinsics:%w", err)
 	}
 
 	nonce := uint32(accountInfo.Nonce) + uint32(len(pendingExt))
 	options := types.SignatureOptions{
-		BlockHash:          genesisHash,
+		BlockHash:          GenesisHash,
 		Era:                types.ExtrinsicEra{IsMortalEra: false},
-		GenesisHash:        genesisHash,
+		GenesisHash:        GenesisHash,
 		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
-		SpecVersion:        rv.SpecVersion,
+		SpecVersion:        Rv.SpecVersion,
 		Tip:                types.NewUCompactFromUInt(10000),
-		AppID:              types.NewUCompactFromUInt(uint64(appID)),
-		TransactionVersion: rv.TransactionVersion,
+		AppID:              types.NewUCompactFromUInt(uint64(AppId)),
+		TransactionVersion: Rv.TransactionVersion,
 	}
 
-	err = ext.Sign(keyringPair, options)
+	err = ext.Sign(KeyringPair, options)
 	if err != nil {
 		return nil, fmt.Errorf("cannot sign:%w", err)
 	}
 
 	// Send the extrinsic
-	sub, err := api.RPC.Author.SubmitAndWatchExtrinsic(ext)
+	sub, err := Api.RPC.Author.SubmitAndWatchExtrinsic(ext)
 	if err != nil {
 		return nil, fmt.Errorf("cannot submit extrinsic:%w", err)
 	}
 
 	defer sub.Unsubscribe()
-	timeout := time.After(time.Duration(config.Timeout) * time.Second)
+	timeout := time.After(time.Duration(Config.Timeout) * time.Second)
 	var blockHash types.Hash
 out:
 	for {
@@ -147,11 +156,11 @@ out:
 				return nil, fmt.Errorf("❌ Extrinsic invalid")
 			}
 		case <-timeout:
-			return nil, fmt.Errorf("⌛️ Timeout of %d seconds reached without getting finalized status for extrinsic", config.Timeout)
+			return nil, fmt.Errorf("⌛️ Timeout of %d seconds reached without getting finalized status for extrinsic", Config.Timeout)
 		}
 	}
 
-	log.Infof("✅ Data submitted by sequencer:%d bytes against AppID %v sent with hash %#x", len(txData), appID, blockHash)
+	log.Infof("✅ Data submitted by sequencer:%d bytes against AppID %v sent with hash %#x", len(txData), AppId, blockHash)
 
 	var dataProof DataProof
 	var batchHash [32]byte
@@ -190,7 +199,7 @@ out:
 	batchDAData.Width = dataProof.NumberOfLeaves
 	batchDAData.LeafIndex = dataProof.LeafIndex
 
-	header, err := api.RPC.Chain.GetHeader(blockHash)
+	header, err := Api.RPC.Chain.GetHeader(blockHash)
 	log.Infof("🎩 received header:%+v", header)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get header:%+v", err)
@@ -203,51 +212,24 @@ out:
 }
 
 func DispatchDataRoot(blockNumber uint64) error {
-	var config config.Config
-
-	err := config.GetConfig("/app/avail-config.json")
-	if err != nil {
-		return fmt.Errorf("cannot get config:%w", err)
-	}
-
-	api, err := gsrpc.NewSubstrateAPI(config.ApiURL)
-	if err != nil {
-		return fmt.Errorf("cannot get api:%w", err)
-	}
-
-	meta, err := api.RPC.State.GetMetadataLatest()
-	if err != nil {
-		return fmt.Errorf("cannot get metadata:%w", err)
-	}
-
-	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
-	if err != nil {
-		return fmt.Errorf("cannot get block hash:%w", err)
-	}
-
-	rv, err := api.RPC.State.GetRuntimeVersionLatest()
+	blockHash, err := Api.RPC.Chain.GetBlockHash(blockNumber)
 	if err != nil {
 		return fmt.Errorf("cannot get runtime version:%w", err)
 	}
 
-	blockHash, err := api.RPC.Chain.GetBlockHash(blockNumber)
-	if err != nil {
-		return fmt.Errorf("cannot get runtime version:%w", err)
-	}
-
-	header, err := api.RPC.Chain.GetHeader(blockHash)
+	header, err := Api.RPC.Chain.GetHeader(blockHash)
 	log.Infof("🎩 received header:%+v", header)
 
 	if err != nil {
 		return fmt.Errorf("cannot get header:%+v", err)
 	}
 
-	destAddress, err := types.NewHashFromHexString(config.DestinationAddress)
+	destAddress, err := types.NewHashFromHexString(Config.DestinationAddress)
 	if err != nil {
 		return fmt.Errorf("cannot decode destination address:%w", err)
 	}
 
-	dispatchDataRootCall, err := types.NewCall(meta, "NomadDABridge.try_dispatch_data_root", types.NewUCompactFromUInt(uint64(config.DestinationDomain)), destAddress, header)
+	dispatchDataRootCall, err := types.NewCall(Meta, "NomadDABridge.try_dispatch_data_root", types.NewUCompactFromUInt(uint64(Config.DestinationDomain)), destAddress, header)
 
 	if err != nil {
 		return fmt.Errorf("cannot create new call:%+v", err)
@@ -255,50 +237,45 @@ func DispatchDataRoot(blockNumber uint64) error {
 
 	dispatchDataRootExt := types.NewExtrinsic(dispatchDataRootCall)
 
-	keyringPair, err := signature.KeyringPairFromSecret(config.Seed, 42)
-	if err != nil {
-		return fmt.Errorf("cannot create keypair:%w", err)
-	}
-
-	key, err := types.CreateStorageKey(meta, "System", "Account", keyringPair.PublicKey)
+	key, err := types.CreateStorageKey(Meta, "System", "Account", KeyringPair.PublicKey)
 	if err != nil {
 		return fmt.Errorf("cannot create storage key:%w", err)
 	}
 
 	var accountInfo types.AccountInfo
-	ok, err := api.RPC.State.GetStorageLatest(key, &accountInfo)
+	ok, err := Api.RPC.State.GetStorageLatest(key, &accountInfo)
 	if err != nil || !ok {
 		return fmt.Errorf("cannot get latest storage:%w", err)
 	}
 
-	pendingExt, err := api.RPC.Author.PendingExtrinsics()
+	pendingExt, err := Api.RPC.Author.PendingExtrinsics()
 	if err != nil {
 		return fmt.Errorf("cannot get pending extrinsics:%w", err)
 	}
 
 	nonce := uint32(accountInfo.Nonce) + uint32(len(pendingExt))
 	options := types.SignatureOptions{
-		BlockHash:          genesisHash,
+		BlockHash:          GenesisHash,
 		Era:                types.ExtrinsicEra{IsMortalEra: false},
-		GenesisHash:        genesisHash,
+		GenesisHash:        GenesisHash,
 		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
-		SpecVersion:        rv.SpecVersion,
+		SpecVersion:        Rv.SpecVersion,
 		Tip:                types.NewUCompactFromUInt(10000),
 		AppID:              types.NewUCompactFromUInt(0),
-		TransactionVersion: rv.TransactionVersion,
+		TransactionVersion: Rv.TransactionVersion,
 	}
 
-	err = dispatchDataRootExt.Sign(keyringPair, options)
+	err = dispatchDataRootExt.Sign(KeyringPair, options)
 	if err != nil {
 		return fmt.Errorf("cannot sign:%w", err)
 	}
 
-	sub, err := api.RPC.Author.SubmitAndWatchExtrinsic(dispatchDataRootExt)
+	sub, err := Api.RPC.Author.SubmitAndWatchExtrinsic(dispatchDataRootExt)
 	if err != nil {
 		return fmt.Errorf("cannot dispatch data root extrinsic:%+v", err)
 	}
 	defer sub.Unsubscribe()
-	timeout := time.After(time.Duration(config.Timeout) * time.Second)
+	timeout := time.After(time.Duration(Config.Timeout) * time.Second)
 out:
 	for {
 		select {
@@ -316,7 +293,7 @@ out:
 				return fmt.Errorf("❌ Extrinsic retracted")
 			}
 		case <-timeout:
-			return fmt.Errorf("⌛️ Timeout of %d seconds reached without getting finalized status for dispatch data root extrinsic", config.Timeout)
+			return fmt.Errorf("⌛️ Timeout of %d seconds reached without getting finalized status for dispatch data root extrinsic", Config.Timeout)
 		}
 	}
 
@@ -326,24 +303,12 @@ out:
 }
 
 func GetData(blockNumber uint64, index uint) ([]byte, error) {
-	var config config.Config
-
-	err := config.GetConfig("/app/avail-config.json")
-	if err != nil {
-		return nil, fmt.Errorf("cannot get config:%w", err)
-	}
-
-	api, err := gsrpc.NewSubstrateAPI(config.ApiURL)
-	if err != nil {
-		return nil, fmt.Errorf("cannot get api:%w", err)
-	}
-
-	blockHash, err := api.RPC.Chain.GetBlockHash(blockNumber)
+	blockHash, err := Api.RPC.Chain.GetBlockHash(blockNumber)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get block hash:%w", err)
 	}
 
-	block, err := api.RPC.Chain.GetBlock(blockHash)
+	block, err := Api.RPC.Chain.GetBlock(blockHash)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get block:%w", err)
 	}

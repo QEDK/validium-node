@@ -797,7 +797,7 @@ func (s *ClientSynchronizer) processSequenceBatches(sequencedBatches []etherman.
 			GlobalExitRoot: sbatch.GlobalExitRoot,
 			Timestamp:      time.Unix(int64(sbatch.Timestamp), 0),
 			Coinbase:       sbatch.Coinbase,
-			BatchHash:      sbatch.BatchHash,
+			BatchHash:      sbatch.BatchHash
 		}
 		// ForcedBatch must be processed
 		if sbatch.MinForcedTimestamp > 0 { // If this is true means that the batch is forced
