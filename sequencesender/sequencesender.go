@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	avail "github.com/0xPolygonHermez/zkevm-node/avail"
 	ethman "github.com/0xPolygonHermez/zkevm-node/etherman"
 	"github.com/0xPolygonHermez/zkevm-node/etherman/types"
 	"github.com/0xPolygonHermez/zkevm-node/ethtxmanager"
@@ -188,7 +189,12 @@ func (s *SequenceSender) getSequencesToSend(ctx context.Context) ([]types.Sequen
 			return nil, err
 		} else if *dataRoot == [32]byte{} {
 			log.Infof("⏰ Data root is not available yet for batch %d, skipping", batch.BatchNumber)
+			// this is to prevent from calling the L1 RPC too often
 			time.Sleep(1 * time.Second)
+			// if a data root is not available after an hour, something is wrong, re-dispatch the data root
+			if time.Now().Unix()-batch.Timestamp.Unix() > 3600 {
+				avail.DispatchDataRoot(uint64(batch.DABlockNumber))
+			}
 			continue
 		} else {
 			sequences = append(sequences, seq)
