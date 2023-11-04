@@ -1,7 +1,6 @@
 package avail
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -37,7 +36,7 @@ type DataProof struct {
 }
 
 var Config availConfig.Config
-var Api gsrpc.SubstrateAPI
+var Api *gsrpc.SubstrateAPI
 var Meta *types.Metadata
 var AppId int
 var GenesisHash types.Hash
@@ -50,7 +49,7 @@ func init() {
 		log.Fatalf("cannot get config:%w", err)
 	}
 
-	Api, err := gsrpc.NewSubstrateAPI(Config.ApiURL)
+	Api, err = gsrpc.NewSubstrateAPI(Config.ApiURL)
 	if err != nil {
 		log.Fatalf("cannot get api:%w", err)
 	}
@@ -141,7 +140,7 @@ out:
 		select {
 		case status := <-sub.Chan():
 			if status.IsInBlock {
-				log.Infof("Extrinsic included in block %v", status.AsInBlock.Hex())
+				log.Infof("📥 Submit data extrinsic included in block %v", status.AsInBlock.Hex())
 			}
 			if status.IsFinalized {
 				blockHash = status.AsFinalized
@@ -200,7 +199,6 @@ out:
 	batchDAData.LeafIndex = dataProof.LeafIndex
 
 	header, err := Api.RPC.Chain.GetHeader(blockHash)
-	log.Infof("🎩 received header:%+v", header)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get header:%+v", err)
 	}
@@ -218,8 +216,6 @@ func DispatchDataRoot(blockNumber uint64) error {
 	}
 
 	header, err := Api.RPC.Chain.GetHeader(blockHash)
-	log.Infof("🎩 received header:%+v", header)
-
 	if err != nil {
 		return fmt.Errorf("cannot get header:%+v", err)
 	}
@@ -281,7 +277,7 @@ out:
 		select {
 		case status := <-sub.Chan():
 			if status.IsInBlock {
-				log.Infof("Dispatch data root extrinsic included in block %v", status.AsInBlock.Hex())
+				log.Infof("📥 Dispatch data root extrinsic included in block %v", status.AsInBlock.Hex())
 				break out
 			} else if status.IsDropped {
 				return fmt.Errorf("❌ Extrinsic dropped")
@@ -303,28 +299,19 @@ out:
 }
 
 func GetData(blockNumber uint64, index uint) ([]byte, error) {
-	blockHash, err := Api.RPC.Chain.GetBlockHash(blockNumber)
+	blockHash, err := Api.RPC.Chain.GetBlockHash(uint64(blockNumber))
 	if err != nil {
 		return nil, fmt.Errorf("cannot get block hash:%w", err)
 	}
-
 	block, err := Api.RPC.Chain.GetBlock(blockHash)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get block:%w", err)
 	}
-	log.Infof("Block: %+v", block)
 
 	var data [][]byte
-
 	for _, ext := range block.Block.Extrinsics {
 		if ext.Method.CallIndex.SectionIndex == 29 && ext.Method.CallIndex.MethodIndex == 1 {
-			str := string(ext.Method.Args)[2:]
-			raw, err := hex.DecodeString(str)
-			if err != nil {
-				data = append(data, []byte{})
-				continue
-			}
-			data = append(data, raw)
+			data = append(data, ext.Method.Args[2:])
 		}
 	}
 
