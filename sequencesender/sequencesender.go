@@ -32,21 +32,23 @@ var (
 
 // SequenceSender represents a sequence sender
 type SequenceSender struct {
-	cfg          Config
-	state        stateInterface
-	ethTxManager ethTxManager
-	etherman     etherman
-	eventLog     *event.EventLog
+	cfg               Config
+	state             stateInterface
+	ethTxManager      ethTxManager
+	etherman          etherman
+	eventLog          *event.EventLog
+	redispatchDataMap map[uint64]int64
 }
 
 // New inits sequence sender
 func New(cfg Config, state stateInterface, etherman etherman, manager ethTxManager, eventLog *event.EventLog) (*SequenceSender, error) {
 	return &SequenceSender{
-		cfg:          cfg,
-		state:        state,
-		etherman:     etherman,
-		ethTxManager: manager,
-		eventLog:     eventLog,
+		cfg:               cfg,
+		state:             state,
+		etherman:          etherman,
+		ethTxManager:      manager,
+		eventLog:          eventLog,
+		redispatchDataMap: map[uint64]int64{},
 	}, nil
 }
 
@@ -187,13 +189,25 @@ func (s *SequenceSender) getSequencesToSend(ctx context.Context) ([]types.Sequen
 		dataRoot, err := s.etherman.GetDataRoot(batch.DABlockNumber)
 		if err != nil {
 			return nil, err
-		} else if *dataRoot == [32]byte{} {
+		} else if len(batch.BatchL2Data) == 0 {
+			sequences = append(sequences, seq)
+		} else if len(batch.BatchL2Data) != 0 && *dataRoot == [32]byte{} {
 			log.Infof("⏰ Data root is not available yet for batch %d, skipping", batch.BatchNumber)
 			// this is to prevent from calling the L1 RPC too often
-			time.Sleep(1 * time.Second)
+			time.Sleep(10 * time.Second)
 			// if a data root is not available after an hour, something is wrong, re-dispatch the data root
 			if time.Now().Unix()-batch.Timestamp.Unix() > 3600 {
-				avail.DispatchDataRoot(uint64(batch.DABlockNumber))
+				// check data redispatch map
+				redispatchTime := s.redispatchDataMap[batch.BatchNumber]
+				if redispatchTime == 0 || time.Now().Unix()-redispatchTime > 3600 {
+					err := avail.DispatchDataRoot(uint64(batch.DABlockNumber))
+					if err == nil {
+						s.redispatchDataMap[batch.BatchNumber] = time.Now().Unix()
+					} else {
+						log.Warnf("error dispatching data root for batch %d: %v", batch.BatchNumber, err)
+						time.Sleep(10 * time.Second)
+					}
+				}
 			}
 			continue
 		} else {
