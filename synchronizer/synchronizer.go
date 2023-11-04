@@ -797,7 +797,11 @@ func (s *ClientSynchronizer) processSequenceBatches(sequencedBatches []etherman.
 			GlobalExitRoot: sbatch.GlobalExitRoot,
 			Timestamp:      time.Unix(int64(sbatch.Timestamp), 0),
 			Coinbase:       sbatch.Coinbase,
-			BatchHash:      sbatch.BatchHash
+			BatchHash:      sbatch.BatchHash,
+			DABlockNumber:  sbatch.PolygonZkEVMDAData.BlockNumber,
+			DAProof:        sbatch.PolygonZkEVMDAData.Proof,
+			DAWidth:        sbatch.PolygonZkEVMDAData.Width,
+			DAIndex:        sbatch.PolygonZkEVMDAData.Index,
 		}
 		// ForcedBatch must be processed
 		if sbatch.MinForcedTimestamp > 0 { // If this is true means that the batch is forced
@@ -860,7 +864,13 @@ func (s *ClientSynchronizer) processSequenceBatches(sequencedBatches []etherman.
 		if err != nil {
 			if errors.Is(err, state.ErrNotFound) || errors.Is(err, state.ErrStateNotSynchronized) {
 				log.Debugf("BatchNumber: %d, not found in trusted state. Storing it...", batch.BatchNumber)
-				// If it is not found, store batch
+				if batch.DABlockNumber != 0 { // data was posted for the batch
+					rawTxs, _ := avail.GetData(uint64(batch.DABlockNumber), uint(batch.DAIndex.Uint64()))
+					log.Infof("fetched RawTxs:%#x from Avail block:%d index %d", rawTxs, batch.DABlockNumber, batch.DAIndex)
+					batch.BatchL2Data = rawTxs
+				} else { // no data was posted for the batch
+					batch.BatchL2Data = []byte{}
+				}
 				newStateRoot, flushID, proverID, err := s.state.ProcessAndStoreClosedBatch(s.ctx, processCtx, batch.BatchL2Data, dbTx, stateMetrics.SynchronizerCallerLabel)
 				if err != nil {
 					log.Errorf("error storing trustedBatch. BatchNumber: %d, BlockNumber: %d, error: %v", batch.BatchNumber, blockNumber, err)
@@ -888,14 +898,18 @@ func (s *ClientSynchronizer) processSequenceBatches(sequencedBatches []etherman.
 			}
 		} else {
 			// Reprocess batch to compare the stateRoot with tBatch.StateRoot and get accInputHash
-			rawTxs, err := avail.GetData(uint64(batch.DABlockNumber), uint(batch.DAIndex.Uint64()))
-			log.Infof("fetched RawTxs:%#x from Avail block:%d index %d", rawTxs, batch.DABlockNumber, batch.DAIndex)
-			// attempt to get data from Avail
-			if err != nil || len(rawTxs) == 0 {
+			if batch.DABlockNumber != 0 {
+				rawTxs, err := avail.GetData(uint64(batch.DABlockNumber), uint(batch.DAIndex.Uint64()))
+				log.Infof("fetched RawTxs:%#x from Avail block:%d index %d", rawTxs, batch.DABlockNumber, batch.DAIndex)
+				if err != nil || len(rawTxs) == 0 { // something is wrong, maybe L2 data is in our trusted node instead
+					batch.BatchL2Data = tBatch.BatchL2Data
+				} else {
+					batch.BatchL2Data = rawTxs
+				}
+			} else {
 				batch.BatchL2Data = tBatch.BatchL2Data
-			} else { // something is wrong, maybe L2 data is in our trusted node instead
-				batch.BatchL2Data = rawTxs
 			}
+			// attempt to get data from Avai
 			p, err := s.state.ExecuteBatch(s.ctx, batch, false, dbTx)
 			if err != nil {
 				log.Errorf("error executing L1 batch: %+v, error: %v", batch, err)
