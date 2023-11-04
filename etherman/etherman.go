@@ -792,17 +792,26 @@ func decodeSequences(txData []byte, lastBatchNumber uint64, sequencer common.Add
 		return nil, err
 	}
 	var sequences []polygonzkevm.PolygonZkEVMBatchData
-	bytedata, err := json.Marshal(data[0])
+	var daDatas []polygonzkevm.PolygonZkEVMDAData
+	batchdata, err := json.Marshal(data[0])
 	if err != nil {
 		return nil, err
 	}
-	err = json.Unmarshal(bytedata, &sequences)
+	dadata, err := json.Marshal(data[1])
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(batchdata, &sequences)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(dadata, &daDatas)
 	if err != nil {
 		return nil, err
 	}
 	coinbase := (data[2]).(common.Address)
 	sequencedBatches := make([]SequencedBatch, len(sequences))
-	for i, seq := range sequences {
+	for i := 0; i < len(sequences); i++ {
 		bn := lastBatchNumber - uint64(len(sequences)-(i+1))
 		sequencedBatches[i] = SequencedBatch{
 			BatchNumber:           bn,
@@ -810,7 +819,8 @@ func decodeSequences(txData []byte, lastBatchNumber uint64, sequencer common.Add
 			TxHash:                txHash,
 			Nonce:                 nonce,
 			Coinbase:              coinbase,
-			PolygonZkEVMBatchData: seq,
+			PolygonZkEVMBatchData: sequences[i],
+			PolygonZkEVMDAData:    daDatas[i],
 		}
 	}
 

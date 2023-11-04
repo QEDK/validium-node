@@ -37,6 +37,7 @@ type SequencedBatch struct {
 	Nonce         uint64
 	Coinbase      common.Address
 	polygonzkevm.PolygonZkEVMBatchData
+	polygonzkevm.PolygonZkEVMDAData
 }
 
 // ForcedBatch represents a ForcedBatch
