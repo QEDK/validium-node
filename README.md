@@ -117,3 +117,7 @@ It's recommended to use `make` for building, and testing the code, ... Run `make
 ## Contribute
 
 Before opening a pull request, please read this [guide](CONTRIBUTING.md).
+
+## License
+All `validium-node` packages except `avail` are released under the AGPL v3 (see [LICENSE](LICENSE.md)). The `avail`
+package is released under Apache v2.
