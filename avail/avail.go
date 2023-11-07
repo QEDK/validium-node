@@ -31,8 +31,8 @@ type DataProofRPCResponse struct {
 type DataProof struct {
 	Root           string   `json:"root"`
 	Proof          []string `json:"proof"`
-	NumberOfLeaves uint     `json:"number_of_leaves"`
-	LeafIndex      uint     `json:"leaf_index"`
+	NumberOfLeaves uint     `json:"numberOfLeaves"`
+	LeafIndex      uint     `json:"leafIndex"`
 	Leaf           string   `json:"leaf"`
 }
 
@@ -43,6 +43,8 @@ var AppId int
 var GenesisHash types.Hash
 var Rv *types.RuntimeVersion
 var KeyringPair signature.KeyringPair
+var DestinationAddress types.Hash
+var DestinationDomain types.UCompact
 
 func init() {
 	err := Config.GetConfig("/app/avail-config.json")
@@ -81,6 +83,13 @@ func init() {
 	if err != nil {
 		log.Fatalf("cannot create keypair:%w", err)
 	}
+
+	DestinationAddress, err = types.NewHashFromHexString(Config.DestinationAddress)
+	if err != nil {
+		log.Fatalf("cannot decode destination address:%w", err)
+	}
+
+	DestinationDomain = types.NewUCompactFromUInt(uint64(Config.DestinationDomain))
 }
 
 func PostData(txData []byte) (*availTypes.BatchDAData, error) {
@@ -164,12 +173,17 @@ out:
 
 	var dataProof DataProof
 	var batchHash [32]byte
-	maxTxIndex := 1
+
 	h := sha3.NewLegacyKeccak256()
 	h.Write(txData)
 	h.Sum(batchHash[:0])
 
-	for i := 0; i < maxTxIndex; i++ {
+	block, err := Api.RPC.Chain.GetBlock(blockHash)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get block:%w", err)
+	}
+
+	for i := 1; i <= len(block.Block.Extrinsics); i++ {
 		resp, err := http.Post("https://kate.avail.tools/api", "application/json", strings.NewReader(fmt.Sprintf("{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"kate_queryDataProof\",\"params\":[%d, \"%#x\"]}", i, blockHash)))
 		if err != nil {
 			return nil, fmt.Errorf("cannot post query request:%v", err)
@@ -189,8 +203,6 @@ out:
 			dataProof = dataProofResp.Result
 			break
 		}
-
-		maxTxIndex = int(dataProofResp.Result.NumberOfLeaves)
 	}
 
 	log.Infof("💿 received data proof:%+v", dataProof)
@@ -221,12 +233,7 @@ func DispatchDataRoot(blockNumber uint64) error {
 		return fmt.Errorf("cannot get header:%+v", err)
 	}
 
-	destAddress, err := types.NewHashFromHexString(Config.DestinationAddress)
-	if err != nil {
-		return fmt.Errorf("cannot decode destination address:%w", err)
-	}
-
-	dispatchDataRootCall, err := types.NewCall(Meta, "NomadDABridge.try_dispatch_data_root", types.NewUCompactFromUInt(uint64(Config.DestinationDomain)), destAddress, header)
+	dispatchDataRootCall, err := types.NewCall(Meta, "NomadDABridge.try_dispatch_data_root", DestinationDomain, DestinationAddress, header)
 
 	if err != nil {
 		return fmt.Errorf("cannot create new call:%+v", err)
@@ -304,6 +311,7 @@ func GetData(blockNumber uint64, index uint) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot get block hash:%w", err)
 	}
+
 	block, err := Api.RPC.Chain.GetBlock(blockHash)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get block:%w", err)

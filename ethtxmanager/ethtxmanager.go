@@ -512,6 +512,7 @@ func (c *Client) ReviewMonitoredTx(ctx context.Context, mTx *monitoredTx) error 
 	mTxLog.Debug("reviewing")
 	// get gas
 	gas, err := c.etherman.EstimateGas(ctx, mTx.from, mTx.to, mTx.value, mTx.data)
+	log.Infof("from: %#x ,to: %#x , value: %#x , data: %#x", mTx.from, mTx.to, mTx.value, mTx.data)
 	if err != nil {
 		err := fmt.Errorf("failed to estimate gas: %w", err)
 		mTxLog.Errorf(err.Error())
