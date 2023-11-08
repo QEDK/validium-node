@@ -20,8 +20,8 @@ import (
 	availTypes "github.com/0xPolygonHermez/zkevm-node/avail/types"
 )
 
-type HeaderRPCResponse struct {
-	Result types.Header `json:"result"`
+type AccountNextIndexRPCResponse struct {
+	Result uint `json:"result"`
 }
 
 type DataProofRPCResponse struct {
@@ -103,30 +103,18 @@ func PostData(txData []byte) (*availTypes.BatchDAData, error) {
 	// Create the extrinsic
 	ext := types.NewExtrinsic(newCall)
 
-	key, err := types.CreateStorageKey(Meta, "System", "Account", KeyringPair.PublicKey)
+	nonce, err := GetAccountNextIndex()
 	if err != nil {
-		return nil, fmt.Errorf("cannot create storage key:%w", err)
+		return nil, fmt.Errorf("cannot get account next index:%w", err)
 	}
 
-	var accountInfo types.AccountInfo
-	ok, err := Api.RPC.State.GetStorageLatest(key, &accountInfo)
-	if err != nil || !ok {
-		return nil, fmt.Errorf("cannot get latest storage:%w", err)
-	}
-
-	pendingExt, err := Api.RPC.Author.PendingExtrinsics()
-	if err != nil {
-		return nil, fmt.Errorf("cannot get pending extrinsics:%w", err)
-	}
-
-	nonce := uint32(accountInfo.Nonce) + uint32(len(pendingExt))
 	options := types.SignatureOptions{
 		BlockHash:          GenesisHash,
 		Era:                types.ExtrinsicEra{IsMortalEra: false},
 		GenesisHash:        GenesisHash,
-		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
+		Nonce:              nonce,
 		SpecVersion:        Rv.SpecVersion,
-		Tip:                types.NewUCompactFromUInt(10000),
+		Tip:                types.NewUCompactFromUInt(1000),
 		AppID:              types.NewUCompactFromUInt(uint64(AppId)),
 		TransactionVersion: Rv.TransactionVersion,
 	}
@@ -184,7 +172,7 @@ out:
 	}
 
 	for i := 1; i <= len(block.Block.Extrinsics); i++ {
-		resp, err := http.Post("https://kate.avail.tools/api", "application/json", strings.NewReader(fmt.Sprintf("{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"kate_queryDataProof\",\"params\":[%d, \"%#x\"]}", i, blockHash)))
+		resp, err := http.Post("https://goldberg.avail.tools/api", "application/json", strings.NewReader(fmt.Sprintf("{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"kate_queryDataProof\",\"params\":[%d, \"%#x\"]}", i, blockHash)))
 		if err != nil {
 			return nil, fmt.Errorf("cannot post query request:%v", err)
 		}
@@ -241,30 +229,18 @@ func DispatchDataRoot(blockNumber uint64) error {
 
 	dispatchDataRootExt := types.NewExtrinsic(dispatchDataRootCall)
 
-	key, err := types.CreateStorageKey(Meta, "System", "Account", KeyringPair.PublicKey)
+	nonce, err := GetAccountNextIndex()
 	if err != nil {
-		return fmt.Errorf("cannot create storage key:%w", err)
+		return fmt.Errorf("cannot get account next index:%w", err)
 	}
 
-	var accountInfo types.AccountInfo
-	ok, err := Api.RPC.State.GetStorageLatest(key, &accountInfo)
-	if err != nil || !ok {
-		return fmt.Errorf("cannot get latest storage:%w", err)
-	}
-
-	pendingExt, err := Api.RPC.Author.PendingExtrinsics()
-	if err != nil {
-		return fmt.Errorf("cannot get pending extrinsics:%w", err)
-	}
-
-	nonce := uint32(accountInfo.Nonce) + uint32(len(pendingExt))
 	options := types.SignatureOptions{
 		BlockHash:          GenesisHash,
 		Era:                types.ExtrinsicEra{IsMortalEra: false},
 		GenesisHash:        GenesisHash,
-		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
+		Nonce:              nonce,
 		SpecVersion:        Rv.SpecVersion,
-		Tip:                types.NewUCompactFromUInt(10000),
+		Tip:                types.NewUCompactFromUInt(1000),
 		AppID:              types.NewUCompactFromUInt(0),
 		TransactionVersion: Rv.TransactionVersion,
 	}
@@ -325,4 +301,23 @@ func GetData(blockNumber uint64, index uint) ([]byte, error) {
 	}
 
 	return data[index], nil
+}
+
+func GetAccountNextIndex() (types.UCompact, error) {
+	resp, err := http.Post("https://goldberg.avail.tools/api", "application/json", strings.NewReader(fmt.Sprintf("{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"system_accountNextIndex\",\"params\":[\"%v\"]}", KeyringPair.Address)))
+	if err != nil {
+		return types.NewUCompactFromUInt(0), fmt.Errorf("cannot post query request:%v", err)
+	}
+	defer resp.Body.Close()
+
+	data, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		return types.NewUCompactFromUInt(0), fmt.Errorf("cannot read body:%v", err)
+	}
+
+	var accountNextIndex AccountNextIndexRPCResponse
+	json.Unmarshal(data, &accountNextIndex)
+
+	return types.NewUCompactFromUInt(uint64(accountNextIndex.Result)), nil
 }
