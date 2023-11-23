@@ -1,8 +1,8 @@
 {
     "seed": "test test test test test test test test test test test junk",
-    "api_url": "wss://kate.avail.tools:443/ws",
+    "api_url": "wss://goldberg.avail.tools/ws",
     "app_id": 1,
     "destination_domain": 1000,
-    "destination_address": "0x000000000000000000000000bD824890A51ed8bda53F51F27303b14EFfEbC152",
-    "timeout": 120
+    "destination_address": "0x000000000000000000000000305222c4DdB86FfA9fa9Aa0A479705577E3c4d33",
+    "timeout": 200
 }
