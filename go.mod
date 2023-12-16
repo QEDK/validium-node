@@ -179,3 +179,5 @@ require (
 	github.com/prometheus/client_golang v1.17.0
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9
 )
+
+replace github.com/centrifuge/go-substrate-rpc-client/v4 => github.com/availproject/go-substrate-rpc-client/v4 v4.1.0-avail-1.8
