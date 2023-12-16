@@ -12,7 +12,6 @@ Level = "info"
 Outputs = ["stderr"]
 
 [State]
-AccountQueue = 64
 	[State.DB]
 	User = "state_user"
 	Password = "state_password"
@@ -33,16 +32,6 @@ AccountQueue = 64
 		MaxArithmetics = 236585
 		MaxBinaries = 473170
 		MaxSteps = 7570538
-		[State.Batch.ResourceWeights]
-		WeightBatchBytesSize = 1
-		WeightCumulativeGasUsed = 1
-		WeightKeccakHashes = 1
-		WeightPoseidonHashes = 1
-		WeightPoseidonPaddings = 1
-		WeightMemAligns = 1
-		WeightArithmetics = 1
-		WeightBinaries = 1
-		WeightSteps = 1
 
 [Pool]
 IntervalToRefreshBlockedAddresses = "5m"
@@ -54,7 +43,16 @@ MinAllowedGasPriceInterval = "5m"
 PollMinAllowedGasPriceInterval = "15s"
 AccountQueue = 64
 GlobalQueue = 1024
-	[Pool.DB]
+    [Pool.EffectiveGasPrice]
+	Enabled = false
+	L1GasPriceFactor = 0.25
+	ByteGasCost = 16
+	ZeroByteGasCost = 4
+	NetProfit = 1
+	BreakEvenFactor = 1.1	
+	FinalDeviationPct = 10
+	L2GasPriceSuggesterFactor = 0.5
+    [Pool.DB]
 	User = "pool_user"
 	Password = "pool_password"
 	Name = "pool_db"
@@ -65,6 +63,7 @@ GlobalQueue = 1024
 
 [Etherman]
 URL = "http://localhost:8545"
+ForkIDChunkSize = 20000
 MultiGasProvider = false
 	[Etherman.Etherscan]
 		ApiKey = ""
@@ -84,9 +83,12 @@ WriteTimeout = "60s"
 MaxRequestsPerIPAndSecond = 500
 SequencerNodeURI = ""
 EnableL2SuggestedGasPricePolling = true
-TraceBatchUseHTTPS = true
 BatchRequestsEnabled = false
 BatchRequestsLimit = 20
+MaxLogsCount = 10000
+MaxLogsBlockRange = 10000
+MaxNativeBlockHashBlockRange = 60000
+EnableHttpLog = true
 	[RPC.WebSockets]
 		Enabled = true
 		Host = "0.0.0.0"
@@ -97,6 +99,20 @@ BatchRequestsLimit = 20
 SyncInterval = "1s"
 SyncChunkSize = 100
 TrustedSequencerURL = "" # If it is empty or not specified, then the value is read from the smc
+L1SynchronizationMode = "sequential" # "sequential" or "parallel"
+	[Synchronizer.L1ParallelSynchronization]
+		MaxClients = 10
+		MaxPendingNoProcessedBlocks = 25
+		RequestLastBlockPeriod = "5s"
+		RequestLastBlockTimeout = "5s"
+		RequestLastBlockMaxRetries = 3
+		StatisticsPeriod = "5m"
+		TimeoutMainLoop = "5m"
+		RollupInfoRetriesSpacing= "5s"
+		FallbackToSequentialModeOnSynchronized = false
+		[Synchronizer.L1ParallelSynchronization.PerformanceWarning]
+			AceptableInacctivityTime = "5s"
+			ApplyAfterNumRollupReceived = 10
 
 [Sequencer]
 WaitPeriodPoolIsEmpty = "1s"
@@ -116,14 +132,13 @@ MaxTxLifetime = "3h"
 		ForcedBatchesFinalityNumberOfBlocks = 64
 		TimestampResolution = "10s"
 		StopSequencerOnBatchNum = 0
+		SequentialReprocessFullBatch = false
 	[Sequencer.DBManager]
 		PoolRetrievalInterval = "500ms"
 		L2ReorgRetrievalInterval = "5s"
-	[Sequencer.EffectiveGasPrice]
-		MaxBreakEvenGasPriceDeviationPercentage = 10
-		L1GasPriceFactor = 0.25
-		ByteGasCost = 16
-		MarginFactor = 1
+	[Sequencer.StreamServer]
+		Port = 0
+		Filename = ""
 		Enabled = false
 
 [SequenceSender]
@@ -132,6 +147,7 @@ LastBatchVirtualizationTimeMaxWaitPeriod = "5s"
 MaxTxSizeForL1 = 131072
 L2Coinbase = "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"
 PrivateKey = {Path = "/pk/sequencer.keystore", Password = "testonly"}
+GasOffset = 80000
 
 [Aggregator]
 Host = "0.0.0.0"
@@ -143,6 +159,7 @@ TxProfitabilityMinReward = "1.1"
 ProofStatePollingInterval = "5s"
 CleanupLockedProofsInterval = "2m"
 GeneratingProofCleanupThreshold = "10m"
+GasOffset = 0
 
 [L2GasPriceSuggester]
 Type = "follower"

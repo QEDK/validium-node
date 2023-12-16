@@ -10,6 +10,11 @@
 /test/contracts/bin/**/*.bin
 /test/contracts/bin/**/*.abi
 
+/tools/datastreamer/*.bin
+/test/datastreamer/*.db/*
+/test/*.bin
+/test/*.db/*
+
 **/.DS_Store
 .vscode
 .idea/
@@ -24,3 +29,5 @@ test/sequencer.keystore
 test/config/test.avail.config.json
 test/config/test.genesis.config.json
 test/config/test.node.config.toml
+
+*metrics.txt
