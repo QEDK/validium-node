@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// Config represents the configuration for avail DA integration
 type Config struct {
 	Seed               string `json:"seed"`
 	ApiURL             string `json:"api_url"`
@@ -16,8 +17,8 @@ type Config struct {
 	Timeout            int    `json:"timeout"`
 }
 
+// GetConfig reads the configuration from a file
 func (c *Config) GetConfig(configFileName string) error {
-
 	jsonFile, err := os.Open(configFileName)
 	if err != nil {
 		return err

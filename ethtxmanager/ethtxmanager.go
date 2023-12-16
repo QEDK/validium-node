@@ -89,6 +89,7 @@ func (c *Client) Add(ctx context.Context, owner, id string, from common.Address,
 		return err
 	}
 
+	// nolint : gomnd
 	gasPrice = gasPrice.Add(gasPrice, gasPrice.Div(gasPrice, big.NewInt(10)))
 
 	// create monitored tx

@@ -19,8 +19,10 @@ import (
 )
 
 const (
-	ethTxManagerOwner = "sequencer"
-	monitoredIDFormat = "sequence-from-%v-to-%v"
+	ethTxManagerOwner  = "sequencer"
+	monitoredIDFormat  = "sequence-from-%v-to-%v"
+	l1_rpcPollInterval = 10 * time.Second
+	hourSecondsCount   = 3600
 )
 
 var (
@@ -195,18 +197,18 @@ func (s *SequenceSender) getSequencesToSend(ctx context.Context) ([]types.Sequen
 		} else if len(batch.BatchL2Data) != 0 && *dataRoot == [32]byte{} {
 			log.Infof("⏰ Data root is not available yet for batch %d, skipping", batch.BatchNumber)
 			// this is to prevent from calling the L1 RPC too often
-			time.Sleep(10 * time.Second)
+			time.Sleep(l1_rpcPollInterval)
 			// if a data root is not available after an hour, something is wrong, re-dispatch the data root
-			if time.Now().Unix()-batch.Timestamp.Unix() > 3600 {
+			if time.Now().Unix()-batch.Timestamp.Unix() > hourSecondsCount {
 				// check data redispatch map
 				redispatchTime := s.redispatchDataMap[batch.BatchNumber]
-				if redispatchTime == 0 || time.Now().Unix()-redispatchTime > 3600 {
+				if redispatchTime == 0 || time.Now().Unix()-redispatchTime > hourSecondsCount {
 					err := avail.DispatchDataRoot(uint64(batch.DABlockNumber))
 					if err == nil {
 						s.redispatchDataMap[batch.BatchNumber] = time.Now().Unix()
 					} else {
 						log.Warnf("error dispatching data root for batch %d: %v", batch.BatchNumber, err)
-						time.Sleep(10 * time.Second)
+						time.Sleep(l1_rpcPollInterval)
 					}
 				}
 			}

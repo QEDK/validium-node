@@ -10,24 +10,25 @@ import (
 	"time"
 
 	availConfig "github.com/0xPolygonHermez/zkevm-node/avail/internal/config"
+	availTypes "github.com/0xPolygonHermez/zkevm-node/avail/types"
 	"github.com/0xPolygonHermez/zkevm-node/log"
-	"golang.org/x/crypto/sha3"
-
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
-
-	availTypes "github.com/0xPolygonHermez/zkevm-node/avail/types"
+	"golang.org/x/crypto/sha3"
 )
 
+// AccountNextIndexRPCResponse represents the next index of account rpc response
 type AccountNextIndexRPCResponse struct {
 	Result uint `json:"result"`
 }
 
+// DataProofRPCResponse represents the data proof rpc response
 type DataProofRPCResponse struct {
 	Result DataProof `json:"result"`
 }
 
+// DataProof represents the data proof structure
 type DataProof struct {
 	Root           string   `json:"root"`
 	Proof          []string `json:"proof"`
@@ -36,15 +37,23 @@ type DataProof struct {
 	Leaf           string   `json:"leaf"`
 }
 
-var Config availConfig.Config
-var Api *gsrpc.SubstrateAPI
-var Meta *types.Metadata
-var AppId int
-var GenesisHash types.Hash
-var Rv *types.RuntimeVersion
-var KeyringPair signature.KeyringPair
-var DestinationAddress types.Hash
-var DestinationDomain types.UCompact
+// nolint : revive
+var (
+	Config             availConfig.Config
+	Api                *gsrpc.SubstrateAPI
+	Meta               *types.Metadata
+	AppId              int
+	GenesisHash        types.Hash
+	Rv                 *types.RuntimeVersion
+	KeyringPair        signature.KeyringPair
+	DestinationAddress types.Hash
+	DestinationDomain  types.UCompact
+)
+
+const (
+	networkID  = 42
+	defaultTip = 1000
+)
 
 func init() {
 	err := Config.GetConfig("/app/avail-config.json")
@@ -79,7 +88,7 @@ func init() {
 		log.Fatalf("cannot get runtime version:%w", err)
 	}
 
-	KeyringPair, err = signature.KeyringPairFromSecret(Config.Seed, 42)
+	KeyringPair, err = signature.KeyringPairFromSecret(Config.Seed, networkID)
 	if err != nil {
 		log.Fatalf("cannot create keypair:%w", err)
 	}
@@ -92,6 +101,7 @@ func init() {
 	DestinationDomain = types.NewUCompactFromUInt(uint64(Config.DestinationDomain))
 }
 
+// PostData posts data to the avail DA
 func PostData(txData []byte) (*availTypes.BatchDAData, error) {
 	log.Infof("⚡️ Prepared data for Avail:%d bytes", len(txData))
 
@@ -114,7 +124,7 @@ func PostData(txData []byte) (*availTypes.BatchDAData, error) {
 		GenesisHash:        GenesisHash,
 		Nonce:              nonce,
 		SpecVersion:        Rv.SpecVersion,
-		Tip:                types.NewUCompactFromUInt(1000),
+		Tip:                types.NewUCompactFromUInt(defaultTip),
 		AppID:              types.NewUCompactFromUInt(uint64(AppId)),
 		TransactionVersion: Rv.TransactionVersion,
 	}
@@ -185,7 +195,9 @@ out:
 		}
 
 		var dataProofResp DataProofRPCResponse
-		json.Unmarshal(data, &dataProofResp)
+		if err := json.Unmarshal(data, &dataProofResp); err != nil {
+			return nil, fmt.Errorf("cannot unmarshal data proof:%v", err)
+		}
 
 		if dataProofResp.Result.Leaf == fmt.Sprintf("%#x", batchHash) {
 			dataProof = dataProofResp.Result
@@ -205,11 +217,14 @@ out:
 	}
 
 	batchDAData.BlockNumber = uint(header.Number)
+
+	//nolint:errcheck
 	GetData(uint64(header.Number), dataProof.LeafIndex)
 	log.Infof("🟢 prepared DA data:%+v", batchDAData)
 	return &batchDAData, nil
 }
 
+// DispatchDataRoot dispatches the data root to the avail DA
 func DispatchDataRoot(blockNumber uint64) error {
 	blockHash, err := Api.RPC.Chain.GetBlockHash(blockNumber)
 	if err != nil {
@@ -240,7 +255,7 @@ func DispatchDataRoot(blockNumber uint64) error {
 		GenesisHash:        GenesisHash,
 		Nonce:              nonce,
 		SpecVersion:        Rv.SpecVersion,
-		Tip:                types.NewUCompactFromUInt(1000),
+		Tip:                types.NewUCompactFromUInt(defaultTip),
 		AppID:              types.NewUCompactFromUInt(0),
 		TransactionVersion: Rv.TransactionVersion,
 	}
@@ -282,6 +297,7 @@ out:
 	return nil
 }
 
+// GetData gets the data from the avail DA block
 func GetData(blockNumber uint64, index uint) ([]byte, error) {
 	blockHash, err := Api.RPC.Chain.GetBlockHash(uint64(blockNumber))
 	if err != nil {
@@ -303,6 +319,7 @@ func GetData(blockNumber uint64, index uint) ([]byte, error) {
 	return data[index], nil
 }
 
+// GetAccountNextIndex gets the next index of the account from avail DA
 func GetAccountNextIndex() (types.UCompact, error) {
 	resp, err := http.Post("https://goldberg.avail.tools/api", "application/json", strings.NewReader(fmt.Sprintf("{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"system_accountNextIndex\",\"params\":[\"%v\"]}", KeyringPair.Address)))
 	if err != nil {
@@ -317,7 +334,10 @@ func GetAccountNextIndex() (types.UCompact, error) {
 	}
 
 	var accountNextIndex AccountNextIndexRPCResponse
-	json.Unmarshal(data, &accountNextIndex)
+
+	if err := json.Unmarshal(data, &accountNextIndex); err != nil {
+		return types.NewUCompactFromUInt(0), fmt.Errorf("cannot unmarshal account next index:%v", err)
+	}
 
 	return types.NewUCompactFromUInt(uint64(accountNextIndex.Result)), nil
 }
