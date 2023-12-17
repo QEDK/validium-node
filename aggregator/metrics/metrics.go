@@ -13,6 +13,7 @@ const (
 
 // Register the metrics for the sequencer package.
 func Register() {
+	fmt.Println("----- debug")
 	gauges := []prometheus.GaugeOpts{
 		{
 			Name: currentConnectedProversName,
