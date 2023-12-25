@@ -33,12 +33,23 @@ type Config struct {
 
 	// Configuration for the batch constraints
 	Batch BatchConfig `mapstructure:"Batch"`
+
+	// MaxLogsCount is a configuration to set the max number of logs that can be returned
+	// in a single call to the state, if zero it means no limit
+	MaxLogsCount uint64
+
+	// MaxLogsBlockRange is a configuration to set the max range for block number when querying TXs
+	// logs in a single call to the state, if zero it means no limit
+	MaxLogsBlockRange uint64
+
+	// MaxNativeBlockHashBlockRange is a configuration to set the max range for block number when querying
+	// native block hashes in a single call to the state, if zero it means no limit
+	MaxNativeBlockHashBlockRange uint64
 }
 
 // BatchConfig represents the configuration of the batch constraints
 type BatchConfig struct {
-	Constraints     BatchConstraintsCfg     `mapstructure:"Constraints"`
-	ResourceWeights BatchResourceWeightsCfg `mapstructure:"ResourceWeights"`
+	Constraints BatchConstraintsCfg `mapstructure:"Constraints"`
 }
 
 // BatchConstraintsCfg represents the configuration of the batch constraints
@@ -65,17 +76,4 @@ func (c BatchConstraintsCfg) IsWithinConstraints(counters ZKCounters) bool {
 		counters.UsedArithmetics <= c.MaxArithmetics &&
 		counters.UsedBinaries <= c.MaxBinaries &&
 		counters.UsedSteps <= c.MaxSteps
-}
-
-// BatchResourceWeightsCfg represents the configuration of the batch resource weights
-type BatchResourceWeightsCfg struct {
-	WeightBatchBytesSize    int `mapstructure:"WeightBatchBytesSize"`
-	WeightCumulativeGasUsed int `mapstructure:"WeightCumulativeGasUsed"`
-	WeightKeccakHashes      int `mapstructure:"WeightKeccakHashes"`
-	WeightPoseidonHashes    int `mapstructure:"WeightPoseidonHashes"`
-	WeightPoseidonPaddings  int `mapstructure:"WeightPoseidonPaddings"`
-	WeightMemAligns         int `mapstructure:"WeightMemAligns"`
-	WeightArithmetics       int `mapstructure:"WeightArithmetics"`
-	WeightBinaries          int `mapstructure:"WeightBinaries"`
-	WeightSteps             int `mapstructure:"WeightSteps"`
 }

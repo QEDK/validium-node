@@ -19,8 +19,10 @@ import (
 )
 
 const (
-	ethTxManagerOwner = "sequencer"
-	monitoredIDFormat = "sequence-from-%v-to-%v"
+	ethTxManagerOwner  = "sequencer"
+	monitoredIDFormat  = "sequence-from-%v-to-%v"
+	l1_rpcPollInterval = 10 * time.Second
+	hourSecondsCount   = 3600
 )
 
 var (
@@ -66,8 +68,8 @@ func (s *SequenceSender) tryToSendSequence(ctx context.Context, ticker *time.Tic
 	s.ethTxManager.ProcessPendingMonitoredTxs(ctx, ethTxManagerOwner, func(result ethtxmanager.MonitoredTxResult, dbTx pgx.Tx) {
 		if result.Status == ethtxmanager.MonitoredTxStatusFailed {
 			retry = true
-			resultLog := log.WithFields("owner", ethTxManagerOwner, "id", result.ID)
-			resultLog.Error("failed to send sequence, TODO: review this fatal and define what to do in this case")
+			mTxResultLogger := ethtxmanager.CreateMonitoredTxResultLogger(ethTxManagerOwner, result)
+			mTxResultLogger.Error("failed to send sequence, TODO: review this fatal and define what to do in this case")
 		}
 	}, nil)
 
@@ -121,9 +123,10 @@ func (s *SequenceSender) tryToSendSequence(ctx context.Context, ticker *time.Tic
 	firstSequence := sequences[0]
 	lastSequence := sequences[len(sequences)-1]
 	monitoredTxID := fmt.Sprintf(monitoredIDFormat, firstSequence.BatchNumber, lastSequence.BatchNumber)
-	err = s.ethTxManager.Add(ctx, ethTxManagerOwner, monitoredTxID, s.cfg.SenderAddress, to, nil, data, nil)
+	err = s.ethTxManager.Add(ctx, ethTxManagerOwner, monitoredTxID, s.cfg.SenderAddress, to, nil, data, s.cfg.GasOffset, nil)
 	if err != nil {
-		log.Error("error to add sequences tx to eth tx manager: ", err)
+		mTxLogger := ethtxmanager.CreateLogger(ethTxManagerOwner, monitoredTxID, s.cfg.SenderAddress, to)
+		mTxLogger.Errorf("error to add sequences tx to eth tx manager: ", err)
 		return
 	}
 }
@@ -194,18 +197,18 @@ func (s *SequenceSender) getSequencesToSend(ctx context.Context) ([]types.Sequen
 		} else if len(batch.BatchL2Data) != 0 && *dataRoot == [32]byte{} {
 			log.Infof("⏰ Data root is not available yet for batch %d, skipping", batch.BatchNumber)
 			// this is to prevent from calling the L1 RPC too often
-			time.Sleep(10 * time.Second)
+			time.Sleep(l1_rpcPollInterval)
 			// if a data root is not available after an hour, something is wrong, re-dispatch the data root
-			if time.Now().Unix()-batch.Timestamp.Unix() > 3600 {
+			if time.Now().Unix()-batch.Timestamp.Unix() > hourSecondsCount {
 				// check data redispatch map
 				redispatchTime := s.redispatchDataMap[batch.BatchNumber]
-				if redispatchTime == 0 || time.Now().Unix()-redispatchTime > 3600 {
+				if redispatchTime == 0 || time.Now().Unix()-redispatchTime > hourSecondsCount {
 					err := avail.DispatchDataRoot(uint64(batch.DABlockNumber))
 					if err == nil {
 						s.redispatchDataMap[batch.BatchNumber] = time.Now().Unix()
 					} else {
 						log.Warnf("error dispatching data root for batch %d: %v", batch.BatchNumber, err)
-						time.Sleep(10 * time.Second)
+						time.Sleep(l1_rpcPollInterval)
 					}
 				}
 			}
@@ -236,7 +239,7 @@ func (s *SequenceSender) getSequencesToSend(ctx context.Context) ([]types.Sequen
 
 		//Check if the current batch is the last before a change to a new forkid, in this case we need to close and send the sequence to L1
 		if (s.cfg.ForkUpgradeBatchNumber != 0) && (currentBatchNumToSequence == (s.cfg.ForkUpgradeBatchNumber)) {
-			log.Info("sequence should be sent to L1, as we have reached the batch %d from which a new forkid is applied (upgrade)", s.cfg.ForkUpgradeBatchNumber)
+			log.Infof("sequence should be sent to L1, as we have reached the batch %d from which a new forkid is applied (upgrade)", s.cfg.ForkUpgradeBatchNumber)
 			return sequences, nil
 		}
 

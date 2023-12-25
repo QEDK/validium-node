@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/0xPolygonHermez/zkevm-node/encoding"
+	"github.com/0xPolygonHermez/zkevm-node/event"
 	"github.com/0xPolygonHermez/zkevm-node/hex"
 	"github.com/0xPolygonHermez/zkevm-node/log"
 	"github.com/0xPolygonHermez/zkevm-node/state/runtime"
@@ -24,6 +25,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/trie"
+	"github.com/google/uuid"
 	"github.com/holiman/uint256"
 	"github.com/jackc/pgx/v4"
 	"google.golang.org/grpc/codes"
@@ -117,7 +119,7 @@ func RlpFieldsToLegacyTx(fields [][]byte, v, r, s []byte) (tx *types.LegacyTx, e
 // StoreTransactions is used by the sequencer to add processed transactions into
 // an open batch. If the batch already has txs, the processedTxs must be a super
 // set of the existing ones, preserving order.
-func (s *State) StoreTransactions(ctx context.Context, batchNumber uint64, processedTxs []*ProcessTransactionResponse, dbTx pgx.Tx) error {
+func (s *State) StoreTransactions(ctx context.Context, batchNumber uint64, processedTxs []*ProcessTransactionResponse, txsEGPLog []*EffectiveGasPriceLog, dbTx pgx.Tx) error {
 	if dbTx == nil {
 		return ErrDBTxNil
 	}
@@ -152,7 +154,7 @@ func (s *State) StoreTransactions(ctx context.Context, batchNumber uint64, proce
 		// if the transaction has an intrinsic invalid tx error it means
 		// the transaction has not changed the state, so we don't store it
 		// and just move to the next
-		if executor.IsIntrinsicError(executor.RomErrorCode(processedTx.RomError)) {
+		if executor.IsIntrinsicError(executor.RomErrorCode(processedTx.RomError)) || errors.Is(processedTx.RomError, executor.RomErr(executor.RomError_ROM_ERROR_INVALID_RLP)) {
 			continue
 		}
 
@@ -184,8 +186,13 @@ func (s *State) StoreTransactions(ctx context.Context, batchNumber uint64, proce
 
 		receipt.BlockHash = block.Hash()
 
+		storeTxsEGPData := []StoreTxEGPData{{EGPLog: nil, EffectivePercentage: uint8(processedTx.EffectivePercentage)}}
+		if txsEGPLog != nil {
+			storeTxsEGPData[0].EGPLog = txsEGPLog[i]
+		}
+
 		// Store L2 block and its transaction
-		if err := s.AddL2Block(ctx, batchNumber, block, receipts, uint8(processedTx.EffectivePercentage), dbTx); err != nil {
+		if err := s.AddL2Block(ctx, batchNumber, block, receipts, storeTxsEGPData, dbTx); err != nil {
 			return err
 		}
 	}
@@ -242,10 +249,19 @@ func (s *State) DebugTransaction(ctx context.Context, transactionHash common.Has
 		return nil, err
 	}
 
+	var txHashToGenerateCallTrace []byte
+	var txHashToGenerateExecuteTrace []byte
+
+	if traceConfig.IsDefaultTracer() {
+		txHashToGenerateExecuteTrace = transactionHash.Bytes()
+	} else {
+		txHashToGenerateCallTrace = transactionHash.Bytes()
+	}
+
 	// Create Batch
 	traceConfigRequest := &executor.TraceConfig{
-		TxHashToGenerateCallTrace:    transactionHash.Bytes(),
-		TxHashToGenerateExecuteTrace: transactionHash.Bytes(),
+		TxHashToGenerateCallTrace:    txHashToGenerateCallTrace,
+		TxHashToGenerateExecuteTrace: txHashToGenerateExecuteTrace,
 		// set the defaults to the maximum information we can have.
 		// this is needed to process custom tracers later
 		DisableStorage:   cFalse,
@@ -263,11 +279,11 @@ func (s *State) DebugTransaction(ctx context.Context, transactionHash common.Has
 		if traceConfig.DisableStack {
 			traceConfigRequest.DisableStack = cTrue
 		}
-		if traceConfig.EnableMemory {
-			traceConfigRequest.EnableMemory = cTrue
+		if !traceConfig.EnableMemory {
+			traceConfigRequest.EnableMemory = cFalse
 		}
-		if traceConfig.EnableReturnData {
-			traceConfigRequest.EnableReturnData = cTrue
+		if !traceConfig.EnableReturnData {
+			traceConfigRequest.EnableReturnData = cFalse
 		}
 	}
 
@@ -285,6 +301,7 @@ func (s *State) DebugTransaction(ctx context.Context, transactionHash common.Has
 		ChainId:          s.cfg.ChainID,
 		ForkId:           forkId,
 		TraceConfig:      traceConfigRequest,
+		ContextId:        uuid.NewString(),
 	}
 
 	// Send Batch to the Executor
@@ -299,6 +316,8 @@ func (s *State) DebugTransaction(ctx context.Context, transactionHash common.Has
 		return nil, err
 	}
 
+	// Transactions are decoded only for logging purposes
+	// as they are not longer needed in the convertToProcessBatchResponse function
 	txs, _, _, err := DecodeTxs(batchL2Data, forkId)
 	if err != nil && !errors.Is(err, ErrInvalidData) {
 		return nil, err
@@ -308,7 +327,7 @@ func (s *State) DebugTransaction(ctx context.Context, transactionHash common.Has
 		log.Debugf(tx.Hash().String())
 	}
 
-	convertedResponse, err := s.convertToProcessBatchResponse(txs, processBatchResponse)
+	convertedResponse, err := s.convertToProcessBatchResponse(processBatchResponse)
 	if err != nil {
 		return nil, err
 	}
@@ -341,6 +360,7 @@ func (s *State) DebugTransaction(ctx context.Context, transactionHash common.Has
 		StateRoot:     response.StateRoot.Bytes(),
 		StructLogs:    response.ExecutionTrace,
 		ExecutorTrace: response.CallTrace,
+		Err:           response.RomError,
 	}
 
 	// if is the default trace, return the result
@@ -427,7 +447,7 @@ func (s *State) DebugTransaction(ctx context.Context, transactionHash common.Has
 	fakeDB := &FakeDB{State: s, stateRoot: batch.StateRoot.Bytes()}
 	evm := fakevm.NewFakeEVM(fakevm.BlockContext{BlockNumber: big.NewInt(1)}, fakevm.TxContext{GasPrice: gasPrice}, fakeDB, params.TestChainConfig, fakevm.Config{Debug: true, Tracer: customTracer})
 
-	traceResult, err := s.buildTrace(evm, result.ExecutorTrace, customTracer)
+	traceResult, err := s.buildTrace(evm, result, customTracer)
 	if err != nil {
 		log.Errorf("debug transaction: failed parse the trace using the tracer: %v", err)
 		return nil, fmt.Errorf("failed parse the trace using the tracer: %v", err)
@@ -439,7 +459,8 @@ func (s *State) DebugTransaction(ctx context.Context, transactionHash common.Has
 }
 
 // ParseTheTraceUsingTheTracer parses the given trace with the given tracer.
-func (s *State) buildTrace(evm *fakevm.FakeEVM, trace instrumentation.ExecutorTrace, tracer tracers.Tracer) (json.RawMessage, error) {
+func (s *State) buildTrace(evm *fakevm.FakeEVM, result *runtime.ExecutionResult, tracer tracers.Tracer) (json.RawMessage, error) {
+	trace := result.ExecutorTrace
 	tracer.CaptureTxStart(trace.Context.Gas)
 	contextGas := trace.Context.Gas - trace.Context.GasUsed
 	if len(trace.Steps) > 0 {
@@ -475,7 +496,8 @@ func (s *State) buildTrace(evm *fakevm.FakeEVM, trace instrumentation.ExecutorTr
 			fakevm.NewAccount(step.Contract.Caller),
 			fakevm.NewAccount(step.Contract.Address),
 			step.Contract.Value, step.Gas)
-		contract.CodeAddr = &step.Contract.Address
+		aux := step.Contract.Address
+		contract.CodeAddr = &aux
 
 		// set Scope
 		scope := &fakevm.ScopeContext{
@@ -574,6 +596,8 @@ func (s *State) buildTrace(evm *fakevm.FakeEVM, trace instrumentation.ExecutorTr
 	var err error
 	if reverted {
 		err = fakevm.ErrExecutionReverted
+	} else if result.Err != nil {
+		err = result.Err
 	}
 	tracer.CaptureEnd(trace.Context.Output, trace.Context.GasUsed, err)
 	restGas := trace.Context.Gas - trace.Context.GasUsed
@@ -593,7 +617,7 @@ func (s *State) getGasUsed(internalTxContextStack *Stack[instrumentation.Interna
 		gasUsed = previousStep.Contract.Gas - step.Gas
 	} else {
 		// otherwise we use the step gas
-		gasUsed = itCtx.RemainingGas - previousStep.Gas - previousStep.GasCost
+		gasUsed = itCtx.RemainingGas - previousStep.Gas + previousStep.GasCost
 	}
 	return gasUsed, nil
 }
@@ -713,7 +737,7 @@ func (s *State) PreProcessTransaction(ctx context.Context, tx *types.Transaction
 
 	response, err := s.internalProcessUnsignedTransaction(ctx, tx, sender, nil, false, dbTx)
 	if err != nil {
-		return nil, err
+		return response, err
 	}
 
 	return response, nil
@@ -812,6 +836,7 @@ func (s *State) internalProcessUnsignedTransaction(ctx context.Context, tx *type
 		UpdateMerkleTree: cFalse,
 		ChainId:          s.cfg.ChainID,
 		ForkId:           forkID,
+		ContextId:        uuid.NewString(),
 	}
 
 	if noZKEVMCounters {
@@ -828,17 +853,18 @@ func (s *State) internalProcessUnsignedTransaction(ctx context.Context, tx *type
 	log.Debugf("internalProcessUnsignedTransaction[processBatchRequest.UpdateMerkleTree]: %v", processBatchRequest.UpdateMerkleTree)
 	log.Debugf("internalProcessUnsignedTransaction[processBatchRequest.ChainId]: %v", processBatchRequest.ChainId)
 	log.Debugf("internalProcessUnsignedTransaction[processBatchRequest.ForkId]: %v", processBatchRequest.ForkId)
+	log.Debugf("internalProcessUnsignedTransaction[processBatchRequest.ContextId]: %v", processBatchRequest.ContextId)
 
 	// Send Batch to the Executor
 	processBatchResponse, err := s.executorClient.ProcessBatch(ctx, processBatchRequest)
 	if err != nil {
-		if status.Code(err) == codes.ResourceExhausted {
+		if status.Code(err) == codes.ResourceExhausted || (processBatchResponse != nil && processBatchResponse.Error == executor.ExecutorError(executor.ExecutorError_EXECUTOR_ERROR_DB_ERROR)) {
 			log.Errorf("error processing unsigned transaction ", err)
 			for attempts < s.cfg.MaxResourceExhaustedAttempts {
 				time.Sleep(s.cfg.WaitOnResourceExhaustion.Duration)
 				log.Errorf("retrying to process unsigned transaction")
 				processBatchResponse, err = s.executorClient.ProcessBatch(ctx, processBatchRequest)
-				if status.Code(err) == codes.ResourceExhausted {
+				if status.Code(err) == codes.ResourceExhausted || (processBatchResponse != nil && processBatchResponse.Error == executor.ExecutorError(executor.ExecutorError_EXECUTOR_ERROR_DB_ERROR)) {
 					log.Errorf("error processing unsigned transaction ", err)
 					attempts++
 					continue
@@ -848,12 +874,23 @@ func (s *State) internalProcessUnsignedTransaction(ctx context.Context, tx *type
 		}
 
 		if err != nil {
-			if status.Code(err) == codes.ResourceExhausted {
+			if status.Code(err) == codes.ResourceExhausted || (processBatchResponse != nil && processBatchResponse.Error == executor.ExecutorError(executor.ExecutorError_EXECUTOR_ERROR_DB_ERROR)) {
 				log.Error("reporting error as time out")
 				return nil, runtime.ErrGRPCResourceExhaustedAsTimeout
 			}
-			// Log this error as an executor unspecified error
-			s.eventLog.LogExecutorError(ctx, executor.ExecutorError_EXECUTOR_ERROR_UNSPECIFIED, processBatchRequest)
+			// Log the error
+			event := &event.Event{
+				ReceivedAt:  time.Now(),
+				Source:      event.Source_Node,
+				Level:       event.Level_Error,
+				EventID:     event.EventID_ExecutorError,
+				Description: fmt.Sprintf("error processing unsigned transaction %s: %v", tx.Hash(), err),
+			}
+
+			err2 := s.eventLog.LogEvent(context.Background(), event)
+			if err2 != nil {
+				log.Errorf("error logging event %v", err2)
+			}
 			log.Errorf("error processing unsigned transaction ", err)
 			return nil, err
 		}
@@ -865,7 +902,7 @@ func (s *State) internalProcessUnsignedTransaction(ctx context.Context, tx *type
 		return nil, err
 	}
 
-	response, err := s.convertToProcessBatchResponse([]types.Transaction{*tx}, processBatchResponse)
+	response, err := s.convertToProcessBatchResponse(processBatchResponse)
 	if err != nil {
 		return nil, err
 	}
@@ -886,20 +923,20 @@ func (s *State) isContractCreation(tx *types.Transaction) bool {
 }
 
 // StoreTransaction is used by the sequencer and trusted state synchronizer to add process a transaction.
-func (s *State) StoreTransaction(ctx context.Context, batchNumber uint64, processedTx *ProcessTransactionResponse, coinbase common.Address, timestamp uint64, dbTx pgx.Tx) error {
+func (s *State) StoreTransaction(ctx context.Context, batchNumber uint64, processedTx *ProcessTransactionResponse, coinbase common.Address, timestamp uint64, egpLog *EffectiveGasPriceLog, dbTx pgx.Tx) (*types.Header, error) {
 	if dbTx == nil {
-		return ErrDBTxNil
+		return nil, ErrDBTxNil
 	}
 
 	// if the transaction has an intrinsic invalid tx error it means
 	// the transaction has not changed the state, so we don't store it
 	if executor.IsIntrinsicError(executor.RomErrorCode(processedTx.RomError)) {
-		return nil
+		return nil, nil
 	}
 
 	lastL2Block, err := s.GetLastL2Block(ctx, dbTx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	header := &types.Header{
@@ -922,12 +959,14 @@ func (s *State) StoreTransaction(ctx context.Context, batchNumber uint64, proces
 
 	receipt.BlockHash = block.Hash()
 
+	storeTxsEGPData := []StoreTxEGPData{{EGPLog: egpLog, EffectivePercentage: uint8(processedTx.EffectivePercentage)}}
+
 	// Store L2 block and its transaction
-	if err := s.AddL2Block(ctx, batchNumber, block, receipts, uint8(processedTx.EffectivePercentage), dbTx); err != nil {
-		return err
+	if err := s.AddL2Block(ctx, batchNumber, block, receipts, storeTxsEGPData, dbTx); err != nil {
+		return nil, err
 	}
 
-	return nil
+	return block.Header(), nil
 }
 
 // CheckSupersetBatchTransactions verifies that processedTransactions is a
@@ -948,9 +987,6 @@ func CheckSupersetBatchTransactions(existingTxHashes []common.Hash, processedTxs
 // EstimateGas for a transaction
 func (s *State) EstimateGas(transaction *types.Transaction, senderAddress common.Address, l2BlockNumber *uint64, dbTx pgx.Tx) (uint64, []byte, error) {
 	const ethTransferGas = 21000
-
-	var lowEnd uint64
-	var highEnd uint64
 
 	ctx := context.Background()
 
@@ -983,63 +1019,68 @@ func (s *State) EstimateGas(transaction *types.Transaction, senderAddress common
 		previousBatch = lastBatches[1]
 	}
 
-	lowEnd, err = core.IntrinsicGas(transaction.Data(), transaction.AccessList(), s.isContractCreation(transaction), true, false, false)
-	if err != nil {
-		return 0, nil, err
-	}
+	highEnd := s.cfg.MaxCumulativeGasUsed
 
-	if lowEnd == ethTransferGas && transaction.To() != nil {
-		code, err := s.tree.GetCode(ctx, *transaction.To(), stateRoot.Bytes())
-		if err != nil {
-			log.Warnf("error while getting transaction.to() code %v", err)
-		} else if len(code) == 0 {
-			return lowEnd, nil, nil
-		}
-	}
-
-	if transaction.Gas() != 0 && transaction.Gas() > lowEnd {
-		highEnd = transaction.Gas()
-	} else {
-		highEnd = s.cfg.MaxCumulativeGasUsed
-	}
-
-	var availableBalance *big.Int
-
-	if senderAddress != ZeroAddress {
+	// if gas price is set, set the highEnd to the max amount
+	// of the account afford
+	isGasPriceSet := transaction.GasPrice().BitLen() != 0
+	if isGasPriceSet {
 		senderBalance, err := s.tree.GetBalance(ctx, senderAddress, stateRoot.Bytes())
-		if err != nil {
-			if errors.Is(err, ErrNotFound) {
-				senderBalance = big.NewInt(0)
-			} else {
-				return 0, nil, err
-			}
+		if errors.Is(err, ErrNotFound) {
+			senderBalance = big.NewInt(0)
+		} else if err != nil {
+			return 0, nil, err
 		}
 
-		availableBalance = new(big.Int).Set(senderBalance)
-
+		availableBalance := new(big.Int).Set(senderBalance)
+		// check if the account has funds to pay the transfer value
 		if transaction.Value() != nil {
 			if transaction.Value().Cmp(availableBalance) > 0 {
-				return 0, nil, ErrInsufficientFunds
+				return 0, nil, ErrInsufficientFundsForTransfer
 			}
 
+			// deduct the value from the available balance
 			availableBalance.Sub(availableBalance, transaction.Value())
 		}
-	}
-
-	if transaction.GasPrice().BitLen() != 0 && // Gas price has been set
-		availableBalance != nil && // Available balance is found
-		availableBalance.Cmp(big.NewInt(0)) > 0 { // Available balance > 0
-		gasAllowance := new(big.Int).Div(availableBalance, transaction.GasPrice())
 
 		// Check the gas allowance for this account, make sure high end is capped to it
+		gasAllowance := new(big.Int).Div(availableBalance, transaction.GasPrice())
 		if gasAllowance.IsUint64() && highEnd > gasAllowance.Uint64() {
 			log.Debugf("Gas estimation high-end capped by allowance [%d]", gasAllowance.Uint64())
 			highEnd = gasAllowance.Uint64()
 		}
 	}
 
-	// Run the transaction with the specified gas value.
-	// Returns a status indicating if the transaction failed, if it was reverted and the accompanying error
+	// if the tx gas is set and it is smaller than the highEnd,
+	// limit the highEnd to the maximum allowed by the tx gas
+	if transaction.Gas() != 0 && transaction.Gas() < highEnd {
+		highEnd = transaction.Gas()
+	}
+
+	// set start values for lowEnd and highEnd:
+	lowEnd, err := core.IntrinsicGas(transaction.Data(), transaction.AccessList(), s.isContractCreation(transaction), true, false, false)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	// if the intrinsic gas is the same as the constant value for eth transfer
+	// and the transaction has a receiver address
+	if lowEnd == ethTransferGas && transaction.To() != nil {
+		receiver := *transaction.To()
+		// check if the receiver address is not a smart contract
+		code, err := s.tree.GetCode(ctx, receiver, stateRoot.Bytes())
+		if err != nil {
+			log.Warnf("error while getting code for address %v: %v", receiver.String(), err)
+		} else if len(code) == 0 {
+			// in case it is just an account, we can avoid the execution and return
+			// the transfer constant amount
+			return lowEnd, nil, nil
+		}
+	}
+
+	// testTransaction runs the transaction with the specified gas value.
+	// it returns a status indicating if the transaction has failed, if it
+	// was reverted and the accompanying error
 	testTransaction := func(gas uint64, nonce uint64, shouldOmitErr bool) (failed, reverted bool, gasUsed uint64, returnValue []byte, err error) {
 		tx := types.NewTx(&types.LegacyTx{
 			Nonce:    nonce,
@@ -1071,6 +1112,7 @@ func (s *State) EstimateGas(transaction *types.Transaction, senderAddress common
 			UpdateMerkleTree: cFalse,
 			ChainId:          s.cfg.ChainID,
 			ForkId:           forkID,
+			ContextId:        uuid.NewString(),
 		}
 
 		log.Debugf("EstimateGas[processBatchRequest.OldBatchNum]: %v", processBatchRequest.OldBatchNum)
@@ -1084,6 +1126,7 @@ func (s *State) EstimateGas(transaction *types.Transaction, senderAddress common
 		log.Debugf("EstimateGas[processBatchRequest.UpdateMerkleTree]: %v", processBatchRequest.UpdateMerkleTree)
 		log.Debugf("EstimateGas[processBatchRequest.ChainId]: %v", processBatchRequest.ChainId)
 		log.Debugf("EstimateGas[processBatchRequest.ForkId]: %v", processBatchRequest.ForkId)
+		log.Debugf("EstimateGas[processBatchRequest.ContextId]: %v", processBatchRequest.ContextId)
 
 		txExecutionOnExecutorTime := time.Now()
 		processBatchResponse, err := s.executorClient.ProcessBatch(ctx, processBatchRequest)
@@ -1092,12 +1135,12 @@ func (s *State) EstimateGas(transaction *types.Transaction, senderAddress common
 			log.Errorf("error estimating gas: %v", err)
 			return false, false, gasUsed, nil, err
 		}
-		gasUsed = processBatchResponse.Responses[0].GasUsed
 		if processBatchResponse.Error != executor.ExecutorError_EXECUTOR_ERROR_NO_ERROR {
 			err = executor.ExecutorErr(processBatchResponse.Error)
 			s.eventLog.LogExecutorError(ctx, processBatchResponse.Error, processBatchRequest)
 			return false, false, gasUsed, nil, err
 		}
+		gasUsed = processBatchResponse.Responses[0].GasUsed
 
 		// Check if an out of gas error happened during EVM execution
 		if processBatchResponse.Responses[0].Error != executor.RomError_ROM_ERROR_NO_ERROR {
@@ -1126,9 +1169,10 @@ func (s *State) EstimateGas(transaction *types.Transaction, senderAddress common
 	txExecutions := []time.Duration{}
 	var totalExecutionTime time.Duration
 
-	// Check if the highEnd is a good value to make the transaction pass
-	failed, reverted, gasUsed, returnValue, err := testTransaction(highEnd, nonce, false)
+	// Check if the highEnd is a good value to make the transaction pass, if it fails we
+	// can return immediately.
 	log.Debugf("Estimate gas. Trying to execute TX with %v gas", highEnd)
+	failed, reverted, gasUsed, returnValue, err := testTransaction(highEnd, nonce, false)
 	if failed {
 		if reverted {
 			return 0, returnValue, err
@@ -1136,12 +1180,12 @@ func (s *State) EstimateGas(transaction *types.Transaction, senderAddress common
 
 		// The transaction shouldn't fail, for whatever reason, at highEnd
 		return 0, nil, fmt.Errorf(
-			"unable to apply transaction even for the highest gas limit %d: %w",
+			"gas required exceeds allowance (%d)",
 			highEnd,
-			err,
 		)
 	}
 
+	// sets
 	if lowEnd < gasUsed {
 		lowEnd = gasUsed
 	}
@@ -1150,9 +1194,14 @@ func (s *State) EstimateGas(transaction *types.Transaction, senderAddress common
 	for (lowEnd < highEnd) && (highEnd-lowEnd) > 4096 {
 		txExecutionStart := time.Now()
 		mid := (lowEnd + highEnd) / uint64(two)
+		if mid > lowEnd*2 {
+			// Most txs don't need much higher gas limit than their gas used, and most txs don't
+			// require near the full block limit of gas, so the selection of where to bisect the
+			// range here is skewed to favor the low side.
+			mid = lowEnd * uint64(two)
+		}
 
 		log.Debugf("Estimate gas. Trying to execute TX with %v gas", mid)
-
 		failed, reverted, _, _, testErr := testTransaction(mid, nonce, true)
 		executionTime := time.Since(txExecutionStart)
 		totalExecutionTime += executionTime
@@ -1174,9 +1223,9 @@ func (s *State) EstimateGas(transaction *types.Transaction, senderAddress common
 
 	executions := int64(len(txExecutions))
 	if executions > 0 {
-		log.Infof("EstimateGas executed TX %v %d times in %d milliseconds", transaction.Hash(), executions, totalExecutionTime.Milliseconds())
+		log.Debugf("EstimateGas executed TX %v %d times in %d milliseconds", transaction.Hash(), executions, totalExecutionTime.Milliseconds())
 	} else {
-		log.Error("Estimate gas. Tx not executed")
+		log.Debug("Estimate gas. Tx not executed")
 	}
 	return highEnd, nil, nil
 }

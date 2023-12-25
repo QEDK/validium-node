@@ -39,6 +39,7 @@ import (
 )
 
 var (
+	updateL1InfoTreeSignatureHash                  = crypto.Keccak256Hash([]byte("UpdateL1InfoTree(bytes32,bytes32)"))
 	updateGlobalExitRootSignatureHash              = crypto.Keccak256Hash([]byte("UpdateGlobalExitRoot(bytes32,bytes32)"))
 	forcedBatchSignatureHash                       = crypto.Keccak256Hash([]byte("ForceBatch(uint64,bytes32,address,bytes)"))
 	sequencedBatchesEventSignatureHash             = crypto.Keccak256Hash([]byte("SequenceBatches(uint64)"))
@@ -147,6 +148,7 @@ type Client struct {
 	GasProviders externalGasProviders
 
 	l1Cfg L1Config
+	cfg   Config
 	auth  map[common.Address]bind.TransactOpts // empty in case of read-only client
 }
 
@@ -202,6 +204,7 @@ func NewClient(cfg Config, l1Config L1Config) (*Client, error) {
 			Providers:        gProviders,
 		},
 		l1Cfg: l1Config,
+		cfg:   cfg,
 		auth:  map[common.Address]bind.TransactOpts{},
 	}, nil
 }
@@ -238,19 +241,32 @@ func (etherMan *Client) VerifyGenBlockNumber(ctx context.Context, genBlockNumber
 }
 
 // GetForks returns fork information
-func (etherMan *Client) GetForks(ctx context.Context, genBlockNumber uint64) ([]state.ForkIDInterval, error) {
+func (etherMan *Client) GetForks(ctx context.Context, genBlockNumber uint64, lastL1BlockSynced uint64) ([]state.ForkIDInterval, error) {
 	log.Debug("Getting forkIDs from blockNumber: ", genBlockNumber)
 	start := time.Now()
-	// Filter query
-	query := ethereum.FilterQuery{
-		FromBlock: new(big.Int).SetUint64(genBlockNumber),
-		Addresses: etherMan.SCAddresses,
-		Topics:    [][]common.Hash{{updateZkEVMVersionSignatureHash}},
+	var logs []types.Log
+	log.Debug("Using ForkIDChunkSize: ", etherMan.cfg.ForkIDChunkSize)
+	for i := genBlockNumber; i <= lastL1BlockSynced; i = i + etherMan.cfg.ForkIDChunkSize + 1 {
+		final := i + etherMan.cfg.ForkIDChunkSize
+		if final > lastL1BlockSynced {
+			// Limit the query to the last l1BlockSynced
+			final = lastL1BlockSynced
+		}
+		log.Debug("INTERVAL. Initial: ", i, ". Final: ", final)
+		// Filter query
+		query := ethereum.FilterQuery{
+			FromBlock: new(big.Int).SetUint64(i),
+			ToBlock:   new(big.Int).SetUint64(final),
+			Addresses: etherMan.SCAddresses,
+			Topics:    [][]common.Hash{{updateZkEVMVersionSignatureHash}},
+		}
+		l, err := etherMan.EthClient.FilterLogs(ctx, query)
+		if err != nil {
+			return []state.ForkIDInterval{}, err
+		}
+		logs = append(logs, l...)
 	}
-	logs, err := etherMan.EthClient.FilterLogs(ctx, query)
-	if err != nil {
-		return []state.ForkIDInterval{}, err
-	}
+
 	var forks []state.ForkIDInterval
 	for i, l := range logs {
 		zkevmVersion, err := etherMan.ZkEVM.ParseUpdateZkEVMVersion(l)
@@ -264,6 +280,7 @@ func (etherMan *Client) GetForks(ctx context.Context, genBlockNumber uint64) ([]
 				ToBatchNumber:   math.MaxUint64,
 				ForkId:          zkevmVersion.ForkID,
 				Version:         zkevmVersion.Version,
+				BlockNumber:     l.BlockNumber,
 			}
 		} else {
 			forks[len(forks)-1].ToBatchNumber = zkevmVersion.NumBatch
@@ -272,12 +289,13 @@ func (etherMan *Client) GetForks(ctx context.Context, genBlockNumber uint64) ([]
 				ToBatchNumber:   math.MaxUint64,
 				ForkId:          zkevmVersion.ForkID,
 				Version:         zkevmVersion.Version,
+				BlockNumber:     l.BlockNumber,
 			}
 		}
 		forks = append(forks, fork)
 	}
 	metrics.GetForksTime(time.Since(start))
-	log.Debugf("Forks decoded: %+v", forks)
+	log.Debugf("ForkIDs found: %+v", forks)
 	return forks, nil
 }
 
@@ -336,6 +354,8 @@ func (etherMan *Client) processEvent(ctx context.Context, vLog types.Log, blocks
 		return etherMan.sequencedBatchesEvent(ctx, vLog, blocks, blocksOrder)
 	case updateGlobalExitRootSignatureHash:
 		return etherMan.updateGlobalExitRootEvent(ctx, vLog, blocks, blocksOrder)
+	case updateL1InfoTreeSignatureHash:
+		return etherMan.updateL1InfoTreeEvent(ctx, vLog, blocks, blocksOrder)
 	case forcedBatchSignatureHash:
 		return etherMan.forcedBatchEvent(ctx, vLog, blocks, blocksOrder)
 	case verifyBatchesTrustedAggregatorSignatureHash:
@@ -456,11 +476,20 @@ func (etherMan *Client) updateGlobalExitRootEvent(ctx context.Context, vLog type
 	if err != nil {
 		return err
 	}
+	return etherMan.processUpdateGlobalExitRootEvent(ctx, globalExitRoot.MainnetExitRoot, globalExitRoot.RollupExitRoot, vLog, blocks, blocksOrder)
+}
+
+func (etherMan *Client) updateL1InfoTreeEvent(ctx context.Context, vLog types.Log, blocks *[]Block, blocksOrder *map[common.Hash][]Order) error {
+	log.Debug("UpdateL1InfoTree event detected")
+	return etherMan.processUpdateGlobalExitRootEvent(ctx, vLog.Topics[1], vLog.Topics[2], vLog, blocks, blocksOrder)
+}
+
+func (etherMan *Client) processUpdateGlobalExitRootEvent(ctx context.Context, mainnetExitRoot, rollupExitRoot common.Hash, vLog types.Log, blocks *[]Block, blocksOrder *map[common.Hash][]Order) error {
 	var gExitRoot GlobalExitRoot
-	gExitRoot.MainnetExitRoot = common.BytesToHash(globalExitRoot.MainnetExitRoot[:])
-	gExitRoot.RollupExitRoot = common.BytesToHash(globalExitRoot.RollupExitRoot[:])
+	gExitRoot.MainnetExitRoot = mainnetExitRoot
+	gExitRoot.RollupExitRoot = rollupExitRoot
 	gExitRoot.BlockNumber = vLog.BlockNumber
-	gExitRoot.GlobalExitRoot = hash(globalExitRoot.MainnetExitRoot, globalExitRoot.RollupExitRoot)
+	gExitRoot.GlobalExitRoot = hash(mainnetExitRoot, rollupExitRoot)
 
 	if len(*blocks) == 0 || ((*blocks)[len(*blocks)-1].BlockHash != vLog.BlockHash || (*blocks)[len(*blocks)-1].BlockNumber != vLog.BlockNumber) {
 		fullBlock, err := etherMan.EthClient.BlockByHash(ctx, vLog.BlockHash)

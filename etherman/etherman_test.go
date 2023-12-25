@@ -27,7 +27,7 @@ import (
 )
 
 const (
-	forkID5 = 5
+	forkID6 = 6
 )
 
 func init() {
@@ -47,7 +47,7 @@ func newTestingEnv() (ethman *Client, ethBackend *backends.SimulatedBackend, aut
 	if err != nil {
 		log.Fatal(err)
 	}
-	ethman, ethBackend, maticAddr, br, err = NewSimulatedEtherman(Config{}, auth)
+	ethman, ethBackend, maticAddr, br, err = NewSimulatedEtherman(Config{ForkIDChunkSize: 10}, auth)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -319,7 +319,7 @@ func TestSendSequences(t *testing.T) {
 	require.NoError(t, err)
 
 	tx1 := types.NewTransaction(uint64(0), common.Address{}, big.NewInt(10), uint64(1), big.NewInt(10), []byte{})
-	batchL2Data, err := state.EncodeTransactions([]types.Transaction{*tx1}, constants.EffectivePercentage, forkID5)
+	batchL2Data, err := state.EncodeTransactions([]types.Transaction{*tx1}, constants.EffectivePercentage, forkID6)
 	require.NoError(t, err)
 	sequence := ethmanTypes.Sequence{
 		GlobalExitRoot: ger,
@@ -404,7 +404,7 @@ func TestGetForks(t *testing.T) {
 	// Set up testing environment
 	etherman, _, _, _, _ := newTestingEnv()
 	ctx := context.Background()
-	forks, err := etherman.GetForks(ctx, 0)
+	forks, err := etherman.GetForks(ctx, 0, 132)
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(forks))
 	assert.Equal(t, uint64(1), forks[0].ForkId)
@@ -431,7 +431,7 @@ func TestProof(t *testing.T) {
 	proof := "0x20227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a0520227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a05"
 	p, err := convertProof(proof)
 	require.NoError(t, err)
-	str := "20227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a05"
+	str := "20227cbcef731b6cbdc0edd5850c63dc7fbc27fb58d12cd4d08298799cf66a05" //nolint:gosec
 	proofReference, err := encoding.DecodeBytes(&str)
 	require.NoError(t, err)
 	var expected [32]byte

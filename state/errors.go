@@ -43,9 +43,9 @@ var (
 	// ongoing batch are not in the same order as the transactions stored in the
 	// database for the same batch.
 	ErrOutOfOrderProcessedTx = errors.New("the processed transactions are not in the same order as the stored transactions")
-	// ErrInsufficientFunds is returned if the total cost of executing a transaction
-	// is higher than the balance of the user's account.
-	ErrInsufficientFunds = errors.New("insufficient funds for gas * price + value")
+	// ErrInsufficientFundsForTransfer is returned if the transaction sender doesn't
+	// have enough funds for transfer(topmost call only).
+	ErrInsufficientFundsForTransfer = errors.New("insufficient funds for transfer")
 	// ErrExecutorNil indicates that the method requires an executor that is not nil
 	ErrExecutorNil = errors.New("the method requires an executor that is not nil")
 	// ErrStateTreeNil indicates that the method requires a state tree that is not nil
@@ -57,6 +57,18 @@ var (
 	ErrInvalidData = errors.New("invalid data")
 	// ErrBatchResourceBytesUnderflow happens when the batch runs out of Bytes
 	ErrBatchResourceBytesUnderflow = NewBatchRemainingResourcesUnderflowError(nil, "Bytes")
+	// ErrInvalidBlockRange returned when the selected block range is invalid, generally
+	// because the toBlock is bigger than the fromBlock
+	ErrInvalidBlockRange = errors.New("invalid block range")
+	// ErrMaxLogsCountLimitExceeded returned when the number of logs is bigger than the
+	// configured limit
+	ErrMaxLogsCountLimitExceeded = errors.New("query returned more than %v results")
+	// ErrMaxLogsBlockRangeLimitExceeded returned when the range between block number range
+	// to filter logs is bigger than the configured limit
+	ErrMaxLogsBlockRangeLimitExceeded = errors.New("logs are limited to a %v block range")
+	// ErrMaxNativeBlockHashBlockRangeLimitExceeded returned when the range between block number range
+	// to filter native block hashes is bigger than the configured limit
+	ErrMaxNativeBlockHashBlockRangeLimitExceeded = errors.New("native block hashes are limited to a %v block range")
 
 	zkCounterErrPrefix = "ZKCounter: "
 )
