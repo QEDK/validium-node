@@ -17,6 +17,7 @@ import (
 	"github.com/0xPolygonHermez/zkevm-node/hex"
 	"github.com/0xPolygonHermez/zkevm-node/merkletree"
 	"github.com/0xPolygonHermez/zkevm-node/state"
+	"github.com/0xPolygonHermez/zkevm-node/state/pgstatestorage"
 	"github.com/0xPolygonHermez/zkevm-node/state/runtime/executor"
 	"github.com/0xPolygonHermez/zkevm-node/tools/datastreamer/config"
 	"github.com/ethereum/go-ethereum/common"
@@ -192,7 +193,7 @@ func generate(cliCtx *cli.Context) error {
 		os.Exit(1)
 	}
 	defer stateSqlDB.Close()
-	stateDBStorage := state.NewPostgresStorage(state.Config{}, stateSqlDB)
+	stateDBStorage := pgstatestorage.NewPostgresStorage(state.Config{}, stateSqlDB)
 	log.Debug("Connected to the database")
 
 	mtDBServerConfig := merkletree.Config{URI: c.MerkleTree.URI}
@@ -205,7 +206,7 @@ func generate(cliCtx *cli.Context) error {
 	stateTree := merkletree.NewStateTree(mtDBServiceClient)
 	log.Debug("Connected to the merkle tree")
 
-	stateDB := state.NewState(state.Config{}, stateDBStorage, nil, stateTree, nil)
+	stateDB := state.NewState(state.Config{}, stateDBStorage, nil, stateTree, nil, nil)
 
 	// Calculate intermediate state roots
 	var imStateRoots map[uint64][]byte
@@ -708,7 +709,7 @@ func printEntry(entry datastreamer.FileEntry) {
 		printColored(color.FgGreen, "L2 Block Number.: ")
 		printColored(color.FgHiWhite, fmt.Sprintf("%d\n", blockStart.L2BlockNumber))
 		printColored(color.FgGreen, "Timestamp.......: ")
-		printColored(color.FgHiWhite, fmt.Sprintf("%v (%d)\n", time.Unix(int64(blockStart.Timestamp), 0), blockStart.Timestamp))
+		printColored(color.FgHiWhite, fmt.Sprintf("%v (%d)\n", time.Unix(blockStart.Timestamp, 0), blockStart.Timestamp))
 		printColored(color.FgGreen, "Global Exit Root: ")
 		printColored(color.FgHiWhite, fmt.Sprintf("%s\n", blockStart.GlobalExitRoot))
 		printColored(color.FgGreen, "Coinbase........: ")
@@ -770,7 +771,7 @@ func printEntry(entry datastreamer.FileEntry) {
 		printColored(color.FgGreen, "Batch Number....: ")
 		printColored(color.FgHiWhite, fmt.Sprintf("%d\n", updateGer.BatchNumber))
 		printColored(color.FgGreen, "Timestamp.......: ")
-		printColored(color.FgHiWhite, fmt.Sprintf("%v (%d)\n", time.Unix(int64(updateGer.Timestamp), 0), updateGer.Timestamp))
+		printColored(color.FgHiWhite, fmt.Sprintf("%v (%d)\n", time.Unix(updateGer.Timestamp, 0), updateGer.Timestamp))
 		printColored(color.FgGreen, "Global Exit Root: ")
 		printColored(color.FgHiWhite, fmt.Sprintf("%s\n", updateGer.GlobalExitRoot))
 		printColored(color.FgGreen, "Coinbase........: ")
@@ -801,7 +802,7 @@ func setGenesis(ctx context.Context, tree *merkletree.StateTree, genesis state.G
 
 	uuid := uuid.New().String()
 
-	for _, action := range genesis.GenesisActions {
+	for _, action := range genesis.Actions {
 		address := common.HexToAddress(action.Address)
 		switch action.Type {
 		case int(merkletree.LeafTypeBalance):
@@ -854,7 +855,7 @@ func setGenesis(ctx context.Context, tree *merkletree.StateTree, genesis state.G
 	root.SetBytes(newRoot)
 
 	// flush state db
-	err = tree.Flush(ctx, uuid)
+	err = tree.Flush(ctx, root, uuid)
 	if err != nil {
 		fmt.Printf("error flushing state tree after genesis: %v", err)
 		return newRoot, err

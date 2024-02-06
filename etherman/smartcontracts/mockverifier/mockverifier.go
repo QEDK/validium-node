@@ -31,8 +31,8 @@ var (
 
 // MockverifierMetaData contains all meta data concerning the Mockverifier contract.
 var MockverifierMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"bytes32[24]\",\"name\":\"proof\",\"type\":\"bytes32[24]\"},{\"internalType\":\"uint256[1]\",\"name\":\"pubSignals\",\"type\":\"uint256[1]\"}],\"name\":\"verifyProof\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
-	Bin: "0x608060405234801561000f575f80fd5b5061014e8061001d5f395ff3fe608060405234801561000f575f80fd5b5060043610610029575f3560e01c80639121da8a1461002d575b5f80fd5b61004361003b366004610084565b600192915050565b604051901515815260200160405180910390f35b7f4e487b71000000000000000000000000000000000000000000000000000000005f52604160045260245ffd5b5f80610320808486031215610097575f80fd5b6103008401858111156100a8575f80fd5b8493508561031f8601126100ba575f80fd5b604051602080820182811067ffffffffffffffff821117156100de576100de610057565b6040529286019281888511156100f2575f80fd5b5b8484101561010a57833581529281019281016100f3565b50949790965094505050505056fea2646970667358221220b445382e638385e1a5d6077372cb04a8572fd044a7b41fdbb25b98ab60f6a0ba64736f6c63430008160033",
+	ABI: "[{\"inputs\":[{\"internalType\":\"bytes32[24]\",\"name\":\"proof\",\"type\":\"bytes32[24]\"},{\"internalType\":\"uint256[1]\",\"name\":\"pubSignals\",\"type\":\"uint256[1]\"}],\"name\":\"verifyProof\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"pure\",\"type\":\"function\"}]",
+	Bin: "0x608060405234801561001057600080fd5b50610158806100206000396000f3fe608060405234801561001057600080fd5b506004361061002b5760003560e01c80639121da8a14610030575b600080fd5b61004661003e366004610089565b600192915050565b604051901515815260200160405180910390f35b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b60008061032080848603121561009e57600080fd5b6103008401858111156100b057600080fd5b8493508561031f8601126100c357600080fd5b604051602080820182811067ffffffffffffffff821117156100e7576100e761005a565b6040529286019281888511156100fc57600080fd5b5b8484101561011457833581529281019281016100fd565b50949790965094505050505056fea264697066735822122061fd8311ce6da82f24c0874a992ea14a8aaf711e353693cae56066e3223abc5a64736f6c63430008140033",
 }
 
 // MockverifierABI is the input ABI used to generate the binding from.
@@ -204,7 +204,7 @@ func (_Mockverifier *MockverifierTransactorRaw) Transact(opts *bind.TransactOpts
 
 // VerifyProof is a free data retrieval call binding the contract method 0x9121da8a.
 //
-// Solidity: function verifyProof(bytes32[24] proof, uint256[1] pubSignals) view returns(bool)
+// Solidity: function verifyProof(bytes32[24] proof, uint256[1] pubSignals) pure returns(bool)
 func (_Mockverifier *MockverifierCaller) VerifyProof(opts *bind.CallOpts, proof [24][32]byte, pubSignals [1]*big.Int) (bool, error) {
 	var out []interface{}
 	err := _Mockverifier.contract.Call(opts, &out, "verifyProof", proof, pubSignals)
@@ -221,14 +221,14 @@ func (_Mockverifier *MockverifierCaller) VerifyProof(opts *bind.CallOpts, proof 
 
 // VerifyProof is a free data retrieval call binding the contract method 0x9121da8a.
 //
-// Solidity: function verifyProof(bytes32[24] proof, uint256[1] pubSignals) view returns(bool)
+// Solidity: function verifyProof(bytes32[24] proof, uint256[1] pubSignals) pure returns(bool)
 func (_Mockverifier *MockverifierSession) VerifyProof(proof [24][32]byte, pubSignals [1]*big.Int) (bool, error) {
 	return _Mockverifier.Contract.VerifyProof(&_Mockverifier.CallOpts, proof, pubSignals)
 }
 
 // VerifyProof is a free data retrieval call binding the contract method 0x9121da8a.
 //
-// Solidity: function verifyProof(bytes32[24] proof, uint256[1] pubSignals) view returns(bool)
+// Solidity: function verifyProof(bytes32[24] proof, uint256[1] pubSignals) pure returns(bool)
 func (_Mockverifier *MockverifierCallerSession) VerifyProof(proof [24][32]byte, pubSignals [1]*big.Int) (bool, error) {
 	return _Mockverifier.Contract.VerifyProof(&_Mockverifier.CallOpts, proof, pubSignals)
 }

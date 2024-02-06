@@ -8,7 +8,6 @@ import (
 	"github.com/0xPolygonHermez/zkevm-data-streamer/datastreamer"
 	"github.com/0xPolygonHermez/zkevm-node/log"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/iden3/go-iden3-crypto/keccak256"
 	"github.com/jackc/pgx/v4"
 )
@@ -110,8 +109,8 @@ type DSL2Transaction struct {
 // Encode returns the encoded DSL2Transaction as a byte slice
 func (l DSL2Transaction) Encode() []byte {
 	bytes := make([]byte, 0)
-	bytes = append(bytes, byte(l.EffectiveGasPricePercentage))
-	bytes = append(bytes, byte(l.IsValid))
+	bytes = append(bytes, l.EffectiveGasPricePercentage)
+	bytes = append(bytes, l.IsValid)
 	bytes = append(bytes, l.StateRoot[:]...)
 	bytes = binary.LittleEndian.AppendUint32(bytes, l.EncodedLength)
 	bytes = append(bytes, l.Encoded...)
@@ -120,8 +119,8 @@ func (l DSL2Transaction) Encode() []byte {
 
 // Decode decodes the DSL2Transaction from a byte slice
 func (l DSL2Transaction) Decode(data []byte) DSL2Transaction {
-	l.EffectiveGasPricePercentage = uint8(data[0])
-	l.IsValid = uint8(data[1])
+	l.EffectiveGasPricePercentage = data[0]
+	l.IsValid = data[1]
 	l.StateRoot = common.BytesToHash(data[2:34])
 	l.EncodedLength = binary.LittleEndian.Uint32(data[34:38])
 	l.Encoded = data[38:]
@@ -168,7 +167,7 @@ func (b DSBookMark) Encode() []byte {
 
 // Decode decodes the DSBookMark from a byte slice
 func (b DSBookMark) Decode(data []byte) DSBookMark {
-	b.Type = byte(data[0])
+	b.Type = data[0]
 	b.L2BlockNumber = binary.LittleEndian.Uint64(data[1:9])
 	return b
 }
@@ -213,7 +212,7 @@ type DSState interface {
 	GetDSL2Blocks(ctx context.Context, firstBatchNumber, lastBatchNumber uint64, dbTx pgx.Tx) ([]*DSL2Block, error)
 	GetDSL2Transactions(ctx context.Context, firstL2Block, lastL2Block uint64, dbTx pgx.Tx) ([]*DSL2Transaction, error)
 	GetStorageAt(ctx context.Context, address common.Address, position *big.Int, root common.Hash) (*big.Int, error)
-	GetLastL2BlockHeader(ctx context.Context, dbTx pgx.Tx) (*types.Header, error)
+	GetLastL2BlockHeader(ctx context.Context, dbTx pgx.Tx) (*L2Header, error)
 }
 
 // GenerateDataStreamerFile generates or resumes a data stream file
@@ -362,10 +361,6 @@ func GenerateDataStreamerFile(ctx context.Context, streamServer *datastreamer.St
 		for _, batch := range fullBatches {
 			if len(batch.L2Blocks) == 0 {
 				// Empty batch
-				// Is WIP Batch?
-				if batch.StateRoot == (common.Hash{}) {
-					continue
-				}
 				// Check if there is a GER update
 				if batch.GlobalExitRoot != currentGER && batch.GlobalExitRoot != (common.Hash{}) {
 					updateGer := DSUpdateGER{

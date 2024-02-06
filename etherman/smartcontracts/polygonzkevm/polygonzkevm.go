@@ -29,42 +29,18 @@ var (
 	_ = abi.ConvertType
 )
 
-// PolygonZkEVMBatchData is an auto generated low-level Go binding around an user-defined struct.
-type PolygonZkEVMBatchData struct {
-	BatchHash          [32]byte
-	GlobalExitRoot     [32]byte
-	Timestamp          uint64
-	MinForcedTimestamp uint64
-}
-
-// PolygonZkEVMDAData is an auto generated low-level Go binding around an user-defined struct.
-type PolygonZkEVMDAData struct {
-	BlockNumber uint32
-	Proof       [][32]byte
-	Width       *big.Int
-	Index       *big.Int
-}
-
-// PolygonZkEVMForcedBatchData is an auto generated low-level Go binding around an user-defined struct.
-type PolygonZkEVMForcedBatchData struct {
-	Transactions       []byte
-	GlobalExitRoot     [32]byte
-	MinForcedTimestamp uint64
-}
-
-// PolygonZkEVMInitializePackedParameters is an auto generated low-level Go binding around an user-defined struct.
-type PolygonZkEVMInitializePackedParameters struct {
-	Admin                    common.Address
-	TrustedSequencer         common.Address
-	PendingStateTimeout      uint64
-	TrustedAggregator        common.Address
-	TrustedAggregatorTimeout uint64
+// PolygonRollupBaseEtrogBatchData is an auto generated low-level Go binding around an user-defined struct.
+type PolygonRollupBaseEtrogBatchData struct {
+	Transactions         []byte
+	ForcedGlobalExitRoot [32]byte
+	ForcedTimestamp      uint64
+	ForcedBlockHashL1    [32]byte
 }
 
 // PolygonzkevmMetaData contains all meta data concerning the Polygonzkevm contract.
 var PolygonzkevmMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"contractIPolygonZkEVMGlobalExitRoot\",\"name\":\"_globalExitRootManager\",\"type\":\"address\"},{\"internalType\":\"contractIDataAvailabilityRouter\",\"name\":\"_dataAvailabilityRouter\",\"type\":\"address\"},{\"internalType\":\"contractIERC20Upgradeable\",\"name\":\"_matic\",\"type\":\"address\"},{\"internalType\":\"contractIVerifierRollup\",\"name\":\"_rollupVerifier\",\"type\":\"address\"},{\"internalType\":\"contractIPolygonZkEVMBridge\",\"name\":\"_bridgeAddress\",\"type\":\"address\"},{\"internalType\":\"uint64\",\"name\":\"_chainID\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"_forkID\",\"type\":\"uint64\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"BatchAlreadyPosted\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"BatchAlreadyVerified\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"BatchNotSequencedOrNotSequenceEnd\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"DataRootNotFound\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ExceedMaxVerifyBatches\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"FinalNumBatchBelowLastVerifiedBatch\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"FinalNumBatchDoesNotMatchPendingState\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"FinalPendingStateNumInvalid\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ForceBatchNotAllowed\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ForceBatchTimeoutNotExpired\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ForceBatchesAlreadyActive\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ForceBatchesOverflow\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ForcedDataDoesNotMatch\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"GlobalExitRootNotExist\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"HaltTimeoutNotExpired\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InitNumBatchAboveLastVerifiedBatch\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InitNumBatchDoesNotMatchPendingState\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidDAProof\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidProof\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidRangeBatchTimeTarget\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidRangeForceBatchTimeout\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidRangeMultiplierBatchFee\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NewAccInputHashDoesNotExist\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NewPendingStateTimeoutMustBeLower\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NewStateRootNotInsidePrime\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NewTrustedAggregatorTimeoutMustBeLower\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotEnoughMaticAmount\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"OldAccInputHashDoesNotExist\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"OldStateRootDoesNotExist\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"OnlyAdmin\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"OnlyEmergencyState\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"OnlyNotEmergencyState\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"OnlyPendingAdmin\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"OnlyTrustedAggregator\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"OnlyTrustedSequencer\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"PendingStateDoesNotExist\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"PendingStateInvalid\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"PendingStateNotConsolidable\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"PendingStateTimeoutExceedHaltAggregationTimeout\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"SequenceZeroBatches\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"SequencedTimestampBelowForcedTimestamp\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"SequencedTimestampInvalid\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"StoredRootMustBeDifferentThanNewRoot\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"TransactionsLengthAboveMax\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"TrustedAggregatorTimeoutExceedHaltAggregationTimeout\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"TrustedAggregatorTimeoutNotExpired\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"newAdmin\",\"type\":\"address\"}],\"name\":\"AcceptAdminRole\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[],\"name\":\"ActivateForceBatches\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint64\",\"name\":\"numBatch\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint64\",\"name\":\"pendingStateNum\",\"type\":\"uint64\"}],\"name\":\"ConsolidatePendingState\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[],\"name\":\"EmergencyStateActivated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[],\"name\":\"EmergencyStateDeactivated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint64\",\"name\":\"forceBatchNum\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"lastGlobalExitRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"sequencer\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"transactions\",\"type\":\"bytes\"}],\"name\":\"ForceBatch\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"version\",\"type\":\"uint8\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint64\",\"name\":\"numBatch\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"aggregator\",\"type\":\"address\"}],\"name\":\"OverridePendingState\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"storedStateRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"provedStateRoot\",\"type\":\"bytes32\"}],\"name\":\"ProveNonDeterministicPendingState\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint64\",\"name\":\"numBatch\",\"type\":\"uint64\"}],\"name\":\"SequenceBatches\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint64\",\"name\":\"numBatch\",\"type\":\"uint64\"}],\"name\":\"SequenceForceBatches\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"newforceBatchTimeout\",\"type\":\"uint64\"}],\"name\":\"SetForceBatchTimeout\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint16\",\"name\":\"newMultiplierBatchFee\",\"type\":\"uint16\"}],\"name\":\"SetMultiplierBatchFee\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"newPendingStateTimeout\",\"type\":\"uint64\"}],\"name\":\"SetPendingStateTimeout\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"newTrustedAggregator\",\"type\":\"address\"}],\"name\":\"SetTrustedAggregator\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"newTrustedAggregatorTimeout\",\"type\":\"uint64\"}],\"name\":\"SetTrustedAggregatorTimeout\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"newTrustedSequencer\",\"type\":\"address\"}],\"name\":\"SetTrustedSequencer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"newTrustedSequencerURL\",\"type\":\"string\"}],\"name\":\"SetTrustedSequencerURL\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"newVerifyBatchTimeTarget\",\"type\":\"uint64\"}],\"name\":\"SetVerifyBatchTimeTarget\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"newPendingAdmin\",\"type\":\"address\"}],\"name\":\"TransferAdminRole\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"numBatch\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"forkID\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"version\",\"type\":\"string\"}],\"name\":\"UpdateZkEVMVersion\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint64\",\"name\":\"numBatch\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"aggregator\",\"type\":\"address\"}],\"name\":\"VerifyBatches\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint64\",\"name\":\"numBatch\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"aggregator\",\"type\":\"address\"}],\"name\":\"VerifyBatchesTrustedAggregator\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"acceptAdminRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"sequencedBatchNum\",\"type\":\"uint64\"}],\"name\":\"activateEmergencyState\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"activateForceBatches\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"admin\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"batchFee\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"name\":\"batchNumToStateRoot\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"bridgeAddress\",\"outputs\":[{\"internalType\":\"contractIPolygonZkEVMBridge\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"calculateRewardPerBatch\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"chainID\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"newStateRoot\",\"type\":\"uint256\"}],\"name\":\"checkStateRootInsidePrime\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"pendingStateNum\",\"type\":\"uint64\"}],\"name\":\"consolidatePendingState\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"deactivateEmergencyState\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"transactions\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"maticAmount\",\"type\":\"uint256\"}],\"name\":\"forceBatch\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"forceBatchTimeout\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"name\":\"forcedBatches\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"forkID\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getForcedBatchFee\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"initNumBatch\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"finalNewBatch\",\"type\":\"uint64\"},{\"internalType\":\"bytes32\",\"name\":\"newLocalExitRoot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"oldStateRoot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"newStateRoot\",\"type\":\"bytes32\"}],\"name\":\"getInputSnarkBytes\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getLastVerifiedBatch\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"globalExitRootManager\",\"outputs\":[{\"internalType\":\"contractIPolygonZkEVMGlobalExitRoot\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"admin\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"trustedSequencer\",\"type\":\"address\"},{\"internalType\":\"uint64\",\"name\":\"pendingStateTimeout\",\"type\":\"uint64\"},{\"internalType\":\"address\",\"name\":\"trustedAggregator\",\"type\":\"address\"},{\"internalType\":\"uint64\",\"name\":\"trustedAggregatorTimeout\",\"type\":\"uint64\"}],\"internalType\":\"structPolygonZkEVM.InitializePackedParameters\",\"name\":\"initializePackedParameters\",\"type\":\"tuple\"},{\"internalType\":\"bytes32\",\"name\":\"genesisRoot\",\"type\":\"bytes32\"},{\"internalType\":\"string\",\"name\":\"_trustedSequencerURL\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_networkName\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_version\",\"type\":\"string\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"isBatchPosted\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isEmergencyState\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isForcedBatchDisallowed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"pendingStateNum\",\"type\":\"uint64\"}],\"name\":\"isPendingStateConsolidable\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lastBatchSequenced\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lastForceBatch\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lastForceBatchSequenced\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lastPendingState\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lastPendingStateConsolidated\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lastTimestamp\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lastVerifiedBatch\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"matic\",\"outputs\":[{\"internalType\":\"contractIERC20Upgradeable\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"multiplierBatchFee\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"networkName\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"initPendingStateNum\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"finalPendingStateNum\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"initNumBatch\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"finalNewBatch\",\"type\":\"uint64\"},{\"internalType\":\"bytes32\",\"name\":\"newLocalExitRoot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"newStateRoot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32[24]\",\"name\":\"proof\",\"type\":\"bytes32[24]\"}],\"name\":\"overridePendingState\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pendingAdmin\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pendingStateTimeout\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"pendingStateTransitions\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"timestamp\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"lastVerifiedBatch\",\"type\":\"uint64\"},{\"internalType\":\"bytes32\",\"name\":\"exitRoot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"initPendingStateNum\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"finalPendingStateNum\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"initNumBatch\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"finalNewBatch\",\"type\":\"uint64\"},{\"internalType\":\"bytes32\",\"name\":\"newLocalExitRoot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"newStateRoot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32[24]\",\"name\":\"proof\",\"type\":\"bytes32[24]\"}],\"name\":\"proveNonDeterministicPendingState\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"rollupVerifier\",\"outputs\":[{\"internalType\":\"contractIVerifierRollup\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"router\",\"outputs\":[{\"internalType\":\"contractIDataAvailabilityRouter\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"batchHash\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"globalExitRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint64\",\"name\":\"timestamp\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"minForcedTimestamp\",\"type\":\"uint64\"}],\"internalType\":\"structPolygonZkEVM.BatchData[]\",\"name\":\"batches\",\"type\":\"tuple[]\"},{\"components\":[{\"internalType\":\"uint32\",\"name\":\"blockNumber\",\"type\":\"uint32\"},{\"internalType\":\"bytes32[]\",\"name\":\"proof\",\"type\":\"bytes32[]\"},{\"internalType\":\"uint256\",\"name\":\"width\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"internalType\":\"structPolygonZkEVM.DAData[]\",\"name\":\"daData\",\"type\":\"tuple[]\"},{\"internalType\":\"address\",\"name\":\"l2Coinbase\",\"type\":\"address\"}],\"name\":\"sequenceBatches\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"bytes\",\"name\":\"transactions\",\"type\":\"bytes\"},{\"internalType\":\"bytes32\",\"name\":\"globalExitRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint64\",\"name\":\"minForcedTimestamp\",\"type\":\"uint64\"}],\"internalType\":\"structPolygonZkEVM.ForcedBatchData[]\",\"name\":\"batches\",\"type\":\"tuple[]\"}],\"name\":\"sequenceForceBatches\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"name\":\"sequencedBatches\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"accInputHash\",\"type\":\"bytes32\"},{\"internalType\":\"uint64\",\"name\":\"sequencedTimestamp\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"previousLastBatchSequenced\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"newforceBatchTimeout\",\"type\":\"uint64\"}],\"name\":\"setForceBatchTimeout\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint16\",\"name\":\"newMultiplierBatchFee\",\"type\":\"uint16\"}],\"name\":\"setMultiplierBatchFee\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"newPendingStateTimeout\",\"type\":\"uint64\"}],\"name\":\"setPendingStateTimeout\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"contractIDataAvailabilityRouter\",\"name\":\"_router\",\"type\":\"address\"}],\"name\":\"setRouter\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newTrustedAggregator\",\"type\":\"address\"}],\"name\":\"setTrustedAggregator\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"newTrustedAggregatorTimeout\",\"type\":\"uint64\"}],\"name\":\"setTrustedAggregatorTimeout\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newTrustedSequencer\",\"type\":\"address\"}],\"name\":\"setTrustedSequencer\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"newTrustedSequencerURL\",\"type\":\"string\"}],\"name\":\"setTrustedSequencerURL\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"newVerifyBatchTimeTarget\",\"type\":\"uint64\"}],\"name\":\"setVerifyBatchTimeTarget\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newPendingAdmin\",\"type\":\"address\"}],\"name\":\"transferAdminRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"trustedAggregator\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"trustedAggregatorTimeout\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"trustedSequencer\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"trustedSequencerURL\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"verifyBatchTimeTarget\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"pendingStateNum\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"initNumBatch\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"finalNewBatch\",\"type\":\"uint64\"},{\"internalType\":\"bytes32\",\"name\":\"newLocalExitRoot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"newStateRoot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32[24]\",\"name\":\"proof\",\"type\":\"bytes32[24]\"}],\"name\":\"verifyBatches\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"pendingStateNum\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"initNumBatch\",\"type\":\"uint64\"},{\"internalType\":\"uint64\",\"name\":\"finalNewBatch\",\"type\":\"uint64\"},{\"internalType\":\"bytes32\",\"name\":\"newLocalExitRoot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"newStateRoot\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32[24]\",\"name\":\"proof\",\"type\":\"bytes32[24]\"}],\"name\":\"verifyBatchesTrustedAggregator\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
-	Bin: "0x61014060405234801562000011575f80fd5b5060405162005f9938038062005f998339810160408190526200003491620000a2565b6001600160a01b0395861660c05293851660805291841660a05290921660e0526001600160401b039182166101005216610120526200012a565b6001600160a01b038116811462000083575f80fd5b50565b80516001600160401b03811681146200009d575f80fd5b919050565b5f805f805f8060c08789031215620000b8575f80fd5b8651620000c5816200006e565b6020880151909650620000d8816200006e565b6040880151909550620000eb816200006e565b6060880151909450620000fe816200006e565b92506200010e6080880162000086565b91506200011e60a0880162000086565b90509295509295509295565b60805160a05160c05160e0516101005161012051615da9620001f05f395f81816106aa01528181610fa4015261135701525f8181610809015261132d01525f81816107cf01528181612ef101528181613a720152614a4901525f818161097a015281816114bc0152818161166d01528181611e510152818161307c015281816136e0015261462a01525f8181610a1401528181613fad01526143e101525f81816108c4015281816122db0152818161305101528181613a40015261408c0152615da95ff3fe608060405234801561000f575f80fd5b50600436106103d9575f3560e01c8063841b24d71161020f578063c754c7ed1161012e578063e8bf92ed116100c3578063f14916d611610093578063f851a44011610079578063f851a44014610aaf578063f887ea4014610ac2578063f8b823e414610ad5575f80fd5b8063f14916d614610a89578063f2fde38b14610a9c575f80fd5b8063e8bf92ed14610a0f578063eaeb077b14610a36578063ed6b010414610a49578063efde529014610a76575f80fd5b8063d8d1091b116100fe578063d8d1091b1461099c578063d939b315146109af578063dbc16976146109d7578063e7a7ed02146109df575f80fd5b8063c754c7ed14610914578063c89e42df14610940578063cfa8ed4714610953578063d02103ca14610975575f80fd5b8063ada8f919116101a4578063b6b0b09711610174578063b6b0b097146108bf578063ba58ae39146108e6578063c0d78655146108f9578063c0ed84e01461090c575f80fd5b8063ada8f919146107f1578063adc879e914610804578063afd23cbe1461082b578063b4d63f5814610859575f80fd5b80639aa972a3116101df5780639aa972a3146107915780639c9f3dfe146107a4578063a066215c146107b7578063a3c573eb146107ca575f80fd5b8063841b24d7146107405780638c3d7301146107705780638da5cb5b1461077857806399f5634e14610789575f80fd5b8063458c0477116102fb578063621dd411116102905780637215541a116102605780637215541a1461067e5780637fcb365314610691578063831c7ead146106a5578063837a4738146106cc575f80fd5b8063621dd411146106315780636b8616ce146106445780636ff512cc14610663578063715018a614610676575f80fd5b80635392c5e0116102cb5780635392c5e0146105fa578063542028d5146106195780635ec91958146106215780636046916914610629575f80fd5b8063458c0477146105a05780634a1a89a7146105b45780634a910e6a146105d45780634e487706146105e7575f80fd5b80632987898311610371578063394218e911610341578063394218e91461051857806340b10f1c1461052b578063423fa856146105585780634560526714610578575f80fd5b806329878983146104c05780632b0006fa146104df5780632c1f816a146104f2578063383b3be814610505575f80fd5b80631816b7e5116103ac5780631816b7e51461045b57806319d8ac611461046e578063220d7899146104825780632678224714610495575f80fd5b8063049a289f146103dd5780630a0d9fbe146103f2578063107bf28c1461042957806315064c961461043e575b5f80fd5b6103f06103eb3660046152d7565b610ade565b005b60715461040b90610100900467ffffffffffffffff1681565b60405167ffffffffffffffff90911681526020015b60405180910390f35b610431611048565b60405161042091906153d0565b60715461044b9060ff1681565b6040519015158152602001610420565b6103f06104693660046153e2565b6110d4565b60755461040b9067ffffffffffffffff1681565b61043161049036600461541a565b6111df565b607d546104a8906001600160a01b031681565b6040516001600160a01b039091168152602001610420565b6076546104a8906801000000000000000090046001600160a01b031681565b6103f06104ed36600461547a565b6113b5565b6103f06105003660046154de565b611565565b61044b610513366004615553565b611753565b6103f0610526366004615553565b6117a8565b61054a61053936600461556c565b60656020525f908152604090205481565b604051908152602001610420565b60755461040b9068010000000000000000900467ffffffffffffffff1681565b60755461040b90700100000000000000000000000000000000900467ffffffffffffffff1681565b607b5461040b9067ffffffffffffffff1681565b607b5461040b9068010000000000000000900467ffffffffffffffff1681565b6103f06105e2366004615553565b61191f565b6103f06105f5366004615553565b6119c5565b61054a610608366004615553565b60776020525f908152604090205481565b610431611b3c565b6103f0611b49565b61054a611c3b565b6103f061063f36600461547a565b611c50565b61054a610652366004615553565b60736020525f908152604090205481565b6103f06106713660046155a2565b611fc1565b6103f061207c565b6103f061068c366004615553565b61208f565b60765461040b9067ffffffffffffffff1681565b61040b7f000000000000000000000000000000000000000000000000000000000000000081565b6107146106da36600461556c565b607a6020525f908152604090208054600182015460029092015467ffffffffffffffff808316936801000000000000000090930416919084565b6040805167ffffffffffffffff9586168152949093166020850152918301526060820152608001610420565b607b5461040b907801000000000000000000000000000000000000000000000000900467ffffffffffffffff1681565b6103f06121ef565b6033546001600160a01b03166104a8565b61054a6122a1565b6103f061079f3660046154de565b6123e7565b6103f06107b2366004615553565b61248e565b6103f06107c5366004615553565b6125fd565b6104a87f000000000000000000000000000000000000000000000000000000000000000081565b6103f06107ff3660046155a2565b6126f6565b61040b7f000000000000000000000000000000000000000000000000000000000000000081565b607154610846906901000000000000000000900461ffff1681565b60405161ffff9091168152602001610420565b610899610867366004615553565b60746020525f90815260409020805460019091015467ffffffffffffffff808216916801000000000000000090041683565b6040805193845267ffffffffffffffff9283166020850152911690820152606001610420565b6104a87f000000000000000000000000000000000000000000000000000000000000000081565b61044b6108f436600461556c565b6127a0565b6103f06109073660046155a2565b612828565b61040b612866565b607d5461040b9074010000000000000000000000000000000000000000900467ffffffffffffffff1681565b6103f061094e3660046155bd565b6128b9565b6071546104a8906b01000000000000000000000090046001600160a01b031681565b6104a87f000000000000000000000000000000000000000000000000000000000000000081565b6103f06109aa366004615630565b612939565b607b5461040b90700100000000000000000000000000000000900467ffffffffffffffff1681565b6103f0612eab565b60755461040b907801000000000000000000000000000000000000000000000000900467ffffffffffffffff1681565b6104a87f000000000000000000000000000000000000000000000000000000000000000081565b6103f0610a4436600461566f565b612f65565b607d5461044b907c0100000000000000000000000000000000000000000000000000000000900460ff1681565b6103f0610a843660046156b7565b6132e1565b6103f0610a973660046155a2565b613b20565b6103f0610aaa3660046155a2565b613bd8565b607c546104a8906001600160a01b031681565b6066546104a8906001600160a01b031681565b61054a60725481565b5f54610100900460ff1615808015610afc57505f54600160ff909116105b80610b155750303b158015610b1557505f5460ff166001145b610ba6576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201527f647920696e697469616c697a656400000000000000000000000000000000000060648201526084015b60405180910390fd5b5f80547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff001660011790558015610c02575f80547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ff166101001790555b610c0f60208801886155a2565b607c80547fffffffffffffffffffffffff0000000000000000000000000000000000000000166001600160a01b0392909216919091179055610c5760408801602089016155a2565b607180546001600160a01b03929092166b010000000000000000000000027fff0000000000000000000000000000000000000000ffffffffffffffffffffff909216919091179055610caf60808801606089016155a2565b607680546001600160a01b039290921668010000000000000000027fffffffff0000000000000000000000000000000000000000ffffffffffffffff9092169190911790555f805260776020527f5bc4dfdf00d266d79007b974fdf03467b7a6429c65a950cd7d967e8c7af65da68690556078610d2c86826157f2565b506079610d3985826157f2565b50610d87610d4d60c0890160a08a016155a2565b606680547fffffffffffffffffffffffff0000000000000000000000000000000000000000166001600160a01b0392909216919091179055565b62093a80610d9b6060890160408a01615553565b67ffffffffffffffff161115610ddd576040517fcc96507000000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b610ded6060880160408901615553565b607b805467ffffffffffffffff92909216700100000000000000000000000000000000027fffffffffffffffff0000000000000000ffffffffffffffffffffffffffffffff90921691909117905562093a80610e4f60a0890160808a01615553565b67ffffffffffffffff161115610e91576040517f1d06e87900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b610ea160a0880160808901615553565b607b805477ffffffffffffffffffffffffffffffffffffffffffffffff16780100000000000000000000000000000000000000000000000067ffffffffffffffff939093169290920291909117905567016345785d8a0000607255607180547fffffffffffffffffffffffffffffffffffffffffff00000000000000000000ff166a03ea000000000000070800179055607d80547fffffff000000000000000000ffffffffffffffffffffffffffffffffffffffff167c0100000000000697800000000000000000000000000000000000000000179055610f80613c7f565b7fed7be53c9f1a96a481223b15568a5b1a475e01a74b347d6ca187c8bf0c078cd65f7f00000000000000000000000000000000000000000000000000000000000000008585604051610fd59493929190615915565b60405180910390a1801561103f575f80547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ff169055604051600181527f7f26b83ff96e1f2b6a682f133852f6798a09c465da95921460cefb38474024989060200160405180910390a15b50505050505050565b607980546110559061575d565b80601f01602080910402602001604051908101604052809291908181526020018280546110819061575d565b80156110cc5780601f106110a3576101008083540402835291602001916110cc565b820191905f5260205f20905b8154815290600101906020018083116110af57829003601f168201915b505050505081565b607c546001600160a01b03163314611118576040517f4755657900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6103e88161ffff16108061113157506103ff8161ffff16115b15611168576040517f4c2533c800000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b607180547fffffffffffffffffffffffffffffffffffffffffff0000ffffffffffffffffff16690100000000000000000061ffff8416908102919091179091556040519081527f7019933d795eba185c180209e8ae8bffbaa25bcef293364687702c31f4d302c5906020015b60405180910390a150565b67ffffffffffffffff8086165f818152607460205260408082205493881682529020546060929115801590611212575081155b15611249576040517f6818c29e00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b80611280576040517f66385b5100000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b611289846127a0565b6112bf576040517f176b913c00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b604080517fffffffffffffffffffffffffffffffffffffffff0000000000000000000000003360601b166020820152603481019690965260548601929092527fffffffffffffffff00000000000000000000000000000000000000000000000060c098891b811660748701527f0000000000000000000000000000000000000000000000000000000000000000891b8116607c8701527f0000000000000000000000000000000000000000000000000000000000000000891b81166084870152608c86019490945260ac85015260cc840194909452509290931b90911660ec830152805180830360d401815260f4909201905290565b6076546801000000000000000090046001600160a01b03163314611405576040517fbbcbbc0500000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b611413868686868686613d1e565b607680547fffffffffffffffffffffffffffffffffffffffffffffffff00000000000000001667ffffffffffffffff8681169182179092555f908152607760205260409020839055607b54161561148d57607b80547fffffffffffffffffffffffffffffffff000000000000000000000000000000001690555b6040517f33d6247d000000000000000000000000000000000000000000000000000000008152600481018490527f00000000000000000000000000000000000000000000000000000000000000006001600160a01b0316906333d6247d906024015f604051808303815f87803b158015611505575f80fd5b505af1158015611517573d5f803e3d5ffd5b505060405184815233925067ffffffffffffffff871691507fcb339b570a7f0b25afa7333371ff11192092a0aeace12b671f4c212f2815c6fe906020015b60405180910390a3505050505050565b6076546801000000000000000090046001600160a01b031633146115b5576040517fbbcbbc0500000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6115c4878787878787876140bf565b607680547fffffffffffffffffffffffffffffffffffffffffffffffff00000000000000001667ffffffffffffffff8681169182179092555f908152607760205260409020839055607b54161561163e57607b80547fffffffffffffffffffffffffffffffff000000000000000000000000000000001690555b6040517f33d6247d000000000000000000000000000000000000000000000000000000008152600481018490527f00000000000000000000000000000000000000000000000000000000000000006001600160a01b0316906333d6247d906024015f604051808303815f87803b1580156116b6575f80fd5b505af11580156116c8573d5f803e3d5ffd5b5050607b805477ffffffffffffffffffffffffffffffffffffffffffffffff167a093a800000000000000000000000000000000000000000000000001790555050604051828152339067ffffffffffffffff8616907fcc1b5520188bf1dd3e63f98164b577c4d75c11a619ddea692112f0d1aec4cf729060200160405180910390a350505050505050565b607b5467ffffffffffffffff8281165f908152607a6020526040812054909242926117969270010000000000000000000000000000000090920481169116615979565b67ffffffffffffffff16111592915050565b607c546001600160a01b031633146117ec576040517f4755657900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b62093a8067ffffffffffffffff82161115611833576040517f1d06e87900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60715460ff166118a257607b5467ffffffffffffffff78010000000000000000000000000000000000000000000000009091048116908216106118a2576040517f401636df00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b607b805477ffffffffffffffffffffffffffffffffffffffffffffffff16780100000000000000000000000000000000000000000000000067ffffffffffffffff8416908102919091179091556040519081527f1f4fa24c2e4bad19a7f3ec5c5485f70d46c798461c2e684f55bbd0fc661373a1906020016111d4565b6076546801000000000000000090046001600160a01b031633146119b95760715460ff161561197a576040517f2f0047fc00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b61198381611753565b6119b9576040517f0ce9e4a200000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6119c2816144e1565b50565b607c546001600160a01b03163314611a09576040517f4755657900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b62093a8067ffffffffffffffff82161115611a50576040517ff5e37f2f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60715460ff16611abb57607d5467ffffffffffffffff74010000000000000000000000000000000000000000909104811690821610611abb576040517ff5e37f2f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b607d80547fffffffff0000000000000000ffffffffffffffffffffffffffffffffffffffff167401000000000000000000000000000000000000000067ffffffffffffffff8416908102919091179091556040519081527fa7eb6cb8a613eb4e8bddc1ac3d61ec6cf10898760f0b187bcca794c6ca6fa40b906020016111d4565b607880546110559061575d565b607c546001600160a01b03163314611b8d576040517f4755657900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b607d547c0100000000000000000000000000000000000000000000000000000000900460ff16611be9576040517ff6ba91a100000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b607d80547fffffff00ffffffffffffffffffffffffffffffffffffffffffffffffffffffff1690556040517f854dd6ce5a1445c4c54388b21cffd11cf5bba1b9e763aec48ce3da75d617412f905f90a1565b5f6072546064611c4b91906159a1565b905090565b60715460ff1615611c8d576040517f2f0047fc00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b607b5467ffffffffffffffff8581165f908152607460205260409020600101544292611cd992780100000000000000000000000000000000000000000000000090910481169116615979565b67ffffffffffffffff161115611d1b576040517f8a0704d300000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6103e8611d2886866159b8565b67ffffffffffffffff161115611d6a576040517fb59f753a00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b611d78868686868686613d1e565b611d81846146e1565b607b54700100000000000000000000000000000000900467ffffffffffffffff165f03611eb557607680547fffffffffffffffffffffffffffffffffffffffffffffffff00000000000000001667ffffffffffffffff8681169182179092555f908152607760205260409020839055607b541615611e2257607b80547fffffffffffffffffffffffffffffffff000000000000000000000000000000001690555b6040517f33d6247d000000000000000000000000000000000000000000000000000000008152600481018490527f00000000000000000000000000000000000000000000000000000000000000006001600160a01b0316906333d6247d906024015f604051808303815f87803b158015611e9a575f80fd5b505af1158015611eac573d5f803e3d5ffd5b50505050611f83565b611ebd6148bb565b607b805467ffffffffffffffff16905f611ed6836159d9565b825467ffffffffffffffff9182166101009390930a928302928202191691909117909155604080516080810182524283168152878316602080830191825282840189815260608401898152607b5487165f908152607a90935294909120925183549251861668010000000000000000027fffffffffffffffffffffffffffffffff000000000000000000000000000000009093169516949094171781559151600183015551600290910155505b604051828152339067ffffffffffffffff8616907f9c72852172521097ba7e1482e6b44b351323df0155f97f4ea18fcec28e1f596690602001611555565b607c546001600160a01b03163314612005576040517f4755657900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b607180547fff0000000000000000000000000000000000000000ffffffffffffffffffffff166b0100000000000000000000006001600160a01b038416908102919091179091556040519081527ff54144f9611984021529f814a1cb6a41e22c58351510a0d9f7e822618abb9cc0906020016111d4565b61208461496a565b61208d5f6149de565b565b6033546001600160a01b031633146121e7575f6120aa612866565b90508067ffffffffffffffff168267ffffffffffffffff16116120f9576040517f812a372d00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60755467ffffffffffffffff680100000000000000009091048116908316118061213e575067ffffffffffffffff8083165f9081526074602052604090206001015416155b15612175576040517f98c5c01400000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b67ffffffffffffffff8083165f9081526074602052604090206001015442916121a39162093a809116615979565b67ffffffffffffffff1611156121e5576040517fd257555a00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b505b6119c2614a47565b607d546001600160a01b03163314612233576040517fd1ec4b2300000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b607d54607c80547fffffffffffffffffffffffff0000000000000000000000000000000000000000166001600160a01b0390921691821790556040519081527f056dc487bbf0795d0bbb1b4f0af523a855503cff740bfb4d5475f7a90c091e8e9060200160405180910390a1565b6040517f70a082310000000000000000000000000000000000000000000000000000000081523060048201525f9081906001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016906370a0823190602401602060405180830381865afa158015612320573d5f803e3d5ffd5b505050506040513d601f19601f8201168201806040525081019061234491906159ff565b90505f61234f612866565b60755467ffffffffffffffff6801000000000000000082048116916123a791700100000000000000000000000000000000820481169178010000000000000000000000000000000000000000000000009004166159b8565b6123b19190615979565b6123bb91906159b8565b67ffffffffffffffff169050805f036123d6575f9250505090565b6123e08183615a43565b9250505090565b60715460ff1615612424576040517f2f0047fc00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b612433878787878787876140bf565b67ffffffffffffffff84165f908152607760209081526040918290205482519081529081018490527f1f44c21118c4603cfb4e1b621dbcfa2b73efcececee2b99b620b2953d33a7010910160405180910390a161103f614a47565b607c546001600160a01b031633146124d2576040517f4755657900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b62093a8067ffffffffffffffff82161115612519576040517fcc96507000000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60715460ff1661258057607b5467ffffffffffffffff700100000000000000000000000000000000909104811690821610612580576040517f48a05a9000000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b607b80547fffffffffffffffff0000000000000000ffffffffffffffffffffffffffffffff1670010000000000000000000000000000000067ffffffffffffffff8416908102919091179091556040519081527fc4121f4e22c69632ebb7cf1f462be0511dc034f999b52013eddfb24aab765c75906020016111d4565b607c546001600160a01b03163314612641576040517f4755657900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b620151808167ffffffffffffffff161115612688576040517fe067dfe800000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b607180547fffffffffffffffffffffffffffffffffffffffffffffff0000000000000000ff1661010067ffffffffffffffff8416908102919091179091556040519081527f1b023231a1ab6b5d93992f168fb44498e1a7e64cef58daff6f1c216de6a68c28906020016111d4565b607c546001600160a01b0316331461273a576040517f4755657900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b607d80547fffffffffffffffffffffffff0000000000000000000000000000000000000000166001600160a01b0383169081179091556040519081527fa5b56b7906fd0a20e3f35120dd8343db1e12e037a6c90111c7e42885e82a1ce6906020016111d4565b5f67ffffffff0000000167ffffffffffffffff83161080156127d7575067ffffffff00000001604083901c67ffffffffffffffff16105b80156127f8575067ffffffff00000001608083901c67ffffffffffffffff16105b801561280f575067ffffffff0000000160c083901c105b1561281c57506001919050565b505f919050565b919050565b61283061496a565b606680547fffffffffffffffffffffffff0000000000000000000000000000000000000000166001600160a01b03831617905550565b607b545f9067ffffffffffffffff16156128a85750607b5467ffffffffffffffff9081165f908152607a60205260409020546801000000000000000090041690565b5060765467ffffffffffffffff1690565b607c546001600160a01b031633146128fd576040517f4755657900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b607861290982826157f2565b507f6b8f723a4c7a5335cafae8a598a0aa0301be1387c037dccc085b62add6448b20816040516111d491906153d0565b607d547c0100000000000000000000000000000000000000000000000000000000900460ff1615612996576040517f24eff8c300000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60715460ff16156129d3576040517f2f0047fc00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b805f819003612a0e576040517fcb591a5f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6103e8811115612a4a576040517fb59f753a00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60755467ffffffffffffffff78010000000000000000000000000000000000000000000000008204811691612a95918491700100000000000000000000000000000000900416615a56565b1115612acd576040517fc630a00d00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60755467ffffffffffffffff68010000000000000000820481165f8181526074602052604081205491937001000000000000000000000000000000009004909216915b84811015612d49575f878783818110612b2b57612b2b615a69565b9050602002810190612b3d9190615a96565b612b4690615ad2565b905083612b52816159d9565b825180516020918201208185015160408087015190519499509194505f93612bb39386939101928352602083019190915260c01b7fffffffffffffffff00000000000000000000000000000000000000000000000016604082015260480190565b60408051601f19818403018152918152815160209283012067ffffffffffffffff89165f90815260739093529120549091508114612c1d576040517fce3d755e00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b67ffffffffffffffff86165f90815260736020526040812055612c41600189615b5e565b8403612cb05742607d60149054906101000a900467ffffffffffffffff168460400151612c6e9190615979565b67ffffffffffffffff161115612cb0576040517fc44a082100000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b506020918201516040805180850196909652858101929092526060808601919091524260c01b7fffffffffffffffff00000000000000000000000000000000000000000000000016608086015233901b7fffffffffffffffffffffffffffffffffffffffff0000000000000000000000001660888501528051808503607c018152609c9094019052825192019190912090600101612b10565b50612d548484615979565b6075805467ffffffffffffffff4281167fffffffffffffffffffffffffffffffffffffffffffffffff00000000000000009092168217808455604080516060810182528781526020808201958652680100000000000000009384900485168284019081528589165f818152607490935284832093518455965160019390930180549151871686027fffffffffffffffffffffffffffffffff0000000000000000000000000000000090921693871693909317179091558554938916700100000000000000000000000000000000027fffffffffffffffff0000000000000000ffffffffffffffffffffffffffffffff938602939093167fffffffffffffffff00000000000000000000000000000000ffffffffffffffff90941693909317919091179093559151929550917f648a61dd2438f072f5a1960939abd30f37aea80d2e94c9792ad142d3e0a490a49190a2505050505050565b607c546001600160a01b03163314612eef576040517f4755657900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b7f00000000000000000000000000000000000000000000000000000000000000006001600160a01b031663dbc169766040518163ffffffff1660e01b81526004015f604051808303815f87803b158015612f47575f80fd5b505af1158015612f59573d5f803e3d5ffd5b5050505061208d614abd565b607d547c0100000000000000000000000000000000000000000000000000000000900460ff1615612fc2576040517f24eff8c300000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60715460ff1615612fff576040517f2f0047fc00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5f613008611c3b565b905081811115613044576040517f4732fdb500000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6130796001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016333084614b4b565b5f7f00000000000000000000000000000000000000000000000000000000000000006001600160a01b0316633ed691ef6040518163ffffffff1660e01b8152600401602060405180830381865afa1580156130d6573d5f803e3d5ffd5b505050506040513d601f19601f820116820180604052508101906130fa91906159ff565b60758054919250780100000000000000000000000000000000000000000000000090910467ffffffffffffffff16906018613134836159d9565b91906101000a81548167ffffffffffffffff021916908367ffffffffffffffff16021790555050848460405161316b929190615b71565b60408051918290038220602083015281018290527fffffffffffffffff0000000000000000000000000000000000000000000000004260c01b16606082015260680160408051808303601f1901815291815281516020928301206075547801000000000000000000000000000000000000000000000000900467ffffffffffffffff165f908152607390935291205532330361327b576075546040805183815233602082015260609181018290525f91810191909152780100000000000000000000000000000000000000000000000090910467ffffffffffffffff16907ff94bb37db835f1ab585ee00041849a09b12cd081d77fa15ca070757619cbc9319060800160405180910390a26132da565b607560189054906101000a900467ffffffffffffffff1667ffffffffffffffff167ff94bb37db835f1ab585ee00041849a09b12cd081d77fa15ca070757619cbc931823388886040516132d19493929190615b80565b60405180910390a25b5050505050565b60715460ff161561331e576040517f2f0047fc00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6071546b01000000000000000000000090046001600160a01b03163314613371576040517f11e7be1500000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b835f8190036133ac576040517fcb591a5f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6103e88111156133e8576040517fb59f753a00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5f5b818110156134d1576134c985858381811061340757613407615a69565b90506020028101906134199190615ba8565b613427906020810190615bda565b86868481811061343957613439615a69565b905060200281019061344b9190615ba8565b613459906020810190615bfd565b88888681811061346b5761346b615a69565b905060200281019061347d9190615ba8565b6040013589898781811061349357613493615a69565b90506020028101906134a59190615ba8565b606001358c8c888181106134bb576134bb615a69565b9050608002015f0135614c02565b6001016133ea565b5060755467ffffffffffffffff68010000000000000000820481165f81815260746020526040812054838516949293700100000000000000000000000000000000909304909216919082905b8681101561389b575f8c8c8381811061353857613538615a69565b90506080020180360381019061354e9190615c61565b805160608201519192509067ffffffffffffffff161561369d5785613572816159d9565b9650505f81836020015184606001516040516020016135c993929190928352602083019190915260c01b7fffffffffffffffff00000000000000000000000000000000000000000000000016604082015260480190565b60408051601f19818403018152918152815160209283012067ffffffffffffffff8a165f90815260739093529120549091508114613633576040517fce3d755e00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b67ffffffffffffffff8088165f908152607360205260408082209190915560608501519085015190821691161015613697576040517f7f7ab87200000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5061378b565b602082015115801590613754575060208201516040517f257b363200000000000000000000000000000000000000000000000000000000815260048101919091527f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03169063257b3632906024016020604051808303815f875af115801561372e573d5f803e3d5ffd5b505050506040513d601f19601f8201168201806040525081019061375291906159ff565b155b1561378b576040517f73bd668d00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b8767ffffffffffffffff16826040015167ffffffffffffffff1610806137be575042826040015167ffffffffffffffff16115b156137f5576040517fea82791600000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b602082810151604080850151815193840189905290830184905260608084019290925260c01b7fffffffffffffffff0000000000000000000000000000000000000000000000001660808301528b901b7fffffffffffffffffffffffffffffffffffffffff000000000000000000000000166088820152609c0160408051601f19818403018152918152815160209092019190912092015197509093505060010161351d565b506138a68685615979565b60755490945067ffffffffffffffff78010000000000000000000000000000000000000000000000009091048116908416111561390f576040517fc630a00d00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5f61391a82856159b8565b61392e9067ffffffffffffffff1688615b5e565b604080516060810182528581524267ffffffffffffffff908116602080840191825260758054680100000000000000009081900485168688019081528d86165f8181526074909552979093209551865592516001909501805492519585167fffffffffffffffffffffffffffffffff000000000000000000000000000000009384161795851684029590951790945583548c8416911617930292909217905590915082811690851614613a2357607580547fffffffffffffffff0000000000000000ffffffffffffffffffffffffffffffff1670010000000000000000000000000000000067ffffffffffffffff8716021790555b613a68333083607254613a3691906159a1565b6001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016929190614b4b565b613a706148bb565b7f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03166379e2cf976040518163ffffffff1660e01b81526004015f604051808303815f87803b158015613ac8575f80fd5b505af1158015613ada573d5f803e3d5ffd5b505060405167ffffffffffffffff881692507f303446e6a8cb73c83dff421c0b1d5e5ce0719dab1bff13660fc254e58cc17fce91505f90a2505050505050505050505050565b607c546001600160a01b03163314613b64576040517f4755657900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b607680547fffffffff0000000000000000000000000000000000000000ffffffffffffffff16680100000000000000006001600160a01b038416908102919091179091556040519081527f61f8fec29495a3078e9271456f05fb0707fd4e41f7661865f80fc437d06681ca906020016111d4565b613be061496a565b6001600160a01b038116613c76576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602660248201527f4f776e61626c653a206e6577206f776e657220697320746865207a65726f206160448201527f64647265737300000000000000000000000000000000000000000000000000006064820152608401610b9d565b6119c2816149de565b5f54610100900460ff16613d15576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602b60248201527f496e697469616c697a61626c653a20636f6e7472616374206973206e6f74206960448201527f6e697469616c697a696e670000000000000000000000000000000000000000006064820152608401610b9d565b61208d336149de565b5f80613d28612866565b905067ffffffffffffffff881615613df757607b5467ffffffffffffffff9081169089161115613d84576040517fbb14c20500000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b67ffffffffffffffff8089165f908152607a60205260409020600281015481549094509091898116680100000000000000009092041614613df1576040517f2bd2e3e700000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b50613e97565b67ffffffffffffffff87165f90815260776020526040902054915081613e49576040517f4997b98600000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b8067ffffffffffffffff168767ffffffffffffffff161115613e97576040517f1e56e9e200000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b8067ffffffffffffffff168667ffffffffffffffff1611613ee4576040517fb9b18f5700000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5f613ef288888886896111df565b90505f7f30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001600283604051613f269190615cd0565b602060405180830381855afa158015613f41573d5f803e3d5ffd5b5050506040513d601f19601f82011682018060405250810190613f6491906159ff565b613f6e9190615ce1565b6040805160208101825282815290517f9121da8a0000000000000000000000000000000000000000000000000000000081529192506001600160a01b037f00000000000000000000000000000000000000000000000000000000000000001691639121da8a91613fe391899190600401615cf4565b602060405180830381865afa158015613ffe573d5f803e3d5ffd5b505050506040513d601f19601f820116820180604052508101906140229190615d2e565b614058576040517f09bde33900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6140b333614066858b6159b8565b67ffffffffffffffff166140786122a1565b61408291906159a1565b6001600160a01b037f0000000000000000000000000000000000000000000000000000000000000000169190614d7f565b50505050505050505050565b5f67ffffffffffffffff88161561418b57607b5467ffffffffffffffff908116908916111561411a576040517fbb14c20500000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5067ffffffffffffffff8088165f908152607a60205260409020600281015481549092888116680100000000000000009092041614614185576040517f2bd2e3e700000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b50614226565b5067ffffffffffffffff85165f90815260776020526040902054806141dc576040517f4997b98600000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60765467ffffffffffffffff9081169087161115614226576040517f1e56e9e200000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b607b5467ffffffffffffffff908116908816118061425857508767ffffffffffffffff168767ffffffffffffffff1611155b8061427f5750607b5467ffffffffffffffff68010000000000000000909104811690881611155b156142b6576040517fbfa7079f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b67ffffffffffffffff8781165f908152607a6020526040902054680100000000000000009004811690861614614318576040517f32a2a77f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5f61432687878785886111df565b90505f7f30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f000000160028360405161435a9190615cd0565b602060405180830381855afa158015614375573d5f803e3d5ffd5b5050506040513d601f19601f8201168201806040525081019061439891906159ff565b6143a29190615ce1565b6040805160208101825282815290517f9121da8a0000000000000000000000000000000000000000000000000000000081529192506001600160a01b037f00000000000000000000000000000000000000000000000000000000000000001691639121da8a9161441791889190600401615cf4565b602060405180830381865afa158015614432573d5f803e3d5ffd5b505050506040513d601f19601f820116820180604052508101906144569190615d2e565b61448c576040517f09bde33900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b67ffffffffffffffff89165f908152607a60205260409020600201548590036140b3576040517fa47276bd00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b607b5467ffffffffffffffff68010000000000000000909104811690821611158061451b5750607b5467ffffffffffffffff908116908216115b15614552576040517fd086b70b00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b67ffffffffffffffff8181165f818152607a6020908152604080832080546076805468010000000000000000928390049098167fffffffffffffffffffffffffffffffffffffffffffffffff000000000000000090981688179055600282015487865260779094529382902092909255607b80547fffffffffffffffffffffffffffffffff0000000000000000ffffffffffffffff169390940292909217909255600182015490517f33d6247d00000000000000000000000000000000000000000000000000000000815260048101919091529091907f00000000000000000000000000000000000000000000000000000000000000006001600160a01b0316906333d6247d906024015f604051808303815f87803b158015614673575f80fd5b505af1158015614685573d5f803e3d5ffd5b505050508267ffffffffffffffff168167ffffffffffffffff167f328d3c6c0fd6f1be0515e422f2d87e59f25922cbc2233568515a0c4bc3f8510e84600201546040516146d491815260200190565b60405180910390a3505050565b5f6146ea612866565b9050815f806146f984846159b8565b60715467ffffffffffffffff91821692505f9161471c9161010090041642615b5e565b90505b8467ffffffffffffffff168467ffffffffffffffff16146147a65767ffffffffffffffff8085165f908152607460205260409020600181015490911682101561478457600181015468010000000000000000900467ffffffffffffffff1694506147a0565b61478e86866159b8565b67ffffffffffffffff169350506147a6565b5061471f565b5f6147b18484615b5e565b90508381101561480857808403600c81116147cc57806147cf565b600c5b9050806103e80a81607160099054906101000a900461ffff1661ffff160a60725402816147fe576147fe615a16565b0460725550614877565b838103600c8111614819578061481c565b600c5b90505f816103e80a82607160099054906101000a900461ffff1661ffff160a670de0b6b3a7640000028161485257614852615a16565b04905080607254670de0b6b3a7640000028161487057614870615a16565b0460725550505b683635c9adc5dea00000607254111561489c57683635c9adc5dea0000060725561103f565b633b9aca00607254101561103f57633b9aca0060725550505050505050565b607b5467ffffffffffffffff68010000000000000000820481169116111561208d57607b545f906149039068010000000000000000900467ffffffffffffffff166001615979565b905061490e81611753565b156119c257607b545f9060029061493090849067ffffffffffffffff166159b8565b61493a9190615d4d565b6149449083615979565b905061494f81611753565b156149615761495d816144e1565b5050565b61495d826144e1565b6033546001600160a01b0316331461208d576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e65726044820152606401610b9d565b603380546001600160a01b038381167fffffffffffffffffffffffff0000000000000000000000000000000000000000831681179093556040519116919082907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0905f90a35050565b7f00000000000000000000000000000000000000000000000000000000000000006001600160a01b0316632072f6c56040518163ffffffff1660e01b81526004015f604051808303815f87803b158015614a9f575f80fd5b505af1158015614ab1573d5f803e3d5ffd5b5050505061208d614dcd565b60715460ff16614af9576040517f5386698100000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b607180547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff001690556040517f1e5e34eea33501aecf2ebec9fe0e884a40804275ea7fe10b2ba084c8374308b3905f90a1565b6040516001600160a01b0380851660248301528316604482015260648101829052614bfc9085907f23b872dd00000000000000000000000000000000000000000000000000000000906084015b60408051601f198184030181529190526020810180517bffffffffffffffffffffffffffffffffffffffffffffffffffffffff167fffffffff0000000000000000000000000000000000000000000000000000000090931692909217909152614e5f565b50505050565b6066546040517f081dc68100000000000000000000000000000000000000000000000000000000815263ffffffff881660048201525f916001600160a01b03169063081dc68190602401602060405180830381865afa158015614c67573d5f803e3d5ffd5b505050506040513d601f19601f82011682018060405250810190614c8b91906159ff565b905080158015614c99575081155b15614ca45750614d77565b80614cdb576040517fffc8de2f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5f8281526065602052604090205415614d20576040517fa84eb91a00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b614d2e828288888888614f5d565b614d64576040517fe453b21c00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b505f818152606560205260409020600190555b505050505050565b6040516001600160a01b038316602482015260448101829052614dc89084907fa9059cbb0000000000000000000000000000000000000000000000000000000090606401614b98565b505050565b60715460ff1615614e0a576040517f2f0047fc00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b607180547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff001660011790556040517f2261efe5aef6fedc1fd1550b25facc9181745623049c7901287030b9ad1a5497905f90a1565b5f614eb3826040518060400160405280602081526020017f5361666545524332303a206c6f772d6c6576656c2063616c6c206661696c6564815250856001600160a01b0316614fde9092919063ffffffff16565b805190915015614dc85780806020019051810190614ed19190615d2e565b614dc8576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602a60248201527f5361666545524332303a204552433230206f7065726174696f6e20646964206e60448201527f6f742073756363656564000000000000000000000000000000000000000000006064820152608401610b9d565b5f8315614fcc578360051b8501855b8360011660051b856001860103614f81575060205b98895280356020998a185260405f20987fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff909501600190811c81019594901c9301818110614f6c5750505b81158688141690509695505050505050565b6060614fec84845f85614ff4565b949350505050565b606082471015615086576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602660248201527f416464726573733a20696e73756666696369656e742062616c616e636520666f60448201527f722063616c6c00000000000000000000000000000000000000000000000000006064820152608401610b9d565b5f80866001600160a01b031685876040516150a19190615cd0565b5f6040518083038185875af1925050503d805f81146150db576040519150601f19603f3d011682016040523d82523d5f602084013e6150e0565b606091505b50915091506150f1878383876150fc565b979650505050505050565b606083156151845782515f0361517d576001600160a01b0385163b61517d576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601d60248201527f416464726573733a2063616c6c20746f206e6f6e2d636f6e74726163740000006044820152606401610b9d565b5081614fec565b614fec83838151156151995781518083602001fd5b806040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401610b9d91906153d0565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52604160045260245ffd5b5f67ffffffffffffffff80841115615214576152146151cd565b604051601f8501601f19908116603f0116810190828211818310171561523c5761523c6151cd565b81604052809350858152868686011115615254575f80fd5b858560208301375f602087830101525050509392505050565b5f82601f83011261527c575f80fd5b61528b838335602085016151fa565b9392505050565b5f8083601f8401126152a2575f80fd5b50813567ffffffffffffffff8111156152b9575f80fd5b6020830191508360208285010111156152d0575f80fd5b9250929050565b5f805f805f808688036101408112156152ee575f80fd5b60c08112156152fb575f80fd5b5086955060c0870135945060e087013567ffffffffffffffff80821115615320575f80fd5b61532c8a838b0161526d565b9550610100890135915080821115615342575f80fd5b61534e8a838b0161526d565b9450610120890135915080821115615364575f80fd5b5061537189828a01615292565b979a9699509497509295939492505050565b5f5b8381101561539d578181015183820152602001615385565b50505f910152565b5f81518084526153bc816020860160208601615383565b601f01601f19169290920160200192915050565b602081525f61528b60208301846153a5565b5f602082840312156153f2575f80fd5b813561ffff8116811461528b575f80fd5b803567ffffffffffffffff81168114612823575f80fd5b5f805f805f60a0868803121561542e575f80fd5b61543786615403565b945061544560208701615403565b94979496505050506040830135926060810135926080909101359150565b806103008101831015615474575f80fd5b92915050565b5f805f805f806103a08789031215615490575f80fd5b61549987615403565b95506154a760208801615403565b94506154b560408801615403565b935060608701359250608087013591506154d28860a08901615463565b90509295509295509295565b5f805f805f805f6103c0888a0312156154f5575f80fd5b6154fe88615403565b965061550c60208901615403565b955061551a60408901615403565b945061552860608901615403565b93506080880135925060a088013591506155458960c08a01615463565b905092959891949750929550565b5f60208284031215615563575f80fd5b61528b82615403565b5f6020828403121561557c575f80fd5b5035919050565b6001600160a01b03811681146119c2575f80fd5b803561282381615583565b5f602082840312156155b2575f80fd5b813561528b81615583565b5f602082840312156155cd575f80fd5b813567ffffffffffffffff8111156155e3575f80fd5b614fec8482850161526d565b5f8083601f8401126155ff575f80fd5b50813567ffffffffffffffff811115615616575f80fd5b6020830191508360208260051b85010111156152d0575f80fd5b5f8060208385031215615641575f80fd5b823567ffffffffffffffff811115615657575f80fd5b615663858286016155ef565b90969095509350505050565b5f805f60408486031215615681575f80fd5b833567ffffffffffffffff811115615697575f80fd5b6156a386828701615292565b909790965060209590950135949350505050565b5f805f805f606086880312156156cb575f80fd5b853567ffffffffffffffff808211156156e2575f80fd5b818801915088601f8301126156f5575f80fd5b813581811115615703575f80fd5b8960208260071b8501011115615717575f80fd5b602092830197509550908701359080821115615731575f80fd5b5061573e888289016155ef565b9094509250615751905060408701615597565b90509295509295909350565b600181811c9082168061577157607f821691505b6020821081036157a8577f4e487b71000000000000000000000000000000000000000000000000000000005f52602260045260245ffd5b50919050565b601f821115614dc857805f5260205f20601f840160051c810160208510156157d35750805b601f840160051c820191505b818110156132da575f81556001016157df565b815167ffffffffffffffff81111561580c5761580c6151cd565b6158208161581a845461575d565b846157ae565b602080601f831160018114615872575f841561583c5750858301515b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff600386901b1c1916600185901b178555614d77565b5f85815260208120601f198616915b828110156158a057888601518255948401946001909101908401615881565b50858210156158dc57878501517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff600388901b60f8161c191681555b5050505050600190811b01905550565b81835281816020850137505f602082840101525f6020601f19601f840116840101905092915050565b5f67ffffffffffffffff8087168352808616602084015250606060408301526159426060830184866158ec565b9695505050505050565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52601160045260245ffd5b67ffffffffffffffff81811683821601908082111561599a5761599a61594c565b5092915050565b80820281158282048414176154745761547461594c565b67ffffffffffffffff82811682821603908082111561599a5761599a61594c565b5f67ffffffffffffffff8083168181036159f5576159f561594c565b6001019392505050565b5f60208284031215615a0f575f80fd5b5051919050565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52601260045260245ffd5b5f82615a5157615a51615a16565b500490565b808201808211156154745761547461594c565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52603260045260245ffd5b5f82357fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa1833603018112615ac8575f80fd5b9190910192915050565b5f60608236031215615ae2575f80fd5b6040516060810167ffffffffffffffff8282108183111715615b0657615b066151cd565b816040528435915080821115615b1a575f80fd5b50830136601f820112615b2b575f80fd5b615b3a368235602084016151fa565b82525060208301356020820152615b5360408401615403565b604082015292915050565b818103818111156154745761547461594c565b818382375f9101908152919050565b8481526001600160a01b0384166020820152606060408201525f6159426060830184866158ec565b5f82357fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff81833603018112615ac8575f80fd5b5f60208284031215615bea575f80fd5b813563ffffffff8116811461528b575f80fd5b5f8083357fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe1843603018112615c30575f80fd5b83018035915067ffffffffffffffff821115615c4a575f80fd5b6020019150600581901b36038213156152d0575f80fd5b5f60808284031215615c71575f80fd5b6040516080810181811067ffffffffffffffff82111715615c9457615c946151cd565b80604052508235815260208301356020820152615cb360408401615403565b6040820152615cc460608401615403565b60608201529392505050565b5f8251615ac8818460208701615383565b5f82615cef57615cef615a16565b500690565b6103208101610300808584378201835f5b6001811015615d24578151835260209283019290910190600101615d05565b5050509392505050565b5f60208284031215615d3e575f80fd5b8151801515811461528b575f80fd5b5f67ffffffffffffffff80841680615d6757615d67615a16565b9216919091049291505056fea264697066735822122017b249131872d700da0ea088548cc040ee20ae51a05723d32917d250d690abd664736f6c63430008160033",
+	ABI: "[{\"inputs\":[{\"internalType\":\"contractIPolygonZkEVMGlobalExitRootV2\",\"name\":\"_globalExitRootManager\",\"type\":\"address\"},{\"internalType\":\"contractIERC20Upgradeable\",\"name\":\"_pol\",\"type\":\"address\"},{\"internalType\":\"contractIPolygonZkEVMBridgeV2\",\"name\":\"_bridgeAddress\",\"type\":\"address\"},{\"internalType\":\"contractPolygonRollupManager\",\"name\":\"_rollupManager\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"BatchAlreadyVerified\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"BatchNotSequencedOrNotSequenceEnd\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ExceedMaxVerifyBatches\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"FinalNumBatchBelowLastVerifiedBatch\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"FinalNumBatchDoesNotMatchPendingState\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"FinalPendingStateNumInvalid\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ForceBatchNotAllowed\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ForceBatchTimeoutNotExpired\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ForceBatchesAlreadyActive\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ForceBatchesOverflow\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ForcedDataDoesNotMatch\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"GasTokenNetworkMustBeZeroOnEther\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"GlobalExitRootNotExist\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"HaltTimeoutNotExpired\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"HugeTokenMetadataNotSupported\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InitNumBatchAboveLastVerifiedBatch\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InitNumBatchDoesNotMatchPendingState\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidInitializeTransaction\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidProof\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidRangeBatchTimeTarget\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidRangeForceBatchTimeout\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidRangeMultiplierBatchFee\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NewAccInputHashDoesNotExist\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NewPendingStateTimeoutMustBeLower\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NewStateRootNotInsidePrime\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NewTrustedAggregatorTimeoutMustBeLower\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotEnoughMaticAmount\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotEnoughPOLAmount\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"OldAccInputHashDoesNotExist\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"OldStateRootDoesNotExist\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"OnlyAdmin\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"OnlyPendingAdmin\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"OnlyRollupManager\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"OnlyTrustedAggregator\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"OnlyTrustedSequencer\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"PendingStateDoesNotExist\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"PendingStateInvalid\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"PendingStateNotConsolidable\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"PendingStateTimeoutExceedHaltAggregationTimeout\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"SequenceZeroBatches\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"SequencedTimestampBelowForcedTimestamp\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"SequencedTimestampInvalid\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"StoredRootMustBeDifferentThanNewRoot\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"TransactionsLengthAboveMax\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"TrustedAggregatorTimeoutExceedHaltAggregationTimeout\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"TrustedAggregatorTimeoutNotExpired\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"newAdmin\",\"type\":\"address\"}],\"name\":\"AcceptAdminRole\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[],\"name\":\"ActivateForceBatches\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint64\",\"name\":\"forceBatchNum\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"lastGlobalExitRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"sequencer\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"transactions\",\"type\":\"bytes\"}],\"name\":\"ForceBatch\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"transactions\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"lastGlobalExitRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"sequencer\",\"type\":\"address\"}],\"name\":\"InitialSequenceBatches\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"version\",\"type\":\"uint8\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint64\",\"name\":\"numBatch\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"l1InfoRoot\",\"type\":\"bytes32\"}],\"name\":\"SequenceBatches\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint64\",\"name\":\"numBatch\",\"type\":\"uint64\"}],\"name\":\"SequenceForceBatches\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"newforceBatchTimeout\",\"type\":\"uint64\"}],\"name\":\"SetForceBatchTimeout\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"newTrustedSequencer\",\"type\":\"address\"}],\"name\":\"SetTrustedSequencer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"newTrustedSequencerURL\",\"type\":\"string\"}],\"name\":\"SetTrustedSequencerURL\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"newPendingAdmin\",\"type\":\"address\"}],\"name\":\"TransferAdminRole\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint64\",\"name\":\"numBatch\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"aggregator\",\"type\":\"address\"}],\"name\":\"VerifyBatches\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"GLOBAL_EXIT_ROOT_MANAGER_L2\",\"outputs\":[{\"internalType\":\"contractIBasePolygonZkEVMGlobalExitRoot\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"INITIALIZE_TX_BRIDGE_LIST_LEN_LEN\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"INITIALIZE_TX_BRIDGE_PARAMS\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"INITIALIZE_TX_BRIDGE_PARAMS_AFTER_BRIDGE_ADDRESS\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"INITIALIZE_TX_BRIDGE_PARAMS_AFTER_BRIDGE_ADDRESS_EMPTY_METADATA\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"INITIALIZE_TX_CONSTANT_BYTES\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"INITIALIZE_TX_CONSTANT_BYTES_EMPTY_METADATA\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"INITIALIZE_TX_DATA_LEN_EMPTY_METADATA\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"INITIALIZE_TX_EFFECTIVE_PERCENTAGE\",\"outputs\":[{\"internalType\":\"bytes1\",\"name\":\"\",\"type\":\"bytes1\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"SIGNATURE_INITIALIZE_TX_R\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"SIGNATURE_INITIALIZE_TX_S\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"SIGNATURE_INITIALIZE_TX_V\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"acceptAdminRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"activateForceBatches\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"admin\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"bridgeAddress\",\"outputs\":[{\"internalType\":\"contractIPolygonZkEVMBridgeV2\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"calculatePolPerForceBatch\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"transactions\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"polAmount\",\"type\":\"uint256\"}],\"name\":\"forceBatch\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"forceBatchTimeout\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"name\":\"forcedBatches\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"gapLastTimestamp\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"gasTokenAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"gasTokenNetwork\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"\",\"type\":\"uint32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"networkID\",\"type\":\"uint32\"},{\"internalType\":\"address\",\"name\":\"_gasTokenAddress\",\"type\":\"address\"},{\"internalType\":\"uint32\",\"name\":\"_gasTokenNetwork\",\"type\":\"uint32\"},{\"internalType\":\"bytes\",\"name\":\"_gasTokenMetadata\",\"type\":\"bytes\"}],\"name\":\"generateInitializeTransaction\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"globalExitRootManager\",\"outputs\":[{\"internalType\":\"contractIPolygonZkEVMGlobalExitRootV2\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_admin\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"sequencer\",\"type\":\"address\"},{\"internalType\":\"uint32\",\"name\":\"networkID\",\"type\":\"uint32\"},{\"internalType\":\"address\",\"name\":\"_gasTokenAddress\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"sequencerURL\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_networkName\",\"type\":\"string\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isForcedBatchAllowed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lastAccInputHash\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lastForceBatch\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lastForceBatchSequenced\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"networkName\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"lastVerifiedBatch\",\"type\":\"uint64\"},{\"internalType\":\"bytes32\",\"name\":\"newStateRoot\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"aggregator\",\"type\":\"address\"}],\"name\":\"onVerifyBatches\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pendingAdmin\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pol\",\"outputs\":[{\"internalType\":\"contractIERC20Upgradeable\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"rollupManager\",\"outputs\":[{\"internalType\":\"contractPolygonRollupManager\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"bytes\",\"name\":\"transactions\",\"type\":\"bytes\"},{\"internalType\":\"bytes32\",\"name\":\"forcedGlobalExitRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint64\",\"name\":\"forcedTimestamp\",\"type\":\"uint64\"},{\"internalType\":\"bytes32\",\"name\":\"forcedBlockHashL1\",\"type\":\"bytes32\"}],\"internalType\":\"structPolygonRollupBaseEtrog.BatchData[]\",\"name\":\"batches\",\"type\":\"tuple[]\"},{\"internalType\":\"address\",\"name\":\"l2Coinbase\",\"type\":\"address\"}],\"name\":\"sequenceBatches\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"bytes\",\"name\":\"transactions\",\"type\":\"bytes\"},{\"internalType\":\"bytes32\",\"name\":\"forcedGlobalExitRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint64\",\"name\":\"forcedTimestamp\",\"type\":\"uint64\"},{\"internalType\":\"bytes32\",\"name\":\"forcedBlockHashL1\",\"type\":\"bytes32\"}],\"internalType\":\"structPolygonRollupBaseEtrog.BatchData[]\",\"name\":\"batches\",\"type\":\"tuple[]\"}],\"name\":\"sequenceForceBatches\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"newforceBatchTimeout\",\"type\":\"uint64\"}],\"name\":\"setForceBatchTimeout\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newTrustedSequencer\",\"type\":\"address\"}],\"name\":\"setTrustedSequencer\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"newTrustedSequencerURL\",\"type\":\"string\"}],\"name\":\"setTrustedSequencerURL\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newPendingAdmin\",\"type\":\"address\"}],\"name\":\"transferAdminRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"trustedSequencer\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"trustedSequencerURL\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
+	Bin: "0x6101006040523480156200001257600080fd5b506040516200464138038062004641833981016040819052620000359162000071565b6001600160a01b0393841660a052918316608052821660c0521660e052620000d9565b6001600160a01b03811681146200006e57600080fd5b50565b600080600080608085870312156200008857600080fd5b8451620000958162000058565b6020860151909450620000a88162000058565b6040860151909350620000bb8162000058565b6060860151909250620000ce8162000058565b939692955090935050565b60805160a05160c05160e051614494620001ad6000396000818161051a015281816109a501528181610b1201528181610e4f015281816113ea01528181611a8d01528181611b8b015281816121dc01528181612b4901528181612bca01528181612bec0152612d04015260008181610669015281816110a901528181611d5b01528181611e63015261266f01526000818161072d0152818161125e0152818161232701526126f101526000818161075f0152818161083d01528181611ad6015281816122fb0152612c9a01526144946000f3fe608060405234801561001057600080fd5b50600436106102e85760003560e01c80636ff512cc11610191578063c7fffd4b116100e3578063e46761c411610097578063ecef3f9911610071578063ecef3f99146107b4578063f35dda47146107c7578063f851a440146107cf57600080fd5b8063e46761c41461075a578063e7a7ed0214610781578063eaeb077b146107a157600080fd5b8063cfa8ed47116100c8578063cfa8ed4714610708578063d02103ca14610728578063d7bc90ff1461074f57600080fd5b8063c7fffd4b146106ed578063c89e42df146106f557600080fd5b80639f26f84011610145578063ada8f9191161011f578063ada8f9191461069e578063b0afe154146106b1578063c754c7ed146106bd57600080fd5b80639f26f84014610651578063a3c573eb14610664578063a652f26c1461068b57600080fd5b80637a5460c5116101765780637a5460c5146105f25780638c3d73011461062e5780639e0018771461063657600080fd5b80636ff512cc146105cc57806371257022146105df57600080fd5b80633cbc795b1161024a57806352bdeb6d116101fe578063676870d2116101d8578063676870d21461059b5780636b8616ce146105a35780636e05d2cd146105c357600080fd5b806352bdeb6d1461054f578063542028d51461058b5780635ec919581461059357600080fd5b8063456052671161022f57806345605267146104ed57806349b7b802146105155780634e4877061461053c57600080fd5b80633cbc795b1461045757806340b5de6c1461049557600080fd5b806326782247116102a15780632b35b3ac116102865780632b35b3ac1461040057806332c2d1531461041d5780633c351e101461043257600080fd5b8063267822471461038e5780632a9f208f146103d357600080fd5b806305835f37116102d257806305835f3714610323578063107bf28c1461036c57806311e892d41461037457600080fd5b8062d0295d146102ed5780630350896314610308575b600080fd5b6102f56107f5565b6040519081526020015b60405180910390f35b610310602081565b60405161ffff90911681526020016102ff565b61035f6040518060400160405280600881526020017f80808401c9c3809400000000000000000000000000000000000000000000000081525081565b6040516102ff91906136e1565b61035f610915565b61037c60f981565b60405160ff90911681526020016102ff565b6001546103ae9073ffffffffffffffffffffffffffffffffffffffff1681565b60405173ffffffffffffffffffffffffffffffffffffffff90911681526020016102ff565b6007546103e79067ffffffffffffffff1681565b60405167ffffffffffffffff90911681526020016102ff565b60085461040d9060ff1681565b60405190151581526020016102ff565b61043061042b366004613736565b6109a3565b005b6008546103ae90610100900473ffffffffffffffffffffffffffffffffffffffff1681565b600854610480907501000000000000000000000000000000000000000000900463ffffffff1681565b60405163ffffffff90911681526020016102ff565b6104bc7fff0000000000000000000000000000000000000000000000000000000000000081565b6040517fff0000000000000000000000000000000000000000000000000000000000000090911681526020016102ff565b6007546103e790700100000000000000000000000000000000900467ffffffffffffffff1681565b6103ae7f000000000000000000000000000000000000000000000000000000000000000081565b61043061054a366004613778565b610a72565b61035f6040518060400160405280600281526020017f80b800000000000000000000000000000000000000000000000000000000000081525081565b61035f610c8c565b610430610c99565b610310601f81565b6102f56105b1366004613778565b60066020526000908152604090205481565b6102f560055481565b6104306105da366004613795565b610d83565b6104306105ed3660046138de565b610e4d565b61035f6040518060400160405280600281526020017f80b900000000000000000000000000000000000000000000000000000000000081525081565b6104306115e5565b6103ae73a40d5f56745a118d0906a34e69aec8c0db1cb8fa81565b61043061065f3660046139d7565b6116b8565b6103ae7f000000000000000000000000000000000000000000000000000000000000000081565b61035f610699366004613a19565b611c5a565b6104306106ac366004613795565b61203f565b6102f56405ca1ab1e081565b6007546103e7907801000000000000000000000000000000000000000000000000900467ffffffffffffffff1681565b61037c60e481565b610430610703366004613a8e565b612109565b6002546103ae9073ffffffffffffffffffffffffffffffffffffffff1681565b6103ae7f000000000000000000000000000000000000000000000000000000000000000081565b6102f5635ca1ab1e81565b6103ae7f000000000000000000000000000000000000000000000000000000000000000081565b6007546103e79068010000000000000000900467ffffffffffffffff1681565b6104306107af366004613ac3565b61219c565b6104306107c2366004613b3b565b6125a4565b61037c601b81565b6000546103ae9062010000900473ffffffffffffffffffffffffffffffffffffffff1681565b6040517f70a08231000000000000000000000000000000000000000000000000000000008152306004820152600090819073ffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000000000000000000000000000000000000000000016906370a0823190602401602060405180830381865afa158015610884573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906108a89190613b87565b6007549091506000906108e79067ffffffffffffffff700100000000000000000000000000000000820481169168010000000000000000900416613bcf565b67ffffffffffffffff169050806000036109045760009250505090565b61090e8183613bf7565b9250505090565b6004805461092290613c32565b80601f016020809104026020016040519081016040528092919081815260200182805461094e90613c32565b801561099b5780601f106109705761010080835404028352916020019161099b565b820191906000526020600020905b81548152906001019060200180831161097e57829003601f168201915b505050505081565b7f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff163314610a12576040517fb9b3a2c800000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b8073ffffffffffffffffffffffffffffffffffffffff168367ffffffffffffffff167f9c72852172521097ba7e1482e6b44b351323df0155f97f4ea18fcec28e1f596684604051610a6591815260200190565b60405180910390a3505050565b60005462010000900473ffffffffffffffffffffffffffffffffffffffff163314610ac9576040517f4755657900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b62093a8067ffffffffffffffff82161115610b10576040517ff5e37f2f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b7f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff166315064c966040518163ffffffff1660e01b8152600401602060405180830381865afa158015610b7b573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610b9f9190613c85565b610c085760075467ffffffffffffffff7801000000000000000000000000000000000000000000000000909104811690821610610c08576040517ff5e37f2f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6007805477ffffffffffffffffffffffffffffffffffffffffffffffff16780100000000000000000000000000000000000000000000000067ffffffffffffffff8416908102919091179091556040519081527fa7eb6cb8a613eb4e8bddc1ac3d61ec6cf10898760f0b187bcca794c6ca6fa40b906020015b60405180910390a150565b6003805461092290613c32565b60005462010000900473ffffffffffffffffffffffffffffffffffffffff163314610cf0576040517f4755657900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60085460ff1615610d2d576040517ff6ba91a100000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b600880547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff001660011790556040517f854dd6ce5a1445c4c54388b21cffd11cf5bba1b9e763aec48ce3da75d617412f90600090a1565b60005462010000900473ffffffffffffffffffffffffffffffffffffffff163314610dda576040517f4755657900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b600280547fffffffffffffffffffffffff00000000000000000000000000000000000000001673ffffffffffffffffffffffffffffffffffffffff83169081179091556040519081527ff54144f9611984021529f814a1cb6a41e22c58351510a0d9f7e822618abb9cc090602001610c81565b7f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff163314610ebc576040517fb9b3a2c800000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b600054610100900460ff1615808015610edc5750600054600160ff909116105b80610ef65750303b158015610ef6575060005460ff166001145b610f87576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201527f647920696e697469616c697a656400000000000000000000000000000000000060648201526084015b60405180910390fd5b600080547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff001660011790558015610fe557600080547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ff166101001790555b606073ffffffffffffffffffffffffffffffffffffffff8516156111fa5761100c85612dd9565b61101586612ee9565b61101e87612ff0565b60405160200161103093929190613ca7565b604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0818403018152908290527f318aee3d00000000000000000000000000000000000000000000000000000000825273ffffffffffffffffffffffffffffffffffffffff878116600484015290925060009182917f0000000000000000000000000000000000000000000000000000000000000000169063318aee3d9060240160408051808303816000875af11580156110f1573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906111159190613ce0565b915091508163ffffffff166000146111b257600880547fffffffffffffff000000000000000000000000000000000000000000000000ff1661010073ffffffffffffffffffffffffffffffffffffffff8416027fffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffff1617750100000000000000000000000000000000000000000063ffffffff8516021790556111f7565b600880547fffffffffffffffffffffff0000000000000000000000000000000000000000ff1661010073ffffffffffffffffffffffffffffffffffffffff8a16021790555b50505b600854600090611247908890610100810473ffffffffffffffffffffffffffffffffffffffff16907501000000000000000000000000000000000000000000900463ffffffff1685611c5a565b9050600081805190602001209050600042905060007f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff16633ed691ef6040518163ffffffff1660e01b8152600401602060405180830381865afa1580156112c7573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906112eb9190613b87565b90506000808483858f6112ff600143613d1a565b60408051602081019790975286019490945260608086019390935260c09190911b7fffffffffffffffff000000000000000000000000000000000000000000000000166080850152901b7fffffffffffffffffffffffffffffffffffffffff00000000000000000000000016608883015240609c82015260bc01604080518083037fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe001815290829052805160209091012060058190557f9a908e73000000000000000000000000000000000000000000000000000000008252600160048301526024820181905291507f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff1690639a908e73906044016020604051808303816000875af1158015611448573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061146c9190613d2d565b508c600060026101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055508b600260006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555088600390816114fe9190613d98565b50600461150b8982613d98565b5062069780600760186101000a81548167ffffffffffffffff021916908367ffffffffffffffff1602179055507f060116213bcbf54ca19fd649dc84b59ab2bbd200ab199770e4d923e222a28e7f85838e60405161156b93929190613eb2565b60405180910390a150505050505080156115dc57600080547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ff169055604051600181527f7f26b83ff96e1f2b6a682f133852f6798a09c465da95921460cefb38474024989060200160405180910390a15b50505050505050565b60015473ffffffffffffffffffffffffffffffffffffffff163314611636576040517fd1ec4b2300000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b600154600080547fffffffffffffffffffff0000000000000000000000000000000000000000ffff1673ffffffffffffffffffffffffffffffffffffffff9092166201000081029290921790556040519081527f056dc487bbf0795d0bbb1b4f0af523a855503cff740bfb4d5475f7a90c091e8e9060200160405180910390a1565b60085460ff166116f4576040517f24eff8c300000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b806000819003611730576040517fcb591a5f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6103e881111561176c576040517fb59f753a00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60075467ffffffffffffffff6801000000000000000082048116916117a7918491700100000000000000000000000000000000900416613ef1565b11156117df576040517fc630a00d00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60075460055470010000000000000000000000000000000090910467ffffffffffffffff169060005b83811015611a8757600086868381811061182457611824613f04565b90506020028101906118369190613f33565b61183f90613f71565b90508361184b81613ffa565b825180516020918201208185015160408087015160608801519151959a509295506000946118b8948794929101938452602084019290925260c01b7fffffffffffffffff000000000000000000000000000000000000000000000000166040830152604882015260680190565b604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0818403018152918152815160209283012067ffffffffffffffff8916600090815260069093529120549091508114611941576040517fce3d755e00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b67ffffffffffffffff8616600090815260066020526040812055611966600188613d1a565b84036119d55742600760189054906101000a900467ffffffffffffffff1684604001516119939190614021565b67ffffffffffffffff1611156119d5576040517fc44a082100000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60208381015160408086015160608088015183519586018b90529285018790528481019390935260c01b7fffffffffffffffff0000000000000000000000000000000000000000000000001660808401523390911b7fffffffffffffffffffffffffffffffffffffffff000000000000000000000000166088830152609c82015260bc016040516020818303038152906040528051906020012094505050508080611a7f90614042565b915050611808565b50611afd7f000000000000000000000000000000000000000000000000000000000000000084611ab56107f5565b611abf919061407a565b73ffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000001691906130e3565b60058190556007805467ffffffffffffffff8416700100000000000000000000000000000000027fffffffffffffffff0000000000000000ffffffffffffffffffffffffffffffff9091161790556040517f9a908e7300000000000000000000000000000000000000000000000000000000815260009073ffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000001690639a908e7390611bd7908790869060040167ffffffffffffffff929092168252602082015260400190565b6020604051808303816000875af1158015611bf6573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190611c1a9190613d2d565b60405190915067ffffffffffffffff8216907f648a61dd2438f072f5a1960939abd30f37aea80d2e94c9792ad142d3e0a490a490600090a2505050505050565b6060600085858573a40d5f56745a118d0906a34e69aec8c0db1cb8fa600087604051602401611c8e96959493929190614091565b604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08184030181529190526020810180517bffffffffffffffffffffffffffffffffffffffffffffffffffffffff167ff811bff7000000000000000000000000000000000000000000000000000000001790528351909150606090600003611ddf5760f9601f8351611d2391906140f4565b6040518060400160405280600881526020017f80808401c9c380940000000000000000000000000000000000000000000000008152507f00000000000000000000000000000000000000000000000000000000000000006040518060400160405280600281526020017f80b800000000000000000000000000000000000000000000000000000000000081525060e487604051602001611dc9979695949392919061410f565b6040516020818303038152906040529050611ee3565b815161ffff1015611e1c576040517f248b8f8200000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b815160f9611e2b6020836140f4565b6040518060400160405280600881526020017f80808401c9c380940000000000000000000000000000000000000000000000008152507f00000000000000000000000000000000000000000000000000000000000000006040518060400160405280600281526020017f80b90000000000000000000000000000000000000000000000000000000000008152508588604051602001611ed097969594939291906141f2565b6040516020818303038152906040529150505b805160208083019190912060408051600080825293810180835292909252601b908201526405ca1ab1e06060820152635ca1ab1e608082015260019060a0016020604051602081039080840390855afa158015611f44573d6000803e3d6000fd5b50506040517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0015191505073ffffffffffffffffffffffffffffffffffffffff8116611fbc576040517fcd16196600000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6040516000906120029084906405ca1ab1e090635ca1ab1e90601b907fff00000000000000000000000000000000000000000000000000000000000000906020016142d5565b604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08184030181529190529450505050505b949350505050565b60005462010000900473ffffffffffffffffffffffffffffffffffffffff163314612096576040517f4755657900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b600180547fffffffffffffffffffffffff00000000000000000000000000000000000000001673ffffffffffffffffffffffffffffffffffffffff83169081179091556040519081527fa5b56b7906fd0a20e3f35120dd8343db1e12e037a6c90111c7e42885e82a1ce690602001610c81565b60005462010000900473ffffffffffffffffffffffffffffffffffffffff163314612160576040517f4755657900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b600361216c8282613d98565b507f6b8f723a4c7a5335cafae8a598a0aa0301be1387c037dccc085b62add6448b2081604051610c8191906136e1565b60085460ff166121d8576040517f24eff8c300000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60007f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff1663604691696040518163ffffffff1660e01b8152600401602060405180830381865afa158015612245573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906122699190613b87565b9050818111156122a5576040517f2354600f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6113888311156122e1576040517fa29a6c7c00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b61232373ffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000000000000000000000000000000000000000000000163330846131bc565b60007f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff16633ed691ef6040518163ffffffff1660e01b8152600401602060405180830381865afa158015612390573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906123b49190613b87565b600780549192506801000000000000000090910467ffffffffffffffff169060086123de83613ffa565b91906101000a81548167ffffffffffffffff021916908367ffffffffffffffff160217905550508484604051612415929190614331565b604051908190039020814261242b600143613d1a565b60408051602081019590955284019290925260c01b7fffffffffffffffff000000000000000000000000000000000000000000000000166060830152406068820152608801604080518083037fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0018152918152815160209283012060075468010000000000000000900467ffffffffffffffff166000908152600690935291205532330361253e576007546040805183815233602082015260609181018290526000918101919091526801000000000000000090910467ffffffffffffffff16907ff94bb37db835f1ab585ee00041849a09b12cd081d77fa15ca070757619cbc9319060800160405180910390a261259d565b600760089054906101000a900467ffffffffffffffff1667ffffffffffffffff167ff94bb37db835f1ab585ee00041849a09b12cd081d77fa15ca070757619cbc931823388886040516125949493929190614341565b60405180910390a25b5050505050565b60025473ffffffffffffffffffffffffffffffffffffffff1633146125f5576040517f11e7be1500000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b816000819003612631576040517fcb591a5f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6103e881111561266d576040517fb59f753a00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b7f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff166379e2cf976040518163ffffffff1660e01b8152600401600060405180830381600087803b1580156126d557600080fd5b505af11580156126e9573d6000803e3d6000fd5b5050505060007f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff16635ca1e1656040518163ffffffff1660e01b8152600401602060405180830381865afa15801561275a573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061277e9190613b87565b600754600554919250429170010000000000000000000000000000000090910467ffffffffffffffff16908160005b86811015612aaf5760008a8a838181106127c9576127c9613f04565b90506020028101906127db9190613f33565b6127e490613f71565b8051805160209091012060408201519192509067ffffffffffffffff16156129c9578561281081613ffa565b9650506000818360200151846040015185606001516040516020016128739493929190938452602084019290925260c01b7fffffffffffffffff000000000000000000000000000000000000000000000000166040830152604882015260680190565b604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0818403018152918152815160209283012067ffffffffffffffff8a166000908152600690935291205490915081146128fc576040517fce3d755e00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60208381015160408086015160608088015183519586018c90529285018790528481019390935260c01b7fffffffffffffffff000000000000000000000000000000000000000000000000166080840152908d901b7fffffffffffffffffffffffffffffffffffffffff000000000000000000000000166088830152609c82015260bc01604051602081830303815290604052805190602001209550600660008867ffffffffffffffff1667ffffffffffffffff1681526020019081526020016000206000905550612a9a565b8151516201d4c01015612a08576040517fa29a6c7c00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b604080516020810187905290810182905260608082018a905260c089901b7fffffffffffffffff0000000000000000000000000000000000000000000000001660808301528b901b7fffffffffffffffffffffffffffffffffffffffff0000000000000000000000001660888201526000609c82015260bc016040516020818303038152906040528051906020012094505b50508080612aa790614042565b9150506127ad565b5060075467ffffffffffffffff6801000000000000000090910481169084161115612b06576040517fc630a00d00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60058290558567ffffffffffffffff84811690831614612bc4576000612b2c8386613bcf565b9050612b4267ffffffffffffffff821683613d1a565b9150612b7b7f00000000000000000000000000000000000000000000000000000000000000008267ffffffffffffffff16611ab56107f5565b50600780547fffffffffffffffff0000000000000000ffffffffffffffffffffffffffffffff1670010000000000000000000000000000000067ffffffffffffffff8716021790555b612cc2337f0000000000000000000000000000000000000000000000000000000000000000837f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff1663477fa2706040518163ffffffff1660e01b8152600401602060405180830381865afa158015612c55573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190612c799190613b87565b612c83919061407a565b73ffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000000000000000000000000000000000000000000000169291906131bc565b6040517f9a908e7300000000000000000000000000000000000000000000000000000000815267ffffffffffffffff88166004820152602481018490526000907f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff1690639a908e73906044016020604051808303816000875af1158015612d62573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190612d869190613d2d565b90508067ffffffffffffffff167f3e54d0825ed78523037d00a81759237eb436ce774bd546993ee67a1b67b6e76688604051612dc491815260200190565b60405180910390a25050505050505050505050565b60408051600481526024810182526020810180517bffffffffffffffffffffffffffffffffffffffffffffffffffffffff167f06fdde03000000000000000000000000000000000000000000000000000000001790529051606091600091829173ffffffffffffffffffffffffffffffffffffffff861691612e5b91906143b2565b600060405180830381855afa9150503d8060008114612e96576040519150601f19603f3d011682016040523d82523d6000602084013e612e9b565b606091505b509150915081612ee0576040518060400160405280600781526020017f4e4f5f4e414d4500000000000000000000000000000000000000000000000000815250612037565b61203781613220565b60408051600481526024810182526020810180517bffffffffffffffffffffffffffffffffffffffffffffffffffffffff167f95d89b41000000000000000000000000000000000000000000000000000000001790529051606091600091829173ffffffffffffffffffffffffffffffffffffffff861691612f6b91906143b2565b600060405180830381855afa9150503d8060008114612fa6576040519150601f19603f3d011682016040523d82523d6000602084013e612fab565b606091505b509150915081612ee0576040518060400160405280600981526020017f4e4f5f53594d424f4c0000000000000000000000000000000000000000000000815250612037565b60408051600481526024810182526020810180517bffffffffffffffffffffffffffffffffffffffffffffffffffffffff167f313ce5670000000000000000000000000000000000000000000000000000000017905290516000918291829173ffffffffffffffffffffffffffffffffffffffff86169161307191906143b2565b600060405180830381855afa9150503d80600081146130ac576040519150601f19603f3d011682016040523d82523d6000602084013e6130b1565b606091505b50915091508180156130c4575080516020145b6130cf576012612037565b8080602001905181019061203791906143c4565b60405173ffffffffffffffffffffffffffffffffffffffff83166024820152604481018290526131b79084907fa9059cbb00000000000000000000000000000000000000000000000000000000906064015b604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08184030181529190526020810180517bffffffffffffffffffffffffffffffffffffffffffffffffffffffff167fffffffff00000000000000000000000000000000000000000000000000000000909316929092179091526133f6565b505050565b60405173ffffffffffffffffffffffffffffffffffffffff8085166024830152831660448201526064810182905261321a9085907f23b872dd0000000000000000000000000000000000000000000000000000000090608401613135565b50505050565b60606040825110613245578180602001905181019061323f91906143e7565b92915050565b81516020036133bd5760005b602081108015613298575082818151811061326e5761326e613f04565b01602001517fff000000000000000000000000000000000000000000000000000000000000001615155b156132af57806132a781614042565b915050613251565b806000036132f257505060408051808201909152601281527f4e4f545f56414c49445f454e434f44494e4700000000000000000000000000006020820152919050565b60008167ffffffffffffffff81111561330d5761330d6137c4565b6040519080825280601f01601f191660200182016040528015613337576020820181803683370190505b50905060005b828110156133b55784818151811061335757613357613f04565b602001015160f81c60f81b82828151811061337457613374613f04565b60200101907effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff1916908160001a905350806133ad81614042565b91505061333d565b509392505050565b505060408051808201909152601281527f4e4f545f56414c49445f454e434f44494e470000000000000000000000000000602082015290565b6000613458826040518060400160405280602081526020017f5361666545524332303a206c6f772d6c6576656c2063616c6c206661696c65648152508573ffffffffffffffffffffffffffffffffffffffff166135029092919063ffffffff16565b8051909150156131b757808060200190518101906134769190613c85565b6131b7576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602a60248201527f5361666545524332303a204552433230206f7065726174696f6e20646964206e60448201527f6f742073756363656564000000000000000000000000000000000000000000006064820152608401610f7e565b60606120378484600085856000808673ffffffffffffffffffffffffffffffffffffffff16858760405161353691906143b2565b60006040518083038185875af1925050503d8060008114613573576040519150601f19603f3d011682016040523d82523d6000602084013e613578565b606091505b509150915061358987838387613594565b979650505050505050565b6060831561362a5782516000036136235773ffffffffffffffffffffffffffffffffffffffff85163b613623576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601d60248201527f416464726573733a2063616c6c20746f206e6f6e2d636f6e74726163740000006044820152606401610f7e565b5081612037565b612037838381511561363f5781518083602001fd5b806040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401610f7e91906136e1565b60005b8381101561368e578181015183820152602001613676565b50506000910152565b600081518084526136af816020860160208601613673565b601f017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0169290920160200192915050565b6020815260006136f46020830184613697565b9392505050565b67ffffffffffffffff8116811461371157600080fd5b50565b73ffffffffffffffffffffffffffffffffffffffff8116811461371157600080fd5b60008060006060848603121561374b57600080fd5b8335613756816136fb565b925060208401359150604084013561376d81613714565b809150509250925092565b60006020828403121561378a57600080fd5b81356136f4816136fb565b6000602082840312156137a757600080fd5b81356136f481613714565b63ffffffff8116811461371157600080fd5b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b604051601f82017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe016810167ffffffffffffffff8111828210171561383a5761383a6137c4565b604052919050565b600067ffffffffffffffff82111561385c5761385c6137c4565b50601f017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe01660200190565b600082601f83011261389957600080fd5b81356138ac6138a782613842565b6137f3565b8181528460208386010111156138c157600080fd5b816020850160208301376000918101602001919091529392505050565b60008060008060008060c087890312156138f757600080fd5b863561390281613714565b9550602087013561391281613714565b94506040870135613922816137b2565b9350606087013561393281613714565b9250608087013567ffffffffffffffff8082111561394f57600080fd5b61395b8a838b01613888565b935060a089013591508082111561397157600080fd5b5061397e89828a01613888565b9150509295509295509295565b60008083601f84011261399d57600080fd5b50813567ffffffffffffffff8111156139b557600080fd5b6020830191508360208260051b85010111156139d057600080fd5b9250929050565b600080602083850312156139ea57600080fd5b823567ffffffffffffffff811115613a0157600080fd5b613a0d8582860161398b565b90969095509350505050565b60008060008060808587031215613a2f57600080fd5b8435613a3a816137b2565b93506020850135613a4a81613714565b92506040850135613a5a816137b2565b9150606085013567ffffffffffffffff811115613a7657600080fd5b613a8287828801613888565b91505092959194509250565b600060208284031215613aa057600080fd5b813567ffffffffffffffff811115613ab757600080fd5b61203784828501613888565b600080600060408486031215613ad857600080fd5b833567ffffffffffffffff80821115613af057600080fd5b818601915086601f830112613b0457600080fd5b813581811115613b1357600080fd5b876020828501011115613b2557600080fd5b6020928301989097509590910135949350505050565b600080600060408486031215613b5057600080fd5b833567ffffffffffffffff811115613b6757600080fd5b613b738682870161398b565b909450925050602084013561376d81613714565b600060208284031215613b9957600080fd5b5051919050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b67ffffffffffffffff828116828216039080821115613bf057613bf0613ba0565b5092915050565b600082613c2d577f4e487b7100000000000000000000000000000000000000000000000000000000600052601260045260246000fd5b500490565b600181811c90821680613c4657607f821691505b602082108103613c7f577f4e487b7100000000000000000000000000000000000000000000000000000000600052602260045260246000fd5b50919050565b600060208284031215613c9757600080fd5b815180151581146136f457600080fd5b606081526000613cba6060830186613697565b8281036020840152613ccc8186613697565b91505060ff83166040830152949350505050565b60008060408385031215613cf357600080fd5b8251613cfe816137b2565b6020840151909250613d0f81613714565b809150509250929050565b8181038181111561323f5761323f613ba0565b600060208284031215613d3f57600080fd5b81516136f4816136fb565b601f8211156131b757600081815260208120601f850160051c81016020861015613d715750805b601f850160051c820191505b81811015613d9057828155600101613d7d565b505050505050565b815167ffffffffffffffff811115613db257613db26137c4565b613dc681613dc08454613c32565b84613d4a565b602080601f831160018114613e195760008415613de35750858301515b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff600386901b1c1916600185901b178555613d90565b6000858152602081207fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08616915b82811015613e6657888601518255948401946001909101908401613e47565b5085821015613ea257878501517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff600388901b60f8161c191681555b5050505050600190811b01905550565b606081526000613ec56060830186613697565b905083602083015273ffffffffffffffffffffffffffffffffffffffff83166040830152949350505050565b8082018082111561323f5761323f613ba0565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b600082357fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff81833603018112613f6757600080fd5b9190910192915050565b600060808236031215613f8357600080fd5b6040516080810167ffffffffffffffff8282108183111715613fa757613fa76137c4565b816040528435915080821115613fbc57600080fd5b50613fc936828601613888565b825250602083013560208201526040830135613fe4816136fb565b6040820152606092830135928101929092525090565b600067ffffffffffffffff80831681810361401757614017613ba0565b6001019392505050565b67ffffffffffffffff818116838216019080821115613bf057613bf0613ba0565b60007fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff820361407357614073613ba0565b5060010190565b808202811582820484141761323f5761323f613ba0565b600063ffffffff808916835273ffffffffffffffffffffffffffffffffffffffff8089166020850152818816604085015280871660608501528086166080850152505060c060a08301526140e860c0830184613697565b98975050505050505050565b61ffff818116838216019080821115613bf057613bf0613ba0565b60007fff00000000000000000000000000000000000000000000000000000000000000808a60f81b1683527fffff0000000000000000000000000000000000000000000000000000000000008960f01b1660018401528751614178816003860160208c01613673565b80840190507fffffffffffffffffffffffffffffffffffffffff0000000000000000000000008860601b16600382015286516141bb816017840160208b01613673565b808201915050818660f81b166017820152845191506141e1826018830160208801613673565b016018019998505050505050505050565b7fff000000000000000000000000000000000000000000000000000000000000008860f81b16815260007fffff000000000000000000000000000000000000000000000000000000000000808960f01b166001840152875161425b816003860160208c01613673565b80840190507fffffffffffffffffffffffffffffffffffffffff0000000000000000000000008860601b166003820152865161429e816017840160208b01613673565b808201915050818660f01b166017820152845191506142c4826019830160208801613673565b016019019998505050505050505050565b600086516142e7818460208b01613673565b9190910194855250602084019290925260f81b7fff000000000000000000000000000000000000000000000000000000000000009081166040840152166041820152604201919050565b8183823760009101908152919050565b84815273ffffffffffffffffffffffffffffffffffffffff8416602082015260606040820152816060820152818360808301376000818301608090810191909152601f9092017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe01601019392505050565b60008251613f67818460208701613673565b6000602082840312156143d657600080fd5b815160ff811681146136f457600080fd5b6000602082840312156143f957600080fd5b815167ffffffffffffffff81111561441057600080fd5b8201601f8101841361442157600080fd5b805161442f6138a782613842565b81815285602083850101111561444457600080fd5b614455826020830160208601613673565b9594505050505056fea2646970667358221220c9b142edbaf63c56761aad22240658b45bae78a2ed1e483abe43944f9fae087664736f6c63430008140033",
 }
 
 // PolygonzkevmABI is the input ABI used to generate the binding from.
@@ -76,7 +52,7 @@ var PolygonzkevmABI = PolygonzkevmMetaData.ABI
 var PolygonzkevmBin = PolygonzkevmMetaData.Bin
 
 // DeployPolygonzkevm deploys a new Ethereum contract, binding an instance of Polygonzkevm to it.
-func DeployPolygonzkevm(auth *bind.TransactOpts, backend bind.ContractBackend, _globalExitRootManager common.Address, _dataAvailabilityRouter common.Address, _matic common.Address, _rollupVerifier common.Address, _bridgeAddress common.Address, _chainID uint64, _forkID uint64) (common.Address, *types.Transaction, *Polygonzkevm, error) {
+func DeployPolygonzkevm(auth *bind.TransactOpts, backend bind.ContractBackend, _globalExitRootManager common.Address, _pol common.Address, _bridgeAddress common.Address, _rollupManager common.Address) (common.Address, *types.Transaction, *Polygonzkevm, error) {
 	parsed, err := PolygonzkevmMetaData.GetAbi()
 	if err != nil {
 		return common.Address{}, nil, nil, err
@@ -85,7 +61,7 @@ func DeployPolygonzkevm(auth *bind.TransactOpts, backend bind.ContractBackend, _
 		return common.Address{}, nil, nil, errors.New("GetABI returned nil")
 	}
 
-	address, tx, contract, err := bind.DeployContract(auth, *parsed, common.FromHex(PolygonzkevmBin), backend, _globalExitRootManager, _dataAvailabilityRouter, _matic, _rollupVerifier, _bridgeAddress, _chainID, _forkID)
+	address, tx, contract, err := bind.DeployContract(auth, *parsed, common.FromHex(PolygonzkevmBin), backend, _globalExitRootManager, _pol, _bridgeAddress, _rollupManager)
 	if err != nil {
 		return common.Address{}, nil, nil, err
 	}
@@ -234,6 +210,378 @@ func (_Polygonzkevm *PolygonzkevmTransactorRaw) Transact(opts *bind.TransactOpts
 	return _Polygonzkevm.Contract.contract.Transact(opts, method, params...)
 }
 
+// GLOBALEXITROOTMANAGERL2 is a free data retrieval call binding the contract method 0x9e001877.
+//
+// Solidity: function GLOBAL_EXIT_ROOT_MANAGER_L2() view returns(address)
+func (_Polygonzkevm *PolygonzkevmCaller) GLOBALEXITROOTMANAGERL2(opts *bind.CallOpts) (common.Address, error) {
+	var out []interface{}
+	err := _Polygonzkevm.contract.Call(opts, &out, "GLOBAL_EXIT_ROOT_MANAGER_L2")
+
+	if err != nil {
+		return *new(common.Address), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+
+	return out0, err
+
+}
+
+// GLOBALEXITROOTMANAGERL2 is a free data retrieval call binding the contract method 0x9e001877.
+//
+// Solidity: function GLOBAL_EXIT_ROOT_MANAGER_L2() view returns(address)
+func (_Polygonzkevm *PolygonzkevmSession) GLOBALEXITROOTMANAGERL2() (common.Address, error) {
+	return _Polygonzkevm.Contract.GLOBALEXITROOTMANAGERL2(&_Polygonzkevm.CallOpts)
+}
+
+// GLOBALEXITROOTMANAGERL2 is a free data retrieval call binding the contract method 0x9e001877.
+//
+// Solidity: function GLOBAL_EXIT_ROOT_MANAGER_L2() view returns(address)
+func (_Polygonzkevm *PolygonzkevmCallerSession) GLOBALEXITROOTMANAGERL2() (common.Address, error) {
+	return _Polygonzkevm.Contract.GLOBALEXITROOTMANAGERL2(&_Polygonzkevm.CallOpts)
+}
+
+// INITIALIZETXBRIDGELISTLENLEN is a free data retrieval call binding the contract method 0x11e892d4.
+//
+// Solidity: function INITIALIZE_TX_BRIDGE_LIST_LEN_LEN() view returns(uint8)
+func (_Polygonzkevm *PolygonzkevmCaller) INITIALIZETXBRIDGELISTLENLEN(opts *bind.CallOpts) (uint8, error) {
+	var out []interface{}
+	err := _Polygonzkevm.contract.Call(opts, &out, "INITIALIZE_TX_BRIDGE_LIST_LEN_LEN")
+
+	if err != nil {
+		return *new(uint8), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(uint8)).(*uint8)
+
+	return out0, err
+
+}
+
+// INITIALIZETXBRIDGELISTLENLEN is a free data retrieval call binding the contract method 0x11e892d4.
+//
+// Solidity: function INITIALIZE_TX_BRIDGE_LIST_LEN_LEN() view returns(uint8)
+func (_Polygonzkevm *PolygonzkevmSession) INITIALIZETXBRIDGELISTLENLEN() (uint8, error) {
+	return _Polygonzkevm.Contract.INITIALIZETXBRIDGELISTLENLEN(&_Polygonzkevm.CallOpts)
+}
+
+// INITIALIZETXBRIDGELISTLENLEN is a free data retrieval call binding the contract method 0x11e892d4.
+//
+// Solidity: function INITIALIZE_TX_BRIDGE_LIST_LEN_LEN() view returns(uint8)
+func (_Polygonzkevm *PolygonzkevmCallerSession) INITIALIZETXBRIDGELISTLENLEN() (uint8, error) {
+	return _Polygonzkevm.Contract.INITIALIZETXBRIDGELISTLENLEN(&_Polygonzkevm.CallOpts)
+}
+
+// INITIALIZETXBRIDGEPARAMS is a free data retrieval call binding the contract method 0x05835f37.
+//
+// Solidity: function INITIALIZE_TX_BRIDGE_PARAMS() view returns(bytes)
+func (_Polygonzkevm *PolygonzkevmCaller) INITIALIZETXBRIDGEPARAMS(opts *bind.CallOpts) ([]byte, error) {
+	var out []interface{}
+	err := _Polygonzkevm.contract.Call(opts, &out, "INITIALIZE_TX_BRIDGE_PARAMS")
+
+	if err != nil {
+		return *new([]byte), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new([]byte)).(*[]byte)
+
+	return out0, err
+
+}
+
+// INITIALIZETXBRIDGEPARAMS is a free data retrieval call binding the contract method 0x05835f37.
+//
+// Solidity: function INITIALIZE_TX_BRIDGE_PARAMS() view returns(bytes)
+func (_Polygonzkevm *PolygonzkevmSession) INITIALIZETXBRIDGEPARAMS() ([]byte, error) {
+	return _Polygonzkevm.Contract.INITIALIZETXBRIDGEPARAMS(&_Polygonzkevm.CallOpts)
+}
+
+// INITIALIZETXBRIDGEPARAMS is a free data retrieval call binding the contract method 0x05835f37.
+//
+// Solidity: function INITIALIZE_TX_BRIDGE_PARAMS() view returns(bytes)
+func (_Polygonzkevm *PolygonzkevmCallerSession) INITIALIZETXBRIDGEPARAMS() ([]byte, error) {
+	return _Polygonzkevm.Contract.INITIALIZETXBRIDGEPARAMS(&_Polygonzkevm.CallOpts)
+}
+
+// INITIALIZETXBRIDGEPARAMSAFTERBRIDGEADDRESS is a free data retrieval call binding the contract method 0x7a5460c5.
+//
+// Solidity: function INITIALIZE_TX_BRIDGE_PARAMS_AFTER_BRIDGE_ADDRESS() view returns(bytes)
+func (_Polygonzkevm *PolygonzkevmCaller) INITIALIZETXBRIDGEPARAMSAFTERBRIDGEADDRESS(opts *bind.CallOpts) ([]byte, error) {
+	var out []interface{}
+	err := _Polygonzkevm.contract.Call(opts, &out, "INITIALIZE_TX_BRIDGE_PARAMS_AFTER_BRIDGE_ADDRESS")
+
+	if err != nil {
+		return *new([]byte), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new([]byte)).(*[]byte)
+
+	return out0, err
+
+}
+
+// INITIALIZETXBRIDGEPARAMSAFTERBRIDGEADDRESS is a free data retrieval call binding the contract method 0x7a5460c5.
+//
+// Solidity: function INITIALIZE_TX_BRIDGE_PARAMS_AFTER_BRIDGE_ADDRESS() view returns(bytes)
+func (_Polygonzkevm *PolygonzkevmSession) INITIALIZETXBRIDGEPARAMSAFTERBRIDGEADDRESS() ([]byte, error) {
+	return _Polygonzkevm.Contract.INITIALIZETXBRIDGEPARAMSAFTERBRIDGEADDRESS(&_Polygonzkevm.CallOpts)
+}
+
+// INITIALIZETXBRIDGEPARAMSAFTERBRIDGEADDRESS is a free data retrieval call binding the contract method 0x7a5460c5.
+//
+// Solidity: function INITIALIZE_TX_BRIDGE_PARAMS_AFTER_BRIDGE_ADDRESS() view returns(bytes)
+func (_Polygonzkevm *PolygonzkevmCallerSession) INITIALIZETXBRIDGEPARAMSAFTERBRIDGEADDRESS() ([]byte, error) {
+	return _Polygonzkevm.Contract.INITIALIZETXBRIDGEPARAMSAFTERBRIDGEADDRESS(&_Polygonzkevm.CallOpts)
+}
+
+// INITIALIZETXBRIDGEPARAMSAFTERBRIDGEADDRESSEMPTYMETADATA is a free data retrieval call binding the contract method 0x52bdeb6d.
+//
+// Solidity: function INITIALIZE_TX_BRIDGE_PARAMS_AFTER_BRIDGE_ADDRESS_EMPTY_METADATA() view returns(bytes)
+func (_Polygonzkevm *PolygonzkevmCaller) INITIALIZETXBRIDGEPARAMSAFTERBRIDGEADDRESSEMPTYMETADATA(opts *bind.CallOpts) ([]byte, error) {
+	var out []interface{}
+	err := _Polygonzkevm.contract.Call(opts, &out, "INITIALIZE_TX_BRIDGE_PARAMS_AFTER_BRIDGE_ADDRESS_EMPTY_METADATA")
+
+	if err != nil {
+		return *new([]byte), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new([]byte)).(*[]byte)
+
+	return out0, err
+
+}
+
+// INITIALIZETXBRIDGEPARAMSAFTERBRIDGEADDRESSEMPTYMETADATA is a free data retrieval call binding the contract method 0x52bdeb6d.
+//
+// Solidity: function INITIALIZE_TX_BRIDGE_PARAMS_AFTER_BRIDGE_ADDRESS_EMPTY_METADATA() view returns(bytes)
+func (_Polygonzkevm *PolygonzkevmSession) INITIALIZETXBRIDGEPARAMSAFTERBRIDGEADDRESSEMPTYMETADATA() ([]byte, error) {
+	return _Polygonzkevm.Contract.INITIALIZETXBRIDGEPARAMSAFTERBRIDGEADDRESSEMPTYMETADATA(&_Polygonzkevm.CallOpts)
+}
+
+// INITIALIZETXBRIDGEPARAMSAFTERBRIDGEADDRESSEMPTYMETADATA is a free data retrieval call binding the contract method 0x52bdeb6d.
+//
+// Solidity: function INITIALIZE_TX_BRIDGE_PARAMS_AFTER_BRIDGE_ADDRESS_EMPTY_METADATA() view returns(bytes)
+func (_Polygonzkevm *PolygonzkevmCallerSession) INITIALIZETXBRIDGEPARAMSAFTERBRIDGEADDRESSEMPTYMETADATA() ([]byte, error) {
+	return _Polygonzkevm.Contract.INITIALIZETXBRIDGEPARAMSAFTERBRIDGEADDRESSEMPTYMETADATA(&_Polygonzkevm.CallOpts)
+}
+
+// INITIALIZETXCONSTANTBYTES is a free data retrieval call binding the contract method 0x03508963.
+//
+// Solidity: function INITIALIZE_TX_CONSTANT_BYTES() view returns(uint16)
+func (_Polygonzkevm *PolygonzkevmCaller) INITIALIZETXCONSTANTBYTES(opts *bind.CallOpts) (uint16, error) {
+	var out []interface{}
+	err := _Polygonzkevm.contract.Call(opts, &out, "INITIALIZE_TX_CONSTANT_BYTES")
+
+	if err != nil {
+		return *new(uint16), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(uint16)).(*uint16)
+
+	return out0, err
+
+}
+
+// INITIALIZETXCONSTANTBYTES is a free data retrieval call binding the contract method 0x03508963.
+//
+// Solidity: function INITIALIZE_TX_CONSTANT_BYTES() view returns(uint16)
+func (_Polygonzkevm *PolygonzkevmSession) INITIALIZETXCONSTANTBYTES() (uint16, error) {
+	return _Polygonzkevm.Contract.INITIALIZETXCONSTANTBYTES(&_Polygonzkevm.CallOpts)
+}
+
+// INITIALIZETXCONSTANTBYTES is a free data retrieval call binding the contract method 0x03508963.
+//
+// Solidity: function INITIALIZE_TX_CONSTANT_BYTES() view returns(uint16)
+func (_Polygonzkevm *PolygonzkevmCallerSession) INITIALIZETXCONSTANTBYTES() (uint16, error) {
+	return _Polygonzkevm.Contract.INITIALIZETXCONSTANTBYTES(&_Polygonzkevm.CallOpts)
+}
+
+// INITIALIZETXCONSTANTBYTESEMPTYMETADATA is a free data retrieval call binding the contract method 0x676870d2.
+//
+// Solidity: function INITIALIZE_TX_CONSTANT_BYTES_EMPTY_METADATA() view returns(uint16)
+func (_Polygonzkevm *PolygonzkevmCaller) INITIALIZETXCONSTANTBYTESEMPTYMETADATA(opts *bind.CallOpts) (uint16, error) {
+	var out []interface{}
+	err := _Polygonzkevm.contract.Call(opts, &out, "INITIALIZE_TX_CONSTANT_BYTES_EMPTY_METADATA")
+
+	if err != nil {
+		return *new(uint16), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(uint16)).(*uint16)
+
+	return out0, err
+
+}
+
+// INITIALIZETXCONSTANTBYTESEMPTYMETADATA is a free data retrieval call binding the contract method 0x676870d2.
+//
+// Solidity: function INITIALIZE_TX_CONSTANT_BYTES_EMPTY_METADATA() view returns(uint16)
+func (_Polygonzkevm *PolygonzkevmSession) INITIALIZETXCONSTANTBYTESEMPTYMETADATA() (uint16, error) {
+	return _Polygonzkevm.Contract.INITIALIZETXCONSTANTBYTESEMPTYMETADATA(&_Polygonzkevm.CallOpts)
+}
+
+// INITIALIZETXCONSTANTBYTESEMPTYMETADATA is a free data retrieval call binding the contract method 0x676870d2.
+//
+// Solidity: function INITIALIZE_TX_CONSTANT_BYTES_EMPTY_METADATA() view returns(uint16)
+func (_Polygonzkevm *PolygonzkevmCallerSession) INITIALIZETXCONSTANTBYTESEMPTYMETADATA() (uint16, error) {
+	return _Polygonzkevm.Contract.INITIALIZETXCONSTANTBYTESEMPTYMETADATA(&_Polygonzkevm.CallOpts)
+}
+
+// INITIALIZETXDATALENEMPTYMETADATA is a free data retrieval call binding the contract method 0xc7fffd4b.
+//
+// Solidity: function INITIALIZE_TX_DATA_LEN_EMPTY_METADATA() view returns(uint8)
+func (_Polygonzkevm *PolygonzkevmCaller) INITIALIZETXDATALENEMPTYMETADATA(opts *bind.CallOpts) (uint8, error) {
+	var out []interface{}
+	err := _Polygonzkevm.contract.Call(opts, &out, "INITIALIZE_TX_DATA_LEN_EMPTY_METADATA")
+
+	if err != nil {
+		return *new(uint8), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(uint8)).(*uint8)
+
+	return out0, err
+
+}
+
+// INITIALIZETXDATALENEMPTYMETADATA is a free data retrieval call binding the contract method 0xc7fffd4b.
+//
+// Solidity: function INITIALIZE_TX_DATA_LEN_EMPTY_METADATA() view returns(uint8)
+func (_Polygonzkevm *PolygonzkevmSession) INITIALIZETXDATALENEMPTYMETADATA() (uint8, error) {
+	return _Polygonzkevm.Contract.INITIALIZETXDATALENEMPTYMETADATA(&_Polygonzkevm.CallOpts)
+}
+
+// INITIALIZETXDATALENEMPTYMETADATA is a free data retrieval call binding the contract method 0xc7fffd4b.
+//
+// Solidity: function INITIALIZE_TX_DATA_LEN_EMPTY_METADATA() view returns(uint8)
+func (_Polygonzkevm *PolygonzkevmCallerSession) INITIALIZETXDATALENEMPTYMETADATA() (uint8, error) {
+	return _Polygonzkevm.Contract.INITIALIZETXDATALENEMPTYMETADATA(&_Polygonzkevm.CallOpts)
+}
+
+// INITIALIZETXEFFECTIVEPERCENTAGE is a free data retrieval call binding the contract method 0x40b5de6c.
+//
+// Solidity: function INITIALIZE_TX_EFFECTIVE_PERCENTAGE() view returns(bytes1)
+func (_Polygonzkevm *PolygonzkevmCaller) INITIALIZETXEFFECTIVEPERCENTAGE(opts *bind.CallOpts) ([1]byte, error) {
+	var out []interface{}
+	err := _Polygonzkevm.contract.Call(opts, &out, "INITIALIZE_TX_EFFECTIVE_PERCENTAGE")
+
+	if err != nil {
+		return *new([1]byte), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new([1]byte)).(*[1]byte)
+
+	return out0, err
+
+}
+
+// INITIALIZETXEFFECTIVEPERCENTAGE is a free data retrieval call binding the contract method 0x40b5de6c.
+//
+// Solidity: function INITIALIZE_TX_EFFECTIVE_PERCENTAGE() view returns(bytes1)
+func (_Polygonzkevm *PolygonzkevmSession) INITIALIZETXEFFECTIVEPERCENTAGE() ([1]byte, error) {
+	return _Polygonzkevm.Contract.INITIALIZETXEFFECTIVEPERCENTAGE(&_Polygonzkevm.CallOpts)
+}
+
+// INITIALIZETXEFFECTIVEPERCENTAGE is a free data retrieval call binding the contract method 0x40b5de6c.
+//
+// Solidity: function INITIALIZE_TX_EFFECTIVE_PERCENTAGE() view returns(bytes1)
+func (_Polygonzkevm *PolygonzkevmCallerSession) INITIALIZETXEFFECTIVEPERCENTAGE() ([1]byte, error) {
+	return _Polygonzkevm.Contract.INITIALIZETXEFFECTIVEPERCENTAGE(&_Polygonzkevm.CallOpts)
+}
+
+// SIGNATUREINITIALIZETXR is a free data retrieval call binding the contract method 0xb0afe154.
+//
+// Solidity: function SIGNATURE_INITIALIZE_TX_R() view returns(bytes32)
+func (_Polygonzkevm *PolygonzkevmCaller) SIGNATUREINITIALIZETXR(opts *bind.CallOpts) ([32]byte, error) {
+	var out []interface{}
+	err := _Polygonzkevm.contract.Call(opts, &out, "SIGNATURE_INITIALIZE_TX_R")
+
+	if err != nil {
+		return *new([32]byte), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
+
+	return out0, err
+
+}
+
+// SIGNATUREINITIALIZETXR is a free data retrieval call binding the contract method 0xb0afe154.
+//
+// Solidity: function SIGNATURE_INITIALIZE_TX_R() view returns(bytes32)
+func (_Polygonzkevm *PolygonzkevmSession) SIGNATUREINITIALIZETXR() ([32]byte, error) {
+	return _Polygonzkevm.Contract.SIGNATUREINITIALIZETXR(&_Polygonzkevm.CallOpts)
+}
+
+// SIGNATUREINITIALIZETXR is a free data retrieval call binding the contract method 0xb0afe154.
+//
+// Solidity: function SIGNATURE_INITIALIZE_TX_R() view returns(bytes32)
+func (_Polygonzkevm *PolygonzkevmCallerSession) SIGNATUREINITIALIZETXR() ([32]byte, error) {
+	return _Polygonzkevm.Contract.SIGNATUREINITIALIZETXR(&_Polygonzkevm.CallOpts)
+}
+
+// SIGNATUREINITIALIZETXS is a free data retrieval call binding the contract method 0xd7bc90ff.
+//
+// Solidity: function SIGNATURE_INITIALIZE_TX_S() view returns(bytes32)
+func (_Polygonzkevm *PolygonzkevmCaller) SIGNATUREINITIALIZETXS(opts *bind.CallOpts) ([32]byte, error) {
+	var out []interface{}
+	err := _Polygonzkevm.contract.Call(opts, &out, "SIGNATURE_INITIALIZE_TX_S")
+
+	if err != nil {
+		return *new([32]byte), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
+
+	return out0, err
+
+}
+
+// SIGNATUREINITIALIZETXS is a free data retrieval call binding the contract method 0xd7bc90ff.
+//
+// Solidity: function SIGNATURE_INITIALIZE_TX_S() view returns(bytes32)
+func (_Polygonzkevm *PolygonzkevmSession) SIGNATUREINITIALIZETXS() ([32]byte, error) {
+	return _Polygonzkevm.Contract.SIGNATUREINITIALIZETXS(&_Polygonzkevm.CallOpts)
+}
+
+// SIGNATUREINITIALIZETXS is a free data retrieval call binding the contract method 0xd7bc90ff.
+//
+// Solidity: function SIGNATURE_INITIALIZE_TX_S() view returns(bytes32)
+func (_Polygonzkevm *PolygonzkevmCallerSession) SIGNATUREINITIALIZETXS() ([32]byte, error) {
+	return _Polygonzkevm.Contract.SIGNATUREINITIALIZETXS(&_Polygonzkevm.CallOpts)
+}
+
+// SIGNATUREINITIALIZETXV is a free data retrieval call binding the contract method 0xf35dda47.
+//
+// Solidity: function SIGNATURE_INITIALIZE_TX_V() view returns(uint8)
+func (_Polygonzkevm *PolygonzkevmCaller) SIGNATUREINITIALIZETXV(opts *bind.CallOpts) (uint8, error) {
+	var out []interface{}
+	err := _Polygonzkevm.contract.Call(opts, &out, "SIGNATURE_INITIALIZE_TX_V")
+
+	if err != nil {
+		return *new(uint8), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(uint8)).(*uint8)
+
+	return out0, err
+
+}
+
+// SIGNATUREINITIALIZETXV is a free data retrieval call binding the contract method 0xf35dda47.
+//
+// Solidity: function SIGNATURE_INITIALIZE_TX_V() view returns(uint8)
+func (_Polygonzkevm *PolygonzkevmSession) SIGNATUREINITIALIZETXV() (uint8, error) {
+	return _Polygonzkevm.Contract.SIGNATUREINITIALIZETXV(&_Polygonzkevm.CallOpts)
+}
+
+// SIGNATUREINITIALIZETXV is a free data retrieval call binding the contract method 0xf35dda47.
+//
+// Solidity: function SIGNATURE_INITIALIZE_TX_V() view returns(uint8)
+func (_Polygonzkevm *PolygonzkevmCallerSession) SIGNATUREINITIALIZETXV() (uint8, error) {
+	return _Polygonzkevm.Contract.SIGNATUREINITIALIZETXV(&_Polygonzkevm.CallOpts)
+}
+
 // Admin is a free data retrieval call binding the contract method 0xf851a440.
 //
 // Solidity: function admin() view returns(address)
@@ -263,68 +611,6 @@ func (_Polygonzkevm *PolygonzkevmSession) Admin() (common.Address, error) {
 // Solidity: function admin() view returns(address)
 func (_Polygonzkevm *PolygonzkevmCallerSession) Admin() (common.Address, error) {
 	return _Polygonzkevm.Contract.Admin(&_Polygonzkevm.CallOpts)
-}
-
-// BatchFee is a free data retrieval call binding the contract method 0xf8b823e4.
-//
-// Solidity: function batchFee() view returns(uint256)
-func (_Polygonzkevm *PolygonzkevmCaller) BatchFee(opts *bind.CallOpts) (*big.Int, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "batchFee")
-
-	if err != nil {
-		return *new(*big.Int), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-
-	return out0, err
-
-}
-
-// BatchFee is a free data retrieval call binding the contract method 0xf8b823e4.
-//
-// Solidity: function batchFee() view returns(uint256)
-func (_Polygonzkevm *PolygonzkevmSession) BatchFee() (*big.Int, error) {
-	return _Polygonzkevm.Contract.BatchFee(&_Polygonzkevm.CallOpts)
-}
-
-// BatchFee is a free data retrieval call binding the contract method 0xf8b823e4.
-//
-// Solidity: function batchFee() view returns(uint256)
-func (_Polygonzkevm *PolygonzkevmCallerSession) BatchFee() (*big.Int, error) {
-	return _Polygonzkevm.Contract.BatchFee(&_Polygonzkevm.CallOpts)
-}
-
-// BatchNumToStateRoot is a free data retrieval call binding the contract method 0x5392c5e0.
-//
-// Solidity: function batchNumToStateRoot(uint64 ) view returns(bytes32)
-func (_Polygonzkevm *PolygonzkevmCaller) BatchNumToStateRoot(opts *bind.CallOpts, arg0 uint64) ([32]byte, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "batchNumToStateRoot", arg0)
-
-	if err != nil {
-		return *new([32]byte), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
-
-	return out0, err
-
-}
-
-// BatchNumToStateRoot is a free data retrieval call binding the contract method 0x5392c5e0.
-//
-// Solidity: function batchNumToStateRoot(uint64 ) view returns(bytes32)
-func (_Polygonzkevm *PolygonzkevmSession) BatchNumToStateRoot(arg0 uint64) ([32]byte, error) {
-	return _Polygonzkevm.Contract.BatchNumToStateRoot(&_Polygonzkevm.CallOpts, arg0)
-}
-
-// BatchNumToStateRoot is a free data retrieval call binding the contract method 0x5392c5e0.
-//
-// Solidity: function batchNumToStateRoot(uint64 ) view returns(bytes32)
-func (_Polygonzkevm *PolygonzkevmCallerSession) BatchNumToStateRoot(arg0 uint64) ([32]byte, error) {
-	return _Polygonzkevm.Contract.BatchNumToStateRoot(&_Polygonzkevm.CallOpts, arg0)
 }
 
 // BridgeAddress is a free data retrieval call binding the contract method 0xa3c573eb.
@@ -358,12 +644,12 @@ func (_Polygonzkevm *PolygonzkevmCallerSession) BridgeAddress() (common.Address,
 	return _Polygonzkevm.Contract.BridgeAddress(&_Polygonzkevm.CallOpts)
 }
 
-// CalculateRewardPerBatch is a free data retrieval call binding the contract method 0x99f5634e.
+// CalculatePolPerForceBatch is a free data retrieval call binding the contract method 0x00d0295d.
 //
-// Solidity: function calculateRewardPerBatch() view returns(uint256)
-func (_Polygonzkevm *PolygonzkevmCaller) CalculateRewardPerBatch(opts *bind.CallOpts) (*big.Int, error) {
+// Solidity: function calculatePolPerForceBatch() view returns(uint256)
+func (_Polygonzkevm *PolygonzkevmCaller) CalculatePolPerForceBatch(opts *bind.CallOpts) (*big.Int, error) {
 	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "calculateRewardPerBatch")
+	err := _Polygonzkevm.contract.Call(opts, &out, "calculatePolPerForceBatch")
 
 	if err != nil {
 		return *new(*big.Int), err
@@ -375,80 +661,18 @@ func (_Polygonzkevm *PolygonzkevmCaller) CalculateRewardPerBatch(opts *bind.Call
 
 }
 
-// CalculateRewardPerBatch is a free data retrieval call binding the contract method 0x99f5634e.
+// CalculatePolPerForceBatch is a free data retrieval call binding the contract method 0x00d0295d.
 //
-// Solidity: function calculateRewardPerBatch() view returns(uint256)
-func (_Polygonzkevm *PolygonzkevmSession) CalculateRewardPerBatch() (*big.Int, error) {
-	return _Polygonzkevm.Contract.CalculateRewardPerBatch(&_Polygonzkevm.CallOpts)
+// Solidity: function calculatePolPerForceBatch() view returns(uint256)
+func (_Polygonzkevm *PolygonzkevmSession) CalculatePolPerForceBatch() (*big.Int, error) {
+	return _Polygonzkevm.Contract.CalculatePolPerForceBatch(&_Polygonzkevm.CallOpts)
 }
 
-// CalculateRewardPerBatch is a free data retrieval call binding the contract method 0x99f5634e.
+// CalculatePolPerForceBatch is a free data retrieval call binding the contract method 0x00d0295d.
 //
-// Solidity: function calculateRewardPerBatch() view returns(uint256)
-func (_Polygonzkevm *PolygonzkevmCallerSession) CalculateRewardPerBatch() (*big.Int, error) {
-	return _Polygonzkevm.Contract.CalculateRewardPerBatch(&_Polygonzkevm.CallOpts)
-}
-
-// ChainID is a free data retrieval call binding the contract method 0xadc879e9.
-//
-// Solidity: function chainID() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCaller) ChainID(opts *bind.CallOpts) (uint64, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "chainID")
-
-	if err != nil {
-		return *new(uint64), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(uint64)).(*uint64)
-
-	return out0, err
-
-}
-
-// ChainID is a free data retrieval call binding the contract method 0xadc879e9.
-//
-// Solidity: function chainID() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmSession) ChainID() (uint64, error) {
-	return _Polygonzkevm.Contract.ChainID(&_Polygonzkevm.CallOpts)
-}
-
-// ChainID is a free data retrieval call binding the contract method 0xadc879e9.
-//
-// Solidity: function chainID() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCallerSession) ChainID() (uint64, error) {
-	return _Polygonzkevm.Contract.ChainID(&_Polygonzkevm.CallOpts)
-}
-
-// CheckStateRootInsidePrime is a free data retrieval call binding the contract method 0xba58ae39.
-//
-// Solidity: function checkStateRootInsidePrime(uint256 newStateRoot) pure returns(bool)
-func (_Polygonzkevm *PolygonzkevmCaller) CheckStateRootInsidePrime(opts *bind.CallOpts, newStateRoot *big.Int) (bool, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "checkStateRootInsidePrime", newStateRoot)
-
-	if err != nil {
-		return *new(bool), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-
-	return out0, err
-
-}
-
-// CheckStateRootInsidePrime is a free data retrieval call binding the contract method 0xba58ae39.
-//
-// Solidity: function checkStateRootInsidePrime(uint256 newStateRoot) pure returns(bool)
-func (_Polygonzkevm *PolygonzkevmSession) CheckStateRootInsidePrime(newStateRoot *big.Int) (bool, error) {
-	return _Polygonzkevm.Contract.CheckStateRootInsidePrime(&_Polygonzkevm.CallOpts, newStateRoot)
-}
-
-// CheckStateRootInsidePrime is a free data retrieval call binding the contract method 0xba58ae39.
-//
-// Solidity: function checkStateRootInsidePrime(uint256 newStateRoot) pure returns(bool)
-func (_Polygonzkevm *PolygonzkevmCallerSession) CheckStateRootInsidePrime(newStateRoot *big.Int) (bool, error) {
-	return _Polygonzkevm.Contract.CheckStateRootInsidePrime(&_Polygonzkevm.CallOpts, newStateRoot)
+// Solidity: function calculatePolPerForceBatch() view returns(uint256)
+func (_Polygonzkevm *PolygonzkevmCallerSession) CalculatePolPerForceBatch() (*big.Int, error) {
+	return _Polygonzkevm.Contract.CalculatePolPerForceBatch(&_Polygonzkevm.CallOpts)
 }
 
 // ForceBatchTimeout is a free data retrieval call binding the contract method 0xc754c7ed.
@@ -513,12 +737,12 @@ func (_Polygonzkevm *PolygonzkevmCallerSession) ForcedBatches(arg0 uint64) ([32]
 	return _Polygonzkevm.Contract.ForcedBatches(&_Polygonzkevm.CallOpts, arg0)
 }
 
-// ForkID is a free data retrieval call binding the contract method 0x831c7ead.
+// GapLastTimestamp is a free data retrieval call binding the contract method 0x2a9f208f.
 //
-// Solidity: function forkID() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCaller) ForkID(opts *bind.CallOpts) (uint64, error) {
+// Solidity: function gapLastTimestamp() view returns(uint64)
+func (_Polygonzkevm *PolygonzkevmCaller) GapLastTimestamp(opts *bind.CallOpts) (uint64, error) {
 	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "forkID")
+	err := _Polygonzkevm.contract.Call(opts, &out, "gapLastTimestamp")
 
 	if err != nil {
 		return *new(uint64), err
@@ -530,57 +754,88 @@ func (_Polygonzkevm *PolygonzkevmCaller) ForkID(opts *bind.CallOpts) (uint64, er
 
 }
 
-// ForkID is a free data retrieval call binding the contract method 0x831c7ead.
+// GapLastTimestamp is a free data retrieval call binding the contract method 0x2a9f208f.
 //
-// Solidity: function forkID() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmSession) ForkID() (uint64, error) {
-	return _Polygonzkevm.Contract.ForkID(&_Polygonzkevm.CallOpts)
+// Solidity: function gapLastTimestamp() view returns(uint64)
+func (_Polygonzkevm *PolygonzkevmSession) GapLastTimestamp() (uint64, error) {
+	return _Polygonzkevm.Contract.GapLastTimestamp(&_Polygonzkevm.CallOpts)
 }
 
-// ForkID is a free data retrieval call binding the contract method 0x831c7ead.
+// GapLastTimestamp is a free data retrieval call binding the contract method 0x2a9f208f.
 //
-// Solidity: function forkID() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCallerSession) ForkID() (uint64, error) {
-	return _Polygonzkevm.Contract.ForkID(&_Polygonzkevm.CallOpts)
+// Solidity: function gapLastTimestamp() view returns(uint64)
+func (_Polygonzkevm *PolygonzkevmCallerSession) GapLastTimestamp() (uint64, error) {
+	return _Polygonzkevm.Contract.GapLastTimestamp(&_Polygonzkevm.CallOpts)
 }
 
-// GetForcedBatchFee is a free data retrieval call binding the contract method 0x60469169.
+// GasTokenAddress is a free data retrieval call binding the contract method 0x3c351e10.
 //
-// Solidity: function getForcedBatchFee() view returns(uint256)
-func (_Polygonzkevm *PolygonzkevmCaller) GetForcedBatchFee(opts *bind.CallOpts) (*big.Int, error) {
+// Solidity: function gasTokenAddress() view returns(address)
+func (_Polygonzkevm *PolygonzkevmCaller) GasTokenAddress(opts *bind.CallOpts) (common.Address, error) {
 	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "getForcedBatchFee")
+	err := _Polygonzkevm.contract.Call(opts, &out, "gasTokenAddress")
 
 	if err != nil {
-		return *new(*big.Int), err
+		return *new(common.Address), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
 
 	return out0, err
 
 }
 
-// GetForcedBatchFee is a free data retrieval call binding the contract method 0x60469169.
+// GasTokenAddress is a free data retrieval call binding the contract method 0x3c351e10.
 //
-// Solidity: function getForcedBatchFee() view returns(uint256)
-func (_Polygonzkevm *PolygonzkevmSession) GetForcedBatchFee() (*big.Int, error) {
-	return _Polygonzkevm.Contract.GetForcedBatchFee(&_Polygonzkevm.CallOpts)
+// Solidity: function gasTokenAddress() view returns(address)
+func (_Polygonzkevm *PolygonzkevmSession) GasTokenAddress() (common.Address, error) {
+	return _Polygonzkevm.Contract.GasTokenAddress(&_Polygonzkevm.CallOpts)
 }
 
-// GetForcedBatchFee is a free data retrieval call binding the contract method 0x60469169.
+// GasTokenAddress is a free data retrieval call binding the contract method 0x3c351e10.
 //
-// Solidity: function getForcedBatchFee() view returns(uint256)
-func (_Polygonzkevm *PolygonzkevmCallerSession) GetForcedBatchFee() (*big.Int, error) {
-	return _Polygonzkevm.Contract.GetForcedBatchFee(&_Polygonzkevm.CallOpts)
+// Solidity: function gasTokenAddress() view returns(address)
+func (_Polygonzkevm *PolygonzkevmCallerSession) GasTokenAddress() (common.Address, error) {
+	return _Polygonzkevm.Contract.GasTokenAddress(&_Polygonzkevm.CallOpts)
 }
 
-// GetInputSnarkBytes is a free data retrieval call binding the contract method 0x220d7899.
+// GasTokenNetwork is a free data retrieval call binding the contract method 0x3cbc795b.
 //
-// Solidity: function getInputSnarkBytes(uint64 initNumBatch, uint64 finalNewBatch, bytes32 newLocalExitRoot, bytes32 oldStateRoot, bytes32 newStateRoot) view returns(bytes)
-func (_Polygonzkevm *PolygonzkevmCaller) GetInputSnarkBytes(opts *bind.CallOpts, initNumBatch uint64, finalNewBatch uint64, newLocalExitRoot [32]byte, oldStateRoot [32]byte, newStateRoot [32]byte) ([]byte, error) {
+// Solidity: function gasTokenNetwork() view returns(uint32)
+func (_Polygonzkevm *PolygonzkevmCaller) GasTokenNetwork(opts *bind.CallOpts) (uint32, error) {
 	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "getInputSnarkBytes", initNumBatch, finalNewBatch, newLocalExitRoot, oldStateRoot, newStateRoot)
+	err := _Polygonzkevm.contract.Call(opts, &out, "gasTokenNetwork")
+
+	if err != nil {
+		return *new(uint32), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(uint32)).(*uint32)
+
+	return out0, err
+
+}
+
+// GasTokenNetwork is a free data retrieval call binding the contract method 0x3cbc795b.
+//
+// Solidity: function gasTokenNetwork() view returns(uint32)
+func (_Polygonzkevm *PolygonzkevmSession) GasTokenNetwork() (uint32, error) {
+	return _Polygonzkevm.Contract.GasTokenNetwork(&_Polygonzkevm.CallOpts)
+}
+
+// GasTokenNetwork is a free data retrieval call binding the contract method 0x3cbc795b.
+//
+// Solidity: function gasTokenNetwork() view returns(uint32)
+func (_Polygonzkevm *PolygonzkevmCallerSession) GasTokenNetwork() (uint32, error) {
+	return _Polygonzkevm.Contract.GasTokenNetwork(&_Polygonzkevm.CallOpts)
+}
+
+// GenerateInitializeTransaction is a free data retrieval call binding the contract method 0xa652f26c.
+//
+// Solidity: function generateInitializeTransaction(uint32 networkID, address _gasTokenAddress, uint32 _gasTokenNetwork, bytes _gasTokenMetadata) view returns(bytes)
+func (_Polygonzkevm *PolygonzkevmCaller) GenerateInitializeTransaction(opts *bind.CallOpts, networkID uint32, _gasTokenAddress common.Address, _gasTokenNetwork uint32, _gasTokenMetadata []byte) ([]byte, error) {
+	var out []interface{}
+	err := _Polygonzkevm.contract.Call(opts, &out, "generateInitializeTransaction", networkID, _gasTokenAddress, _gasTokenNetwork, _gasTokenMetadata)
 
 	if err != nil {
 		return *new([]byte), err
@@ -592,49 +847,18 @@ func (_Polygonzkevm *PolygonzkevmCaller) GetInputSnarkBytes(opts *bind.CallOpts,
 
 }
 
-// GetInputSnarkBytes is a free data retrieval call binding the contract method 0x220d7899.
+// GenerateInitializeTransaction is a free data retrieval call binding the contract method 0xa652f26c.
 //
-// Solidity: function getInputSnarkBytes(uint64 initNumBatch, uint64 finalNewBatch, bytes32 newLocalExitRoot, bytes32 oldStateRoot, bytes32 newStateRoot) view returns(bytes)
-func (_Polygonzkevm *PolygonzkevmSession) GetInputSnarkBytes(initNumBatch uint64, finalNewBatch uint64, newLocalExitRoot [32]byte, oldStateRoot [32]byte, newStateRoot [32]byte) ([]byte, error) {
-	return _Polygonzkevm.Contract.GetInputSnarkBytes(&_Polygonzkevm.CallOpts, initNumBatch, finalNewBatch, newLocalExitRoot, oldStateRoot, newStateRoot)
+// Solidity: function generateInitializeTransaction(uint32 networkID, address _gasTokenAddress, uint32 _gasTokenNetwork, bytes _gasTokenMetadata) view returns(bytes)
+func (_Polygonzkevm *PolygonzkevmSession) GenerateInitializeTransaction(networkID uint32, _gasTokenAddress common.Address, _gasTokenNetwork uint32, _gasTokenMetadata []byte) ([]byte, error) {
+	return _Polygonzkevm.Contract.GenerateInitializeTransaction(&_Polygonzkevm.CallOpts, networkID, _gasTokenAddress, _gasTokenNetwork, _gasTokenMetadata)
 }
 
-// GetInputSnarkBytes is a free data retrieval call binding the contract method 0x220d7899.
+// GenerateInitializeTransaction is a free data retrieval call binding the contract method 0xa652f26c.
 //
-// Solidity: function getInputSnarkBytes(uint64 initNumBatch, uint64 finalNewBatch, bytes32 newLocalExitRoot, bytes32 oldStateRoot, bytes32 newStateRoot) view returns(bytes)
-func (_Polygonzkevm *PolygonzkevmCallerSession) GetInputSnarkBytes(initNumBatch uint64, finalNewBatch uint64, newLocalExitRoot [32]byte, oldStateRoot [32]byte, newStateRoot [32]byte) ([]byte, error) {
-	return _Polygonzkevm.Contract.GetInputSnarkBytes(&_Polygonzkevm.CallOpts, initNumBatch, finalNewBatch, newLocalExitRoot, oldStateRoot, newStateRoot)
-}
-
-// GetLastVerifiedBatch is a free data retrieval call binding the contract method 0xc0ed84e0.
-//
-// Solidity: function getLastVerifiedBatch() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCaller) GetLastVerifiedBatch(opts *bind.CallOpts) (uint64, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "getLastVerifiedBatch")
-
-	if err != nil {
-		return *new(uint64), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(uint64)).(*uint64)
-
-	return out0, err
-
-}
-
-// GetLastVerifiedBatch is a free data retrieval call binding the contract method 0xc0ed84e0.
-//
-// Solidity: function getLastVerifiedBatch() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmSession) GetLastVerifiedBatch() (uint64, error) {
-	return _Polygonzkevm.Contract.GetLastVerifiedBatch(&_Polygonzkevm.CallOpts)
-}
-
-// GetLastVerifiedBatch is a free data retrieval call binding the contract method 0xc0ed84e0.
-//
-// Solidity: function getLastVerifiedBatch() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCallerSession) GetLastVerifiedBatch() (uint64, error) {
-	return _Polygonzkevm.Contract.GetLastVerifiedBatch(&_Polygonzkevm.CallOpts)
+// Solidity: function generateInitializeTransaction(uint32 networkID, address _gasTokenAddress, uint32 _gasTokenNetwork, bytes _gasTokenMetadata) view returns(bytes)
+func (_Polygonzkevm *PolygonzkevmCallerSession) GenerateInitializeTransaction(networkID uint32, _gasTokenAddress common.Address, _gasTokenNetwork uint32, _gasTokenMetadata []byte) ([]byte, error) {
+	return _Polygonzkevm.Contract.GenerateInitializeTransaction(&_Polygonzkevm.CallOpts, networkID, _gasTokenAddress, _gasTokenNetwork, _gasTokenMetadata)
 }
 
 // GlobalExitRootManager is a free data retrieval call binding the contract method 0xd02103ca.
@@ -668,43 +892,12 @@ func (_Polygonzkevm *PolygonzkevmCallerSession) GlobalExitRootManager() (common.
 	return _Polygonzkevm.Contract.GlobalExitRootManager(&_Polygonzkevm.CallOpts)
 }
 
-// IsBatchPosted is a free data retrieval call binding the contract method 0x40b10f1c.
+// IsForcedBatchAllowed is a free data retrieval call binding the contract method 0x2b35b3ac.
 //
-// Solidity: function isBatchPosted(bytes32 ) view returns(uint256)
-func (_Polygonzkevm *PolygonzkevmCaller) IsBatchPosted(opts *bind.CallOpts, arg0 [32]byte) (*big.Int, error) {
+// Solidity: function isForcedBatchAllowed() view returns(bool)
+func (_Polygonzkevm *PolygonzkevmCaller) IsForcedBatchAllowed(opts *bind.CallOpts) (bool, error) {
 	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "isBatchPosted", arg0)
-
-	if err != nil {
-		return *new(*big.Int), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-
-	return out0, err
-
-}
-
-// IsBatchPosted is a free data retrieval call binding the contract method 0x40b10f1c.
-//
-// Solidity: function isBatchPosted(bytes32 ) view returns(uint256)
-func (_Polygonzkevm *PolygonzkevmSession) IsBatchPosted(arg0 [32]byte) (*big.Int, error) {
-	return _Polygonzkevm.Contract.IsBatchPosted(&_Polygonzkevm.CallOpts, arg0)
-}
-
-// IsBatchPosted is a free data retrieval call binding the contract method 0x40b10f1c.
-//
-// Solidity: function isBatchPosted(bytes32 ) view returns(uint256)
-func (_Polygonzkevm *PolygonzkevmCallerSession) IsBatchPosted(arg0 [32]byte) (*big.Int, error) {
-	return _Polygonzkevm.Contract.IsBatchPosted(&_Polygonzkevm.CallOpts, arg0)
-}
-
-// IsEmergencyState is a free data retrieval call binding the contract method 0x15064c96.
-//
-// Solidity: function isEmergencyState() view returns(bool)
-func (_Polygonzkevm *PolygonzkevmCaller) IsEmergencyState(opts *bind.CallOpts) (bool, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "isEmergencyState")
+	err := _Polygonzkevm.contract.Call(opts, &out, "isForcedBatchAllowed")
 
 	if err != nil {
 		return *new(bool), err
@@ -716,111 +909,49 @@ func (_Polygonzkevm *PolygonzkevmCaller) IsEmergencyState(opts *bind.CallOpts) (
 
 }
 
-// IsEmergencyState is a free data retrieval call binding the contract method 0x15064c96.
+// IsForcedBatchAllowed is a free data retrieval call binding the contract method 0x2b35b3ac.
 //
-// Solidity: function isEmergencyState() view returns(bool)
-func (_Polygonzkevm *PolygonzkevmSession) IsEmergencyState() (bool, error) {
-	return _Polygonzkevm.Contract.IsEmergencyState(&_Polygonzkevm.CallOpts)
+// Solidity: function isForcedBatchAllowed() view returns(bool)
+func (_Polygonzkevm *PolygonzkevmSession) IsForcedBatchAllowed() (bool, error) {
+	return _Polygonzkevm.Contract.IsForcedBatchAllowed(&_Polygonzkevm.CallOpts)
 }
 
-// IsEmergencyState is a free data retrieval call binding the contract method 0x15064c96.
+// IsForcedBatchAllowed is a free data retrieval call binding the contract method 0x2b35b3ac.
 //
-// Solidity: function isEmergencyState() view returns(bool)
-func (_Polygonzkevm *PolygonzkevmCallerSession) IsEmergencyState() (bool, error) {
-	return _Polygonzkevm.Contract.IsEmergencyState(&_Polygonzkevm.CallOpts)
+// Solidity: function isForcedBatchAllowed() view returns(bool)
+func (_Polygonzkevm *PolygonzkevmCallerSession) IsForcedBatchAllowed() (bool, error) {
+	return _Polygonzkevm.Contract.IsForcedBatchAllowed(&_Polygonzkevm.CallOpts)
 }
 
-// IsForcedBatchDisallowed is a free data retrieval call binding the contract method 0xed6b0104.
+// LastAccInputHash is a free data retrieval call binding the contract method 0x6e05d2cd.
 //
-// Solidity: function isForcedBatchDisallowed() view returns(bool)
-func (_Polygonzkevm *PolygonzkevmCaller) IsForcedBatchDisallowed(opts *bind.CallOpts) (bool, error) {
+// Solidity: function lastAccInputHash() view returns(bytes32)
+func (_Polygonzkevm *PolygonzkevmCaller) LastAccInputHash(opts *bind.CallOpts) ([32]byte, error) {
 	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "isForcedBatchDisallowed")
+	err := _Polygonzkevm.contract.Call(opts, &out, "lastAccInputHash")
 
 	if err != nil {
-		return *new(bool), err
+		return *new([32]byte), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
+	out0 := *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
 
 	return out0, err
 
 }
 
-// IsForcedBatchDisallowed is a free data retrieval call binding the contract method 0xed6b0104.
+// LastAccInputHash is a free data retrieval call binding the contract method 0x6e05d2cd.
 //
-// Solidity: function isForcedBatchDisallowed() view returns(bool)
-func (_Polygonzkevm *PolygonzkevmSession) IsForcedBatchDisallowed() (bool, error) {
-	return _Polygonzkevm.Contract.IsForcedBatchDisallowed(&_Polygonzkevm.CallOpts)
+// Solidity: function lastAccInputHash() view returns(bytes32)
+func (_Polygonzkevm *PolygonzkevmSession) LastAccInputHash() ([32]byte, error) {
+	return _Polygonzkevm.Contract.LastAccInputHash(&_Polygonzkevm.CallOpts)
 }
 
-// IsForcedBatchDisallowed is a free data retrieval call binding the contract method 0xed6b0104.
+// LastAccInputHash is a free data retrieval call binding the contract method 0x6e05d2cd.
 //
-// Solidity: function isForcedBatchDisallowed() view returns(bool)
-func (_Polygonzkevm *PolygonzkevmCallerSession) IsForcedBatchDisallowed() (bool, error) {
-	return _Polygonzkevm.Contract.IsForcedBatchDisallowed(&_Polygonzkevm.CallOpts)
-}
-
-// IsPendingStateConsolidable is a free data retrieval call binding the contract method 0x383b3be8.
-//
-// Solidity: function isPendingStateConsolidable(uint64 pendingStateNum) view returns(bool)
-func (_Polygonzkevm *PolygonzkevmCaller) IsPendingStateConsolidable(opts *bind.CallOpts, pendingStateNum uint64) (bool, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "isPendingStateConsolidable", pendingStateNum)
-
-	if err != nil {
-		return *new(bool), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-
-	return out0, err
-
-}
-
-// IsPendingStateConsolidable is a free data retrieval call binding the contract method 0x383b3be8.
-//
-// Solidity: function isPendingStateConsolidable(uint64 pendingStateNum) view returns(bool)
-func (_Polygonzkevm *PolygonzkevmSession) IsPendingStateConsolidable(pendingStateNum uint64) (bool, error) {
-	return _Polygonzkevm.Contract.IsPendingStateConsolidable(&_Polygonzkevm.CallOpts, pendingStateNum)
-}
-
-// IsPendingStateConsolidable is a free data retrieval call binding the contract method 0x383b3be8.
-//
-// Solidity: function isPendingStateConsolidable(uint64 pendingStateNum) view returns(bool)
-func (_Polygonzkevm *PolygonzkevmCallerSession) IsPendingStateConsolidable(pendingStateNum uint64) (bool, error) {
-	return _Polygonzkevm.Contract.IsPendingStateConsolidable(&_Polygonzkevm.CallOpts, pendingStateNum)
-}
-
-// LastBatchSequenced is a free data retrieval call binding the contract method 0x423fa856.
-//
-// Solidity: function lastBatchSequenced() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCaller) LastBatchSequenced(opts *bind.CallOpts) (uint64, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "lastBatchSequenced")
-
-	if err != nil {
-		return *new(uint64), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(uint64)).(*uint64)
-
-	return out0, err
-
-}
-
-// LastBatchSequenced is a free data retrieval call binding the contract method 0x423fa856.
-//
-// Solidity: function lastBatchSequenced() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmSession) LastBatchSequenced() (uint64, error) {
-	return _Polygonzkevm.Contract.LastBatchSequenced(&_Polygonzkevm.CallOpts)
-}
-
-// LastBatchSequenced is a free data retrieval call binding the contract method 0x423fa856.
-//
-// Solidity: function lastBatchSequenced() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCallerSession) LastBatchSequenced() (uint64, error) {
-	return _Polygonzkevm.Contract.LastBatchSequenced(&_Polygonzkevm.CallOpts)
+// Solidity: function lastAccInputHash() view returns(bytes32)
+func (_Polygonzkevm *PolygonzkevmCallerSession) LastAccInputHash() ([32]byte, error) {
+	return _Polygonzkevm.Contract.LastAccInputHash(&_Polygonzkevm.CallOpts)
 }
 
 // LastForceBatch is a free data retrieval call binding the contract method 0xe7a7ed02.
@@ -885,192 +1016,6 @@ func (_Polygonzkevm *PolygonzkevmCallerSession) LastForceBatchSequenced() (uint6
 	return _Polygonzkevm.Contract.LastForceBatchSequenced(&_Polygonzkevm.CallOpts)
 }
 
-// LastPendingState is a free data retrieval call binding the contract method 0x458c0477.
-//
-// Solidity: function lastPendingState() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCaller) LastPendingState(opts *bind.CallOpts) (uint64, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "lastPendingState")
-
-	if err != nil {
-		return *new(uint64), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(uint64)).(*uint64)
-
-	return out0, err
-
-}
-
-// LastPendingState is a free data retrieval call binding the contract method 0x458c0477.
-//
-// Solidity: function lastPendingState() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmSession) LastPendingState() (uint64, error) {
-	return _Polygonzkevm.Contract.LastPendingState(&_Polygonzkevm.CallOpts)
-}
-
-// LastPendingState is a free data retrieval call binding the contract method 0x458c0477.
-//
-// Solidity: function lastPendingState() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCallerSession) LastPendingState() (uint64, error) {
-	return _Polygonzkevm.Contract.LastPendingState(&_Polygonzkevm.CallOpts)
-}
-
-// LastPendingStateConsolidated is a free data retrieval call binding the contract method 0x4a1a89a7.
-//
-// Solidity: function lastPendingStateConsolidated() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCaller) LastPendingStateConsolidated(opts *bind.CallOpts) (uint64, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "lastPendingStateConsolidated")
-
-	if err != nil {
-		return *new(uint64), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(uint64)).(*uint64)
-
-	return out0, err
-
-}
-
-// LastPendingStateConsolidated is a free data retrieval call binding the contract method 0x4a1a89a7.
-//
-// Solidity: function lastPendingStateConsolidated() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmSession) LastPendingStateConsolidated() (uint64, error) {
-	return _Polygonzkevm.Contract.LastPendingStateConsolidated(&_Polygonzkevm.CallOpts)
-}
-
-// LastPendingStateConsolidated is a free data retrieval call binding the contract method 0x4a1a89a7.
-//
-// Solidity: function lastPendingStateConsolidated() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCallerSession) LastPendingStateConsolidated() (uint64, error) {
-	return _Polygonzkevm.Contract.LastPendingStateConsolidated(&_Polygonzkevm.CallOpts)
-}
-
-// LastTimestamp is a free data retrieval call binding the contract method 0x19d8ac61.
-//
-// Solidity: function lastTimestamp() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCaller) LastTimestamp(opts *bind.CallOpts) (uint64, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "lastTimestamp")
-
-	if err != nil {
-		return *new(uint64), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(uint64)).(*uint64)
-
-	return out0, err
-
-}
-
-// LastTimestamp is a free data retrieval call binding the contract method 0x19d8ac61.
-//
-// Solidity: function lastTimestamp() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmSession) LastTimestamp() (uint64, error) {
-	return _Polygonzkevm.Contract.LastTimestamp(&_Polygonzkevm.CallOpts)
-}
-
-// LastTimestamp is a free data retrieval call binding the contract method 0x19d8ac61.
-//
-// Solidity: function lastTimestamp() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCallerSession) LastTimestamp() (uint64, error) {
-	return _Polygonzkevm.Contract.LastTimestamp(&_Polygonzkevm.CallOpts)
-}
-
-// LastVerifiedBatch is a free data retrieval call binding the contract method 0x7fcb3653.
-//
-// Solidity: function lastVerifiedBatch() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCaller) LastVerifiedBatch(opts *bind.CallOpts) (uint64, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "lastVerifiedBatch")
-
-	if err != nil {
-		return *new(uint64), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(uint64)).(*uint64)
-
-	return out0, err
-
-}
-
-// LastVerifiedBatch is a free data retrieval call binding the contract method 0x7fcb3653.
-//
-// Solidity: function lastVerifiedBatch() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmSession) LastVerifiedBatch() (uint64, error) {
-	return _Polygonzkevm.Contract.LastVerifiedBatch(&_Polygonzkevm.CallOpts)
-}
-
-// LastVerifiedBatch is a free data retrieval call binding the contract method 0x7fcb3653.
-//
-// Solidity: function lastVerifiedBatch() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCallerSession) LastVerifiedBatch() (uint64, error) {
-	return _Polygonzkevm.Contract.LastVerifiedBatch(&_Polygonzkevm.CallOpts)
-}
-
-// Matic is a free data retrieval call binding the contract method 0xb6b0b097.
-//
-// Solidity: function matic() view returns(address)
-func (_Polygonzkevm *PolygonzkevmCaller) Matic(opts *bind.CallOpts) (common.Address, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "matic")
-
-	if err != nil {
-		return *new(common.Address), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-
-	return out0, err
-
-}
-
-// Matic is a free data retrieval call binding the contract method 0xb6b0b097.
-//
-// Solidity: function matic() view returns(address)
-func (_Polygonzkevm *PolygonzkevmSession) Matic() (common.Address, error) {
-	return _Polygonzkevm.Contract.Matic(&_Polygonzkevm.CallOpts)
-}
-
-// Matic is a free data retrieval call binding the contract method 0xb6b0b097.
-//
-// Solidity: function matic() view returns(address)
-func (_Polygonzkevm *PolygonzkevmCallerSession) Matic() (common.Address, error) {
-	return _Polygonzkevm.Contract.Matic(&_Polygonzkevm.CallOpts)
-}
-
-// MultiplierBatchFee is a free data retrieval call binding the contract method 0xafd23cbe.
-//
-// Solidity: function multiplierBatchFee() view returns(uint16)
-func (_Polygonzkevm *PolygonzkevmCaller) MultiplierBatchFee(opts *bind.CallOpts) (uint16, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "multiplierBatchFee")
-
-	if err != nil {
-		return *new(uint16), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(uint16)).(*uint16)
-
-	return out0, err
-
-}
-
-// MultiplierBatchFee is a free data retrieval call binding the contract method 0xafd23cbe.
-//
-// Solidity: function multiplierBatchFee() view returns(uint16)
-func (_Polygonzkevm *PolygonzkevmSession) MultiplierBatchFee() (uint16, error) {
-	return _Polygonzkevm.Contract.MultiplierBatchFee(&_Polygonzkevm.CallOpts)
-}
-
-// MultiplierBatchFee is a free data retrieval call binding the contract method 0xafd23cbe.
-//
-// Solidity: function multiplierBatchFee() view returns(uint16)
-func (_Polygonzkevm *PolygonzkevmCallerSession) MultiplierBatchFee() (uint16, error) {
-	return _Polygonzkevm.Contract.MultiplierBatchFee(&_Polygonzkevm.CallOpts)
-}
-
 // NetworkName is a free data retrieval call binding the contract method 0x107bf28c.
 //
 // Solidity: function networkName() view returns(string)
@@ -1100,37 +1045,6 @@ func (_Polygonzkevm *PolygonzkevmSession) NetworkName() (string, error) {
 // Solidity: function networkName() view returns(string)
 func (_Polygonzkevm *PolygonzkevmCallerSession) NetworkName() (string, error) {
 	return _Polygonzkevm.Contract.NetworkName(&_Polygonzkevm.CallOpts)
-}
-
-// Owner is a free data retrieval call binding the contract method 0x8da5cb5b.
-//
-// Solidity: function owner() view returns(address)
-func (_Polygonzkevm *PolygonzkevmCaller) Owner(opts *bind.CallOpts) (common.Address, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "owner")
-
-	if err != nil {
-		return *new(common.Address), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-
-	return out0, err
-
-}
-
-// Owner is a free data retrieval call binding the contract method 0x8da5cb5b.
-//
-// Solidity: function owner() view returns(address)
-func (_Polygonzkevm *PolygonzkevmSession) Owner() (common.Address, error) {
-	return _Polygonzkevm.Contract.Owner(&_Polygonzkevm.CallOpts)
-}
-
-// Owner is a free data retrieval call binding the contract method 0x8da5cb5b.
-//
-// Solidity: function owner() view returns(address)
-func (_Polygonzkevm *PolygonzkevmCallerSession) Owner() (common.Address, error) {
-	return _Polygonzkevm.Contract.Owner(&_Polygonzkevm.CallOpts)
 }
 
 // PendingAdmin is a free data retrieval call binding the contract method 0x26782247.
@@ -1164,98 +1078,12 @@ func (_Polygonzkevm *PolygonzkevmCallerSession) PendingAdmin() (common.Address, 
 	return _Polygonzkevm.Contract.PendingAdmin(&_Polygonzkevm.CallOpts)
 }
 
-// PendingStateTimeout is a free data retrieval call binding the contract method 0xd939b315.
+// Pol is a free data retrieval call binding the contract method 0xe46761c4.
 //
-// Solidity: function pendingStateTimeout() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCaller) PendingStateTimeout(opts *bind.CallOpts) (uint64, error) {
+// Solidity: function pol() view returns(address)
+func (_Polygonzkevm *PolygonzkevmCaller) Pol(opts *bind.CallOpts) (common.Address, error) {
 	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "pendingStateTimeout")
-
-	if err != nil {
-		return *new(uint64), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(uint64)).(*uint64)
-
-	return out0, err
-
-}
-
-// PendingStateTimeout is a free data retrieval call binding the contract method 0xd939b315.
-//
-// Solidity: function pendingStateTimeout() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmSession) PendingStateTimeout() (uint64, error) {
-	return _Polygonzkevm.Contract.PendingStateTimeout(&_Polygonzkevm.CallOpts)
-}
-
-// PendingStateTimeout is a free data retrieval call binding the contract method 0xd939b315.
-//
-// Solidity: function pendingStateTimeout() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCallerSession) PendingStateTimeout() (uint64, error) {
-	return _Polygonzkevm.Contract.PendingStateTimeout(&_Polygonzkevm.CallOpts)
-}
-
-// PendingStateTransitions is a free data retrieval call binding the contract method 0x837a4738.
-//
-// Solidity: function pendingStateTransitions(uint256 ) view returns(uint64 timestamp, uint64 lastVerifiedBatch, bytes32 exitRoot, bytes32 stateRoot)
-func (_Polygonzkevm *PolygonzkevmCaller) PendingStateTransitions(opts *bind.CallOpts, arg0 *big.Int) (struct {
-	Timestamp         uint64
-	LastVerifiedBatch uint64
-	ExitRoot          [32]byte
-	StateRoot         [32]byte
-}, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "pendingStateTransitions", arg0)
-
-	outstruct := new(struct {
-		Timestamp         uint64
-		LastVerifiedBatch uint64
-		ExitRoot          [32]byte
-		StateRoot         [32]byte
-	})
-	if err != nil {
-		return *outstruct, err
-	}
-
-	outstruct.Timestamp = *abi.ConvertType(out[0], new(uint64)).(*uint64)
-	outstruct.LastVerifiedBatch = *abi.ConvertType(out[1], new(uint64)).(*uint64)
-	outstruct.ExitRoot = *abi.ConvertType(out[2], new([32]byte)).(*[32]byte)
-	outstruct.StateRoot = *abi.ConvertType(out[3], new([32]byte)).(*[32]byte)
-
-	return *outstruct, err
-
-}
-
-// PendingStateTransitions is a free data retrieval call binding the contract method 0x837a4738.
-//
-// Solidity: function pendingStateTransitions(uint256 ) view returns(uint64 timestamp, uint64 lastVerifiedBatch, bytes32 exitRoot, bytes32 stateRoot)
-func (_Polygonzkevm *PolygonzkevmSession) PendingStateTransitions(arg0 *big.Int) (struct {
-	Timestamp         uint64
-	LastVerifiedBatch uint64
-	ExitRoot          [32]byte
-	StateRoot         [32]byte
-}, error) {
-	return _Polygonzkevm.Contract.PendingStateTransitions(&_Polygonzkevm.CallOpts, arg0)
-}
-
-// PendingStateTransitions is a free data retrieval call binding the contract method 0x837a4738.
-//
-// Solidity: function pendingStateTransitions(uint256 ) view returns(uint64 timestamp, uint64 lastVerifiedBatch, bytes32 exitRoot, bytes32 stateRoot)
-func (_Polygonzkevm *PolygonzkevmCallerSession) PendingStateTransitions(arg0 *big.Int) (struct {
-	Timestamp         uint64
-	LastVerifiedBatch uint64
-	ExitRoot          [32]byte
-	StateRoot         [32]byte
-}, error) {
-	return _Polygonzkevm.Contract.PendingStateTransitions(&_Polygonzkevm.CallOpts, arg0)
-}
-
-// RollupVerifier is a free data retrieval call binding the contract method 0xe8bf92ed.
-//
-// Solidity: function rollupVerifier() view returns(address)
-func (_Polygonzkevm *PolygonzkevmCaller) RollupVerifier(opts *bind.CallOpts) (common.Address, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "rollupVerifier")
+	err := _Polygonzkevm.contract.Call(opts, &out, "pol")
 
 	if err != nil {
 		return *new(common.Address), err
@@ -1267,26 +1095,26 @@ func (_Polygonzkevm *PolygonzkevmCaller) RollupVerifier(opts *bind.CallOpts) (co
 
 }
 
-// RollupVerifier is a free data retrieval call binding the contract method 0xe8bf92ed.
+// Pol is a free data retrieval call binding the contract method 0xe46761c4.
 //
-// Solidity: function rollupVerifier() view returns(address)
-func (_Polygonzkevm *PolygonzkevmSession) RollupVerifier() (common.Address, error) {
-	return _Polygonzkevm.Contract.RollupVerifier(&_Polygonzkevm.CallOpts)
+// Solidity: function pol() view returns(address)
+func (_Polygonzkevm *PolygonzkevmSession) Pol() (common.Address, error) {
+	return _Polygonzkevm.Contract.Pol(&_Polygonzkevm.CallOpts)
 }
 
-// RollupVerifier is a free data retrieval call binding the contract method 0xe8bf92ed.
+// Pol is a free data retrieval call binding the contract method 0xe46761c4.
 //
-// Solidity: function rollupVerifier() view returns(address)
-func (_Polygonzkevm *PolygonzkevmCallerSession) RollupVerifier() (common.Address, error) {
-	return _Polygonzkevm.Contract.RollupVerifier(&_Polygonzkevm.CallOpts)
+// Solidity: function pol() view returns(address)
+func (_Polygonzkevm *PolygonzkevmCallerSession) Pol() (common.Address, error) {
+	return _Polygonzkevm.Contract.Pol(&_Polygonzkevm.CallOpts)
 }
 
-// Router is a free data retrieval call binding the contract method 0xf887ea40.
+// RollupManager is a free data retrieval call binding the contract method 0x49b7b802.
 //
-// Solidity: function router() view returns(address)
-func (_Polygonzkevm *PolygonzkevmCaller) Router(opts *bind.CallOpts) (common.Address, error) {
+// Solidity: function rollupManager() view returns(address)
+func (_Polygonzkevm *PolygonzkevmCaller) RollupManager(opts *bind.CallOpts) (common.Address, error) {
 	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "router")
+	err := _Polygonzkevm.contract.Call(opts, &out, "rollupManager")
 
 	if err != nil {
 		return *new(common.Address), err
@@ -1298,130 +1126,18 @@ func (_Polygonzkevm *PolygonzkevmCaller) Router(opts *bind.CallOpts) (common.Add
 
 }
 
-// Router is a free data retrieval call binding the contract method 0xf887ea40.
+// RollupManager is a free data retrieval call binding the contract method 0x49b7b802.
 //
-// Solidity: function router() view returns(address)
-func (_Polygonzkevm *PolygonzkevmSession) Router() (common.Address, error) {
-	return _Polygonzkevm.Contract.Router(&_Polygonzkevm.CallOpts)
+// Solidity: function rollupManager() view returns(address)
+func (_Polygonzkevm *PolygonzkevmSession) RollupManager() (common.Address, error) {
+	return _Polygonzkevm.Contract.RollupManager(&_Polygonzkevm.CallOpts)
 }
 
-// Router is a free data retrieval call binding the contract method 0xf887ea40.
+// RollupManager is a free data retrieval call binding the contract method 0x49b7b802.
 //
-// Solidity: function router() view returns(address)
-func (_Polygonzkevm *PolygonzkevmCallerSession) Router() (common.Address, error) {
-	return _Polygonzkevm.Contract.Router(&_Polygonzkevm.CallOpts)
-}
-
-// SequencedBatches is a free data retrieval call binding the contract method 0xb4d63f58.
-//
-// Solidity: function sequencedBatches(uint64 ) view returns(bytes32 accInputHash, uint64 sequencedTimestamp, uint64 previousLastBatchSequenced)
-func (_Polygonzkevm *PolygonzkevmCaller) SequencedBatches(opts *bind.CallOpts, arg0 uint64) (struct {
-	AccInputHash               [32]byte
-	SequencedTimestamp         uint64
-	PreviousLastBatchSequenced uint64
-}, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "sequencedBatches", arg0)
-
-	outstruct := new(struct {
-		AccInputHash               [32]byte
-		SequencedTimestamp         uint64
-		PreviousLastBatchSequenced uint64
-	})
-	if err != nil {
-		return *outstruct, err
-	}
-
-	outstruct.AccInputHash = *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
-	outstruct.SequencedTimestamp = *abi.ConvertType(out[1], new(uint64)).(*uint64)
-	outstruct.PreviousLastBatchSequenced = *abi.ConvertType(out[2], new(uint64)).(*uint64)
-
-	return *outstruct, err
-
-}
-
-// SequencedBatches is a free data retrieval call binding the contract method 0xb4d63f58.
-//
-// Solidity: function sequencedBatches(uint64 ) view returns(bytes32 accInputHash, uint64 sequencedTimestamp, uint64 previousLastBatchSequenced)
-func (_Polygonzkevm *PolygonzkevmSession) SequencedBatches(arg0 uint64) (struct {
-	AccInputHash               [32]byte
-	SequencedTimestamp         uint64
-	PreviousLastBatchSequenced uint64
-}, error) {
-	return _Polygonzkevm.Contract.SequencedBatches(&_Polygonzkevm.CallOpts, arg0)
-}
-
-// SequencedBatches is a free data retrieval call binding the contract method 0xb4d63f58.
-//
-// Solidity: function sequencedBatches(uint64 ) view returns(bytes32 accInputHash, uint64 sequencedTimestamp, uint64 previousLastBatchSequenced)
-func (_Polygonzkevm *PolygonzkevmCallerSession) SequencedBatches(arg0 uint64) (struct {
-	AccInputHash               [32]byte
-	SequencedTimestamp         uint64
-	PreviousLastBatchSequenced uint64
-}, error) {
-	return _Polygonzkevm.Contract.SequencedBatches(&_Polygonzkevm.CallOpts, arg0)
-}
-
-// TrustedAggregator is a free data retrieval call binding the contract method 0x29878983.
-//
-// Solidity: function trustedAggregator() view returns(address)
-func (_Polygonzkevm *PolygonzkevmCaller) TrustedAggregator(opts *bind.CallOpts) (common.Address, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "trustedAggregator")
-
-	if err != nil {
-		return *new(common.Address), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-
-	return out0, err
-
-}
-
-// TrustedAggregator is a free data retrieval call binding the contract method 0x29878983.
-//
-// Solidity: function trustedAggregator() view returns(address)
-func (_Polygonzkevm *PolygonzkevmSession) TrustedAggregator() (common.Address, error) {
-	return _Polygonzkevm.Contract.TrustedAggregator(&_Polygonzkevm.CallOpts)
-}
-
-// TrustedAggregator is a free data retrieval call binding the contract method 0x29878983.
-//
-// Solidity: function trustedAggregator() view returns(address)
-func (_Polygonzkevm *PolygonzkevmCallerSession) TrustedAggregator() (common.Address, error) {
-	return _Polygonzkevm.Contract.TrustedAggregator(&_Polygonzkevm.CallOpts)
-}
-
-// TrustedAggregatorTimeout is a free data retrieval call binding the contract method 0x841b24d7.
-//
-// Solidity: function trustedAggregatorTimeout() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCaller) TrustedAggregatorTimeout(opts *bind.CallOpts) (uint64, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "trustedAggregatorTimeout")
-
-	if err != nil {
-		return *new(uint64), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(uint64)).(*uint64)
-
-	return out0, err
-
-}
-
-// TrustedAggregatorTimeout is a free data retrieval call binding the contract method 0x841b24d7.
-//
-// Solidity: function trustedAggregatorTimeout() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmSession) TrustedAggregatorTimeout() (uint64, error) {
-	return _Polygonzkevm.Contract.TrustedAggregatorTimeout(&_Polygonzkevm.CallOpts)
-}
-
-// TrustedAggregatorTimeout is a free data retrieval call binding the contract method 0x841b24d7.
-//
-// Solidity: function trustedAggregatorTimeout() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCallerSession) TrustedAggregatorTimeout() (uint64, error) {
-	return _Polygonzkevm.Contract.TrustedAggregatorTimeout(&_Polygonzkevm.CallOpts)
+// Solidity: function rollupManager() view returns(address)
+func (_Polygonzkevm *PolygonzkevmCallerSession) RollupManager() (common.Address, error) {
+	return _Polygonzkevm.Contract.RollupManager(&_Polygonzkevm.CallOpts)
 }
 
 // TrustedSequencer is a free data retrieval call binding the contract method 0xcfa8ed47.
@@ -1486,37 +1202,6 @@ func (_Polygonzkevm *PolygonzkevmCallerSession) TrustedSequencerURL() (string, e
 	return _Polygonzkevm.Contract.TrustedSequencerURL(&_Polygonzkevm.CallOpts)
 }
 
-// VerifyBatchTimeTarget is a free data retrieval call binding the contract method 0x0a0d9fbe.
-//
-// Solidity: function verifyBatchTimeTarget() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCaller) VerifyBatchTimeTarget(opts *bind.CallOpts) (uint64, error) {
-	var out []interface{}
-	err := _Polygonzkevm.contract.Call(opts, &out, "verifyBatchTimeTarget")
-
-	if err != nil {
-		return *new(uint64), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(uint64)).(*uint64)
-
-	return out0, err
-
-}
-
-// VerifyBatchTimeTarget is a free data retrieval call binding the contract method 0x0a0d9fbe.
-//
-// Solidity: function verifyBatchTimeTarget() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmSession) VerifyBatchTimeTarget() (uint64, error) {
-	return _Polygonzkevm.Contract.VerifyBatchTimeTarget(&_Polygonzkevm.CallOpts)
-}
-
-// VerifyBatchTimeTarget is a free data retrieval call binding the contract method 0x0a0d9fbe.
-//
-// Solidity: function verifyBatchTimeTarget() view returns(uint64)
-func (_Polygonzkevm *PolygonzkevmCallerSession) VerifyBatchTimeTarget() (uint64, error) {
-	return _Polygonzkevm.Contract.VerifyBatchTimeTarget(&_Polygonzkevm.CallOpts)
-}
-
 // AcceptAdminRole is a paid mutator transaction binding the contract method 0x8c3d7301.
 //
 // Solidity: function acceptAdminRole() returns()
@@ -1536,27 +1221,6 @@ func (_Polygonzkevm *PolygonzkevmSession) AcceptAdminRole() (*types.Transaction,
 // Solidity: function acceptAdminRole() returns()
 func (_Polygonzkevm *PolygonzkevmTransactorSession) AcceptAdminRole() (*types.Transaction, error) {
 	return _Polygonzkevm.Contract.AcceptAdminRole(&_Polygonzkevm.TransactOpts)
-}
-
-// ActivateEmergencyState is a paid mutator transaction binding the contract method 0x7215541a.
-//
-// Solidity: function activateEmergencyState(uint64 sequencedBatchNum) returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) ActivateEmergencyState(opts *bind.TransactOpts, sequencedBatchNum uint64) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "activateEmergencyState", sequencedBatchNum)
-}
-
-// ActivateEmergencyState is a paid mutator transaction binding the contract method 0x7215541a.
-//
-// Solidity: function activateEmergencyState(uint64 sequencedBatchNum) returns()
-func (_Polygonzkevm *PolygonzkevmSession) ActivateEmergencyState(sequencedBatchNum uint64) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.ActivateEmergencyState(&_Polygonzkevm.TransactOpts, sequencedBatchNum)
-}
-
-// ActivateEmergencyState is a paid mutator transaction binding the contract method 0x7215541a.
-//
-// Solidity: function activateEmergencyState(uint64 sequencedBatchNum) returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) ActivateEmergencyState(sequencedBatchNum uint64) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.ActivateEmergencyState(&_Polygonzkevm.TransactOpts, sequencedBatchNum)
 }
 
 // ActivateForceBatches is a paid mutator transaction binding the contract method 0x5ec91958.
@@ -1580,192 +1244,108 @@ func (_Polygonzkevm *PolygonzkevmTransactorSession) ActivateForceBatches() (*typ
 	return _Polygonzkevm.Contract.ActivateForceBatches(&_Polygonzkevm.TransactOpts)
 }
 
-// ConsolidatePendingState is a paid mutator transaction binding the contract method 0x4a910e6a.
+// ForceBatch is a paid mutator transaction binding the contract method 0xeaeb077b.
 //
-// Solidity: function consolidatePendingState(uint64 pendingStateNum) returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) ConsolidatePendingState(opts *bind.TransactOpts, pendingStateNum uint64) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "consolidatePendingState", pendingStateNum)
-}
-
-// ConsolidatePendingState is a paid mutator transaction binding the contract method 0x4a910e6a.
-//
-// Solidity: function consolidatePendingState(uint64 pendingStateNum) returns()
-func (_Polygonzkevm *PolygonzkevmSession) ConsolidatePendingState(pendingStateNum uint64) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.ConsolidatePendingState(&_Polygonzkevm.TransactOpts, pendingStateNum)
-}
-
-// ConsolidatePendingState is a paid mutator transaction binding the contract method 0x4a910e6a.
-//
-// Solidity: function consolidatePendingState(uint64 pendingStateNum) returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) ConsolidatePendingState(pendingStateNum uint64) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.ConsolidatePendingState(&_Polygonzkevm.TransactOpts, pendingStateNum)
-}
-
-// DeactivateEmergencyState is a paid mutator transaction binding the contract method 0xdbc16976.
-//
-// Solidity: function deactivateEmergencyState() returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) DeactivateEmergencyState(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "deactivateEmergencyState")
-}
-
-// DeactivateEmergencyState is a paid mutator transaction binding the contract method 0xdbc16976.
-//
-// Solidity: function deactivateEmergencyState() returns()
-func (_Polygonzkevm *PolygonzkevmSession) DeactivateEmergencyState() (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.DeactivateEmergencyState(&_Polygonzkevm.TransactOpts)
-}
-
-// DeactivateEmergencyState is a paid mutator transaction binding the contract method 0xdbc16976.
-//
-// Solidity: function deactivateEmergencyState() returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) DeactivateEmergencyState() (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.DeactivateEmergencyState(&_Polygonzkevm.TransactOpts)
+// Solidity: function forceBatch(bytes transactions, uint256 polAmount) returns()
+func (_Polygonzkevm *PolygonzkevmTransactor) ForceBatch(opts *bind.TransactOpts, transactions []byte, polAmount *big.Int) (*types.Transaction, error) {
+	return _Polygonzkevm.contract.Transact(opts, "forceBatch", transactions, polAmount)
 }
 
 // ForceBatch is a paid mutator transaction binding the contract method 0xeaeb077b.
 //
-// Solidity: function forceBatch(bytes transactions, uint256 maticAmount) returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) ForceBatch(opts *bind.TransactOpts, transactions []byte, maticAmount *big.Int) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "forceBatch", transactions, maticAmount)
+// Solidity: function forceBatch(bytes transactions, uint256 polAmount) returns()
+func (_Polygonzkevm *PolygonzkevmSession) ForceBatch(transactions []byte, polAmount *big.Int) (*types.Transaction, error) {
+	return _Polygonzkevm.Contract.ForceBatch(&_Polygonzkevm.TransactOpts, transactions, polAmount)
 }
 
 // ForceBatch is a paid mutator transaction binding the contract method 0xeaeb077b.
 //
-// Solidity: function forceBatch(bytes transactions, uint256 maticAmount) returns()
-func (_Polygonzkevm *PolygonzkevmSession) ForceBatch(transactions []byte, maticAmount *big.Int) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.ForceBatch(&_Polygonzkevm.TransactOpts, transactions, maticAmount)
+// Solidity: function forceBatch(bytes transactions, uint256 polAmount) returns()
+func (_Polygonzkevm *PolygonzkevmTransactorSession) ForceBatch(transactions []byte, polAmount *big.Int) (*types.Transaction, error) {
+	return _Polygonzkevm.Contract.ForceBatch(&_Polygonzkevm.TransactOpts, transactions, polAmount)
 }
 
-// ForceBatch is a paid mutator transaction binding the contract method 0xeaeb077b.
+// Initialize is a paid mutator transaction binding the contract method 0x71257022.
 //
-// Solidity: function forceBatch(bytes transactions, uint256 maticAmount) returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) ForceBatch(transactions []byte, maticAmount *big.Int) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.ForceBatch(&_Polygonzkevm.TransactOpts, transactions, maticAmount)
+// Solidity: function initialize(address _admin, address sequencer, uint32 networkID, address _gasTokenAddress, string sequencerURL, string _networkName) returns()
+func (_Polygonzkevm *PolygonzkevmTransactor) Initialize(opts *bind.TransactOpts, _admin common.Address, sequencer common.Address, networkID uint32, _gasTokenAddress common.Address, sequencerURL string, _networkName string) (*types.Transaction, error) {
+	return _Polygonzkevm.contract.Transact(opts, "initialize", _admin, sequencer, networkID, _gasTokenAddress, sequencerURL, _networkName)
 }
 
-// Initialize is a paid mutator transaction binding the contract method 0xd2e129f9.
+// Initialize is a paid mutator transaction binding the contract method 0x71257022.
 //
-// Solidity: function initialize((address,address,uint64,address,uint64) initializePackedParameters, bytes32 genesisRoot, string _trustedSequencerURL, string _networkName, string _version) returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) Initialize(opts *bind.TransactOpts, initializePackedParameters PolygonZkEVMInitializePackedParameters, genesisRoot [32]byte, _trustedSequencerURL string, _networkName string, _version string) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "initialize", initializePackedParameters, genesisRoot, _trustedSequencerURL, _networkName, _version)
+// Solidity: function initialize(address _admin, address sequencer, uint32 networkID, address _gasTokenAddress, string sequencerURL, string _networkName) returns()
+func (_Polygonzkevm *PolygonzkevmSession) Initialize(_admin common.Address, sequencer common.Address, networkID uint32, _gasTokenAddress common.Address, sequencerURL string, _networkName string) (*types.Transaction, error) {
+	return _Polygonzkevm.Contract.Initialize(&_Polygonzkevm.TransactOpts, _admin, sequencer, networkID, _gasTokenAddress, sequencerURL, _networkName)
 }
 
-// Initialize is a paid mutator transaction binding the contract method 0xd2e129f9.
+// Initialize is a paid mutator transaction binding the contract method 0x71257022.
 //
-// Solidity: function initialize((address,address,uint64,address,uint64) initializePackedParameters, bytes32 genesisRoot, string _trustedSequencerURL, string _networkName, string _version) returns()
-func (_Polygonzkevm *PolygonzkevmSession) Initialize(initializePackedParameters PolygonZkEVMInitializePackedParameters, genesisRoot [32]byte, _trustedSequencerURL string, _networkName string, _version string) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.Initialize(&_Polygonzkevm.TransactOpts, initializePackedParameters, genesisRoot, _trustedSequencerURL, _networkName, _version)
+// Solidity: function initialize(address _admin, address sequencer, uint32 networkID, address _gasTokenAddress, string sequencerURL, string _networkName) returns()
+func (_Polygonzkevm *PolygonzkevmTransactorSession) Initialize(_admin common.Address, sequencer common.Address, networkID uint32, _gasTokenAddress common.Address, sequencerURL string, _networkName string) (*types.Transaction, error) {
+	return _Polygonzkevm.Contract.Initialize(&_Polygonzkevm.TransactOpts, _admin, sequencer, networkID, _gasTokenAddress, sequencerURL, _networkName)
 }
 
-// Initialize is a paid mutator transaction binding the contract method 0xd2e129f9.
+// OnVerifyBatches is a paid mutator transaction binding the contract method 0x32c2d153.
 //
-// Solidity: function initialize((address,address,uint64,address,uint64) initializePackedParameters, bytes32 genesisRoot, string _trustedSequencerURL, string _networkName, string _version) returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) Initialize(initializePackedParameters PolygonZkEVMInitializePackedParameters, genesisRoot [32]byte, _trustedSequencerURL string, _networkName string, _version string) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.Initialize(&_Polygonzkevm.TransactOpts, initializePackedParameters, genesisRoot, _trustedSequencerURL, _networkName, _version)
+// Solidity: function onVerifyBatches(uint64 lastVerifiedBatch, bytes32 newStateRoot, address aggregator) returns()
+func (_Polygonzkevm *PolygonzkevmTransactor) OnVerifyBatches(opts *bind.TransactOpts, lastVerifiedBatch uint64, newStateRoot [32]byte, aggregator common.Address) (*types.Transaction, error) {
+	return _Polygonzkevm.contract.Transact(opts, "onVerifyBatches", lastVerifiedBatch, newStateRoot, aggregator)
 }
 
-// OverridePendingState is a paid mutator transaction binding the contract method 0x2c1f816a.
+// OnVerifyBatches is a paid mutator transaction binding the contract method 0x32c2d153.
 //
-// Solidity: function overridePendingState(uint64 initPendingStateNum, uint64 finalPendingStateNum, uint64 initNumBatch, uint64 finalNewBatch, bytes32 newLocalExitRoot, bytes32 newStateRoot, bytes32[24] proof) returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) OverridePendingState(opts *bind.TransactOpts, initPendingStateNum uint64, finalPendingStateNum uint64, initNumBatch uint64, finalNewBatch uint64, newLocalExitRoot [32]byte, newStateRoot [32]byte, proof [24][32]byte) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "overridePendingState", initPendingStateNum, finalPendingStateNum, initNumBatch, finalNewBatch, newLocalExitRoot, newStateRoot, proof)
+// Solidity: function onVerifyBatches(uint64 lastVerifiedBatch, bytes32 newStateRoot, address aggregator) returns()
+func (_Polygonzkevm *PolygonzkevmSession) OnVerifyBatches(lastVerifiedBatch uint64, newStateRoot [32]byte, aggregator common.Address) (*types.Transaction, error) {
+	return _Polygonzkevm.Contract.OnVerifyBatches(&_Polygonzkevm.TransactOpts, lastVerifiedBatch, newStateRoot, aggregator)
 }
 
-// OverridePendingState is a paid mutator transaction binding the contract method 0x2c1f816a.
+// OnVerifyBatches is a paid mutator transaction binding the contract method 0x32c2d153.
 //
-// Solidity: function overridePendingState(uint64 initPendingStateNum, uint64 finalPendingStateNum, uint64 initNumBatch, uint64 finalNewBatch, bytes32 newLocalExitRoot, bytes32 newStateRoot, bytes32[24] proof) returns()
-func (_Polygonzkevm *PolygonzkevmSession) OverridePendingState(initPendingStateNum uint64, finalPendingStateNum uint64, initNumBatch uint64, finalNewBatch uint64, newLocalExitRoot [32]byte, newStateRoot [32]byte, proof [24][32]byte) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.OverridePendingState(&_Polygonzkevm.TransactOpts, initPendingStateNum, finalPendingStateNum, initNumBatch, finalNewBatch, newLocalExitRoot, newStateRoot, proof)
+// Solidity: function onVerifyBatches(uint64 lastVerifiedBatch, bytes32 newStateRoot, address aggregator) returns()
+func (_Polygonzkevm *PolygonzkevmTransactorSession) OnVerifyBatches(lastVerifiedBatch uint64, newStateRoot [32]byte, aggregator common.Address) (*types.Transaction, error) {
+	return _Polygonzkevm.Contract.OnVerifyBatches(&_Polygonzkevm.TransactOpts, lastVerifiedBatch, newStateRoot, aggregator)
 }
 
-// OverridePendingState is a paid mutator transaction binding the contract method 0x2c1f816a.
+// SequenceBatches is a paid mutator transaction binding the contract method 0xecef3f99.
 //
-// Solidity: function overridePendingState(uint64 initPendingStateNum, uint64 finalPendingStateNum, uint64 initNumBatch, uint64 finalNewBatch, bytes32 newLocalExitRoot, bytes32 newStateRoot, bytes32[24] proof) returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) OverridePendingState(initPendingStateNum uint64, finalPendingStateNum uint64, initNumBatch uint64, finalNewBatch uint64, newLocalExitRoot [32]byte, newStateRoot [32]byte, proof [24][32]byte) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.OverridePendingState(&_Polygonzkevm.TransactOpts, initPendingStateNum, finalPendingStateNum, initNumBatch, finalNewBatch, newLocalExitRoot, newStateRoot, proof)
+// Solidity: function sequenceBatches((bytes,bytes32,uint64,bytes32)[] batches, address l2Coinbase) returns()
+func (_Polygonzkevm *PolygonzkevmTransactor) SequenceBatches(opts *bind.TransactOpts, batches []PolygonRollupBaseEtrogBatchData, l2Coinbase common.Address) (*types.Transaction, error) {
+	return _Polygonzkevm.contract.Transact(opts, "sequenceBatches", batches, l2Coinbase)
 }
 
-// ProveNonDeterministicPendingState is a paid mutator transaction binding the contract method 0x9aa972a3.
+// SequenceBatches is a paid mutator transaction binding the contract method 0xecef3f99.
 //
-// Solidity: function proveNonDeterministicPendingState(uint64 initPendingStateNum, uint64 finalPendingStateNum, uint64 initNumBatch, uint64 finalNewBatch, bytes32 newLocalExitRoot, bytes32 newStateRoot, bytes32[24] proof) returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) ProveNonDeterministicPendingState(opts *bind.TransactOpts, initPendingStateNum uint64, finalPendingStateNum uint64, initNumBatch uint64, finalNewBatch uint64, newLocalExitRoot [32]byte, newStateRoot [32]byte, proof [24][32]byte) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "proveNonDeterministicPendingState", initPendingStateNum, finalPendingStateNum, initNumBatch, finalNewBatch, newLocalExitRoot, newStateRoot, proof)
+// Solidity: function sequenceBatches((bytes,bytes32,uint64,bytes32)[] batches, address l2Coinbase) returns()
+func (_Polygonzkevm *PolygonzkevmSession) SequenceBatches(batches []PolygonRollupBaseEtrogBatchData, l2Coinbase common.Address) (*types.Transaction, error) {
+	return _Polygonzkevm.Contract.SequenceBatches(&_Polygonzkevm.TransactOpts, batches, l2Coinbase)
 }
 
-// ProveNonDeterministicPendingState is a paid mutator transaction binding the contract method 0x9aa972a3.
+// SequenceBatches is a paid mutator transaction binding the contract method 0xecef3f99.
 //
-// Solidity: function proveNonDeterministicPendingState(uint64 initPendingStateNum, uint64 finalPendingStateNum, uint64 initNumBatch, uint64 finalNewBatch, bytes32 newLocalExitRoot, bytes32 newStateRoot, bytes32[24] proof) returns()
-func (_Polygonzkevm *PolygonzkevmSession) ProveNonDeterministicPendingState(initPendingStateNum uint64, finalPendingStateNum uint64, initNumBatch uint64, finalNewBatch uint64, newLocalExitRoot [32]byte, newStateRoot [32]byte, proof [24][32]byte) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.ProveNonDeterministicPendingState(&_Polygonzkevm.TransactOpts, initPendingStateNum, finalPendingStateNum, initNumBatch, finalNewBatch, newLocalExitRoot, newStateRoot, proof)
+// Solidity: function sequenceBatches((bytes,bytes32,uint64,bytes32)[] batches, address l2Coinbase) returns()
+func (_Polygonzkevm *PolygonzkevmTransactorSession) SequenceBatches(batches []PolygonRollupBaseEtrogBatchData, l2Coinbase common.Address) (*types.Transaction, error) {
+	return _Polygonzkevm.Contract.SequenceBatches(&_Polygonzkevm.TransactOpts, batches, l2Coinbase)
 }
 
-// ProveNonDeterministicPendingState is a paid mutator transaction binding the contract method 0x9aa972a3.
+// SequenceForceBatches is a paid mutator transaction binding the contract method 0x9f26f840.
 //
-// Solidity: function proveNonDeterministicPendingState(uint64 initPendingStateNum, uint64 finalPendingStateNum, uint64 initNumBatch, uint64 finalNewBatch, bytes32 newLocalExitRoot, bytes32 newStateRoot, bytes32[24] proof) returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) ProveNonDeterministicPendingState(initPendingStateNum uint64, finalPendingStateNum uint64, initNumBatch uint64, finalNewBatch uint64, newLocalExitRoot [32]byte, newStateRoot [32]byte, proof [24][32]byte) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.ProveNonDeterministicPendingState(&_Polygonzkevm.TransactOpts, initPendingStateNum, finalPendingStateNum, initNumBatch, finalNewBatch, newLocalExitRoot, newStateRoot, proof)
-}
-
-// RenounceOwnership is a paid mutator transaction binding the contract method 0x715018a6.
-//
-// Solidity: function renounceOwnership() returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) RenounceOwnership(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "renounceOwnership")
-}
-
-// RenounceOwnership is a paid mutator transaction binding the contract method 0x715018a6.
-//
-// Solidity: function renounceOwnership() returns()
-func (_Polygonzkevm *PolygonzkevmSession) RenounceOwnership() (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.RenounceOwnership(&_Polygonzkevm.TransactOpts)
-}
-
-// RenounceOwnership is a paid mutator transaction binding the contract method 0x715018a6.
-//
-// Solidity: function renounceOwnership() returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) RenounceOwnership() (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.RenounceOwnership(&_Polygonzkevm.TransactOpts)
-}
-
-// SequenceBatches is a paid mutator transaction binding the contract method 0xefde5290.
-//
-// Solidity: function sequenceBatches((bytes32,bytes32,uint64,uint64)[] batches, (uint32,bytes32[],uint256,uint256)[] daData, address l2Coinbase) returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) SequenceBatches(opts *bind.TransactOpts, batches []PolygonZkEVMBatchData, daData []PolygonZkEVMDAData, l2Coinbase common.Address) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "sequenceBatches", batches, daData, l2Coinbase)
-}
-
-// SequenceBatches is a paid mutator transaction binding the contract method 0xefde5290.
-//
-// Solidity: function sequenceBatches((bytes32,bytes32,uint64,uint64)[] batches, (uint32,bytes32[],uint256,uint256)[] daData, address l2Coinbase) returns()
-func (_Polygonzkevm *PolygonzkevmSession) SequenceBatches(batches []PolygonZkEVMBatchData, daData []PolygonZkEVMDAData, l2Coinbase common.Address) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.SequenceBatches(&_Polygonzkevm.TransactOpts, batches, daData, l2Coinbase)
-}
-
-// SequenceBatches is a paid mutator transaction binding the contract method 0xefde5290.
-//
-// Solidity: function sequenceBatches((bytes32,bytes32,uint64,uint64)[] batches, (uint32,bytes32[],uint256,uint256)[] daData, address l2Coinbase) returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) SequenceBatches(batches []PolygonZkEVMBatchData, daData []PolygonZkEVMDAData, l2Coinbase common.Address) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.SequenceBatches(&_Polygonzkevm.TransactOpts, batches, daData, l2Coinbase)
-}
-
-// SequenceForceBatches is a paid mutator transaction binding the contract method 0xd8d1091b.
-//
-// Solidity: function sequenceForceBatches((bytes,bytes32,uint64)[] batches) returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) SequenceForceBatches(opts *bind.TransactOpts, batches []PolygonZkEVMForcedBatchData) (*types.Transaction, error) {
+// Solidity: function sequenceForceBatches((bytes,bytes32,uint64,bytes32)[] batches) returns()
+func (_Polygonzkevm *PolygonzkevmTransactor) SequenceForceBatches(opts *bind.TransactOpts, batches []PolygonRollupBaseEtrogBatchData) (*types.Transaction, error) {
 	return _Polygonzkevm.contract.Transact(opts, "sequenceForceBatches", batches)
 }
 
-// SequenceForceBatches is a paid mutator transaction binding the contract method 0xd8d1091b.
+// SequenceForceBatches is a paid mutator transaction binding the contract method 0x9f26f840.
 //
-// Solidity: function sequenceForceBatches((bytes,bytes32,uint64)[] batches) returns()
-func (_Polygonzkevm *PolygonzkevmSession) SequenceForceBatches(batches []PolygonZkEVMForcedBatchData) (*types.Transaction, error) {
+// Solidity: function sequenceForceBatches((bytes,bytes32,uint64,bytes32)[] batches) returns()
+func (_Polygonzkevm *PolygonzkevmSession) SequenceForceBatches(batches []PolygonRollupBaseEtrogBatchData) (*types.Transaction, error) {
 	return _Polygonzkevm.Contract.SequenceForceBatches(&_Polygonzkevm.TransactOpts, batches)
 }
 
-// SequenceForceBatches is a paid mutator transaction binding the contract method 0xd8d1091b.
+// SequenceForceBatches is a paid mutator transaction binding the contract method 0x9f26f840.
 //
-// Solidity: function sequenceForceBatches((bytes,bytes32,uint64)[] batches) returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) SequenceForceBatches(batches []PolygonZkEVMForcedBatchData) (*types.Transaction, error) {
+// Solidity: function sequenceForceBatches((bytes,bytes32,uint64,bytes32)[] batches) returns()
+func (_Polygonzkevm *PolygonzkevmTransactorSession) SequenceForceBatches(batches []PolygonRollupBaseEtrogBatchData) (*types.Transaction, error) {
 	return _Polygonzkevm.Contract.SequenceForceBatches(&_Polygonzkevm.TransactOpts, batches)
 }
 
@@ -1788,111 +1368,6 @@ func (_Polygonzkevm *PolygonzkevmSession) SetForceBatchTimeout(newforceBatchTime
 // Solidity: function setForceBatchTimeout(uint64 newforceBatchTimeout) returns()
 func (_Polygonzkevm *PolygonzkevmTransactorSession) SetForceBatchTimeout(newforceBatchTimeout uint64) (*types.Transaction, error) {
 	return _Polygonzkevm.Contract.SetForceBatchTimeout(&_Polygonzkevm.TransactOpts, newforceBatchTimeout)
-}
-
-// SetMultiplierBatchFee is a paid mutator transaction binding the contract method 0x1816b7e5.
-//
-// Solidity: function setMultiplierBatchFee(uint16 newMultiplierBatchFee) returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) SetMultiplierBatchFee(opts *bind.TransactOpts, newMultiplierBatchFee uint16) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "setMultiplierBatchFee", newMultiplierBatchFee)
-}
-
-// SetMultiplierBatchFee is a paid mutator transaction binding the contract method 0x1816b7e5.
-//
-// Solidity: function setMultiplierBatchFee(uint16 newMultiplierBatchFee) returns()
-func (_Polygonzkevm *PolygonzkevmSession) SetMultiplierBatchFee(newMultiplierBatchFee uint16) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.SetMultiplierBatchFee(&_Polygonzkevm.TransactOpts, newMultiplierBatchFee)
-}
-
-// SetMultiplierBatchFee is a paid mutator transaction binding the contract method 0x1816b7e5.
-//
-// Solidity: function setMultiplierBatchFee(uint16 newMultiplierBatchFee) returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) SetMultiplierBatchFee(newMultiplierBatchFee uint16) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.SetMultiplierBatchFee(&_Polygonzkevm.TransactOpts, newMultiplierBatchFee)
-}
-
-// SetPendingStateTimeout is a paid mutator transaction binding the contract method 0x9c9f3dfe.
-//
-// Solidity: function setPendingStateTimeout(uint64 newPendingStateTimeout) returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) SetPendingStateTimeout(opts *bind.TransactOpts, newPendingStateTimeout uint64) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "setPendingStateTimeout", newPendingStateTimeout)
-}
-
-// SetPendingStateTimeout is a paid mutator transaction binding the contract method 0x9c9f3dfe.
-//
-// Solidity: function setPendingStateTimeout(uint64 newPendingStateTimeout) returns()
-func (_Polygonzkevm *PolygonzkevmSession) SetPendingStateTimeout(newPendingStateTimeout uint64) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.SetPendingStateTimeout(&_Polygonzkevm.TransactOpts, newPendingStateTimeout)
-}
-
-// SetPendingStateTimeout is a paid mutator transaction binding the contract method 0x9c9f3dfe.
-//
-// Solidity: function setPendingStateTimeout(uint64 newPendingStateTimeout) returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) SetPendingStateTimeout(newPendingStateTimeout uint64) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.SetPendingStateTimeout(&_Polygonzkevm.TransactOpts, newPendingStateTimeout)
-}
-
-// SetRouter is a paid mutator transaction binding the contract method 0xc0d78655.
-//
-// Solidity: function setRouter(address _router) returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) SetRouter(opts *bind.TransactOpts, _router common.Address) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "setRouter", _router)
-}
-
-// SetRouter is a paid mutator transaction binding the contract method 0xc0d78655.
-//
-// Solidity: function setRouter(address _router) returns()
-func (_Polygonzkevm *PolygonzkevmSession) SetRouter(_router common.Address) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.SetRouter(&_Polygonzkevm.TransactOpts, _router)
-}
-
-// SetRouter is a paid mutator transaction binding the contract method 0xc0d78655.
-//
-// Solidity: function setRouter(address _router) returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) SetRouter(_router common.Address) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.SetRouter(&_Polygonzkevm.TransactOpts, _router)
-}
-
-// SetTrustedAggregator is a paid mutator transaction binding the contract method 0xf14916d6.
-//
-// Solidity: function setTrustedAggregator(address newTrustedAggregator) returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) SetTrustedAggregator(opts *bind.TransactOpts, newTrustedAggregator common.Address) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "setTrustedAggregator", newTrustedAggregator)
-}
-
-// SetTrustedAggregator is a paid mutator transaction binding the contract method 0xf14916d6.
-//
-// Solidity: function setTrustedAggregator(address newTrustedAggregator) returns()
-func (_Polygonzkevm *PolygonzkevmSession) SetTrustedAggregator(newTrustedAggregator common.Address) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.SetTrustedAggregator(&_Polygonzkevm.TransactOpts, newTrustedAggregator)
-}
-
-// SetTrustedAggregator is a paid mutator transaction binding the contract method 0xf14916d6.
-//
-// Solidity: function setTrustedAggregator(address newTrustedAggregator) returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) SetTrustedAggregator(newTrustedAggregator common.Address) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.SetTrustedAggregator(&_Polygonzkevm.TransactOpts, newTrustedAggregator)
-}
-
-// SetTrustedAggregatorTimeout is a paid mutator transaction binding the contract method 0x394218e9.
-//
-// Solidity: function setTrustedAggregatorTimeout(uint64 newTrustedAggregatorTimeout) returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) SetTrustedAggregatorTimeout(opts *bind.TransactOpts, newTrustedAggregatorTimeout uint64) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "setTrustedAggregatorTimeout", newTrustedAggregatorTimeout)
-}
-
-// SetTrustedAggregatorTimeout is a paid mutator transaction binding the contract method 0x394218e9.
-//
-// Solidity: function setTrustedAggregatorTimeout(uint64 newTrustedAggregatorTimeout) returns()
-func (_Polygonzkevm *PolygonzkevmSession) SetTrustedAggregatorTimeout(newTrustedAggregatorTimeout uint64) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.SetTrustedAggregatorTimeout(&_Polygonzkevm.TransactOpts, newTrustedAggregatorTimeout)
-}
-
-// SetTrustedAggregatorTimeout is a paid mutator transaction binding the contract method 0x394218e9.
-//
-// Solidity: function setTrustedAggregatorTimeout(uint64 newTrustedAggregatorTimeout) returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) SetTrustedAggregatorTimeout(newTrustedAggregatorTimeout uint64) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.SetTrustedAggregatorTimeout(&_Polygonzkevm.TransactOpts, newTrustedAggregatorTimeout)
 }
 
 // SetTrustedSequencer is a paid mutator transaction binding the contract method 0x6ff512cc.
@@ -1937,27 +1412,6 @@ func (_Polygonzkevm *PolygonzkevmTransactorSession) SetTrustedSequencerURL(newTr
 	return _Polygonzkevm.Contract.SetTrustedSequencerURL(&_Polygonzkevm.TransactOpts, newTrustedSequencerURL)
 }
 
-// SetVerifyBatchTimeTarget is a paid mutator transaction binding the contract method 0xa066215c.
-//
-// Solidity: function setVerifyBatchTimeTarget(uint64 newVerifyBatchTimeTarget) returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) SetVerifyBatchTimeTarget(opts *bind.TransactOpts, newVerifyBatchTimeTarget uint64) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "setVerifyBatchTimeTarget", newVerifyBatchTimeTarget)
-}
-
-// SetVerifyBatchTimeTarget is a paid mutator transaction binding the contract method 0xa066215c.
-//
-// Solidity: function setVerifyBatchTimeTarget(uint64 newVerifyBatchTimeTarget) returns()
-func (_Polygonzkevm *PolygonzkevmSession) SetVerifyBatchTimeTarget(newVerifyBatchTimeTarget uint64) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.SetVerifyBatchTimeTarget(&_Polygonzkevm.TransactOpts, newVerifyBatchTimeTarget)
-}
-
-// SetVerifyBatchTimeTarget is a paid mutator transaction binding the contract method 0xa066215c.
-//
-// Solidity: function setVerifyBatchTimeTarget(uint64 newVerifyBatchTimeTarget) returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) SetVerifyBatchTimeTarget(newVerifyBatchTimeTarget uint64) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.SetVerifyBatchTimeTarget(&_Polygonzkevm.TransactOpts, newVerifyBatchTimeTarget)
-}
-
 // TransferAdminRole is a paid mutator transaction binding the contract method 0xada8f919.
 //
 // Solidity: function transferAdminRole(address newPendingAdmin) returns()
@@ -1977,69 +1431,6 @@ func (_Polygonzkevm *PolygonzkevmSession) TransferAdminRole(newPendingAdmin comm
 // Solidity: function transferAdminRole(address newPendingAdmin) returns()
 func (_Polygonzkevm *PolygonzkevmTransactorSession) TransferAdminRole(newPendingAdmin common.Address) (*types.Transaction, error) {
 	return _Polygonzkevm.Contract.TransferAdminRole(&_Polygonzkevm.TransactOpts, newPendingAdmin)
-}
-
-// TransferOwnership is a paid mutator transaction binding the contract method 0xf2fde38b.
-//
-// Solidity: function transferOwnership(address newOwner) returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) TransferOwnership(opts *bind.TransactOpts, newOwner common.Address) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "transferOwnership", newOwner)
-}
-
-// TransferOwnership is a paid mutator transaction binding the contract method 0xf2fde38b.
-//
-// Solidity: function transferOwnership(address newOwner) returns()
-func (_Polygonzkevm *PolygonzkevmSession) TransferOwnership(newOwner common.Address) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.TransferOwnership(&_Polygonzkevm.TransactOpts, newOwner)
-}
-
-// TransferOwnership is a paid mutator transaction binding the contract method 0xf2fde38b.
-//
-// Solidity: function transferOwnership(address newOwner) returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) TransferOwnership(newOwner common.Address) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.TransferOwnership(&_Polygonzkevm.TransactOpts, newOwner)
-}
-
-// VerifyBatches is a paid mutator transaction binding the contract method 0x621dd411.
-//
-// Solidity: function verifyBatches(uint64 pendingStateNum, uint64 initNumBatch, uint64 finalNewBatch, bytes32 newLocalExitRoot, bytes32 newStateRoot, bytes32[24] proof) returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) VerifyBatches(opts *bind.TransactOpts, pendingStateNum uint64, initNumBatch uint64, finalNewBatch uint64, newLocalExitRoot [32]byte, newStateRoot [32]byte, proof [24][32]byte) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "verifyBatches", pendingStateNum, initNumBatch, finalNewBatch, newLocalExitRoot, newStateRoot, proof)
-}
-
-// VerifyBatches is a paid mutator transaction binding the contract method 0x621dd411.
-//
-// Solidity: function verifyBatches(uint64 pendingStateNum, uint64 initNumBatch, uint64 finalNewBatch, bytes32 newLocalExitRoot, bytes32 newStateRoot, bytes32[24] proof) returns()
-func (_Polygonzkevm *PolygonzkevmSession) VerifyBatches(pendingStateNum uint64, initNumBatch uint64, finalNewBatch uint64, newLocalExitRoot [32]byte, newStateRoot [32]byte, proof [24][32]byte) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.VerifyBatches(&_Polygonzkevm.TransactOpts, pendingStateNum, initNumBatch, finalNewBatch, newLocalExitRoot, newStateRoot, proof)
-}
-
-// VerifyBatches is a paid mutator transaction binding the contract method 0x621dd411.
-//
-// Solidity: function verifyBatches(uint64 pendingStateNum, uint64 initNumBatch, uint64 finalNewBatch, bytes32 newLocalExitRoot, bytes32 newStateRoot, bytes32[24] proof) returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) VerifyBatches(pendingStateNum uint64, initNumBatch uint64, finalNewBatch uint64, newLocalExitRoot [32]byte, newStateRoot [32]byte, proof [24][32]byte) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.VerifyBatches(&_Polygonzkevm.TransactOpts, pendingStateNum, initNumBatch, finalNewBatch, newLocalExitRoot, newStateRoot, proof)
-}
-
-// VerifyBatchesTrustedAggregator is a paid mutator transaction binding the contract method 0x2b0006fa.
-//
-// Solidity: function verifyBatchesTrustedAggregator(uint64 pendingStateNum, uint64 initNumBatch, uint64 finalNewBatch, bytes32 newLocalExitRoot, bytes32 newStateRoot, bytes32[24] proof) returns()
-func (_Polygonzkevm *PolygonzkevmTransactor) VerifyBatchesTrustedAggregator(opts *bind.TransactOpts, pendingStateNum uint64, initNumBatch uint64, finalNewBatch uint64, newLocalExitRoot [32]byte, newStateRoot [32]byte, proof [24][32]byte) (*types.Transaction, error) {
-	return _Polygonzkevm.contract.Transact(opts, "verifyBatchesTrustedAggregator", pendingStateNum, initNumBatch, finalNewBatch, newLocalExitRoot, newStateRoot, proof)
-}
-
-// VerifyBatchesTrustedAggregator is a paid mutator transaction binding the contract method 0x2b0006fa.
-//
-// Solidity: function verifyBatchesTrustedAggregator(uint64 pendingStateNum, uint64 initNumBatch, uint64 finalNewBatch, bytes32 newLocalExitRoot, bytes32 newStateRoot, bytes32[24] proof) returns()
-func (_Polygonzkevm *PolygonzkevmSession) VerifyBatchesTrustedAggregator(pendingStateNum uint64, initNumBatch uint64, finalNewBatch uint64, newLocalExitRoot [32]byte, newStateRoot [32]byte, proof [24][32]byte) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.VerifyBatchesTrustedAggregator(&_Polygonzkevm.TransactOpts, pendingStateNum, initNumBatch, finalNewBatch, newLocalExitRoot, newStateRoot, proof)
-}
-
-// VerifyBatchesTrustedAggregator is a paid mutator transaction binding the contract method 0x2b0006fa.
-//
-// Solidity: function verifyBatchesTrustedAggregator(uint64 pendingStateNum, uint64 initNumBatch, uint64 finalNewBatch, bytes32 newLocalExitRoot, bytes32 newStateRoot, bytes32[24] proof) returns()
-func (_Polygonzkevm *PolygonzkevmTransactorSession) VerifyBatchesTrustedAggregator(pendingStateNum uint64, initNumBatch uint64, finalNewBatch uint64, newLocalExitRoot [32]byte, newStateRoot [32]byte, proof [24][32]byte) (*types.Transaction, error) {
-	return _Polygonzkevm.Contract.VerifyBatchesTrustedAggregator(&_Polygonzkevm.TransactOpts, pendingStateNum, initNumBatch, finalNewBatch, newLocalExitRoot, newStateRoot, proof)
 }
 
 // PolygonzkevmAcceptAdminRoleIterator is returned from FilterAcceptAdminRole and is used to iterate over the raw logs and unpacked data for AcceptAdminRole events raised by the Polygonzkevm contract.
@@ -2309,428 +1700,6 @@ func (_Polygonzkevm *PolygonzkevmFilterer) ParseActivateForceBatches(log types.L
 	return event, nil
 }
 
-// PolygonzkevmConsolidatePendingStateIterator is returned from FilterConsolidatePendingState and is used to iterate over the raw logs and unpacked data for ConsolidatePendingState events raised by the Polygonzkevm contract.
-type PolygonzkevmConsolidatePendingStateIterator struct {
-	Event *PolygonzkevmConsolidatePendingState // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *PolygonzkevmConsolidatePendingStateIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(PolygonzkevmConsolidatePendingState)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(PolygonzkevmConsolidatePendingState)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *PolygonzkevmConsolidatePendingStateIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *PolygonzkevmConsolidatePendingStateIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// PolygonzkevmConsolidatePendingState represents a ConsolidatePendingState event raised by the Polygonzkevm contract.
-type PolygonzkevmConsolidatePendingState struct {
-	NumBatch        uint64
-	StateRoot       [32]byte
-	PendingStateNum uint64
-	Raw             types.Log // Blockchain specific contextual infos
-}
-
-// FilterConsolidatePendingState is a free log retrieval operation binding the contract event 0x328d3c6c0fd6f1be0515e422f2d87e59f25922cbc2233568515a0c4bc3f8510e.
-//
-// Solidity: event ConsolidatePendingState(uint64 indexed numBatch, bytes32 stateRoot, uint64 indexed pendingStateNum)
-func (_Polygonzkevm *PolygonzkevmFilterer) FilterConsolidatePendingState(opts *bind.FilterOpts, numBatch []uint64, pendingStateNum []uint64) (*PolygonzkevmConsolidatePendingStateIterator, error) {
-
-	var numBatchRule []interface{}
-	for _, numBatchItem := range numBatch {
-		numBatchRule = append(numBatchRule, numBatchItem)
-	}
-
-	var pendingStateNumRule []interface{}
-	for _, pendingStateNumItem := range pendingStateNum {
-		pendingStateNumRule = append(pendingStateNumRule, pendingStateNumItem)
-	}
-
-	logs, sub, err := _Polygonzkevm.contract.FilterLogs(opts, "ConsolidatePendingState", numBatchRule, pendingStateNumRule)
-	if err != nil {
-		return nil, err
-	}
-	return &PolygonzkevmConsolidatePendingStateIterator{contract: _Polygonzkevm.contract, event: "ConsolidatePendingState", logs: logs, sub: sub}, nil
-}
-
-// WatchConsolidatePendingState is a free log subscription operation binding the contract event 0x328d3c6c0fd6f1be0515e422f2d87e59f25922cbc2233568515a0c4bc3f8510e.
-//
-// Solidity: event ConsolidatePendingState(uint64 indexed numBatch, bytes32 stateRoot, uint64 indexed pendingStateNum)
-func (_Polygonzkevm *PolygonzkevmFilterer) WatchConsolidatePendingState(opts *bind.WatchOpts, sink chan<- *PolygonzkevmConsolidatePendingState, numBatch []uint64, pendingStateNum []uint64) (event.Subscription, error) {
-
-	var numBatchRule []interface{}
-	for _, numBatchItem := range numBatch {
-		numBatchRule = append(numBatchRule, numBatchItem)
-	}
-
-	var pendingStateNumRule []interface{}
-	for _, pendingStateNumItem := range pendingStateNum {
-		pendingStateNumRule = append(pendingStateNumRule, pendingStateNumItem)
-	}
-
-	logs, sub, err := _Polygonzkevm.contract.WatchLogs(opts, "ConsolidatePendingState", numBatchRule, pendingStateNumRule)
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(PolygonzkevmConsolidatePendingState)
-				if err := _Polygonzkevm.contract.UnpackLog(event, "ConsolidatePendingState", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseConsolidatePendingState is a log parse operation binding the contract event 0x328d3c6c0fd6f1be0515e422f2d87e59f25922cbc2233568515a0c4bc3f8510e.
-//
-// Solidity: event ConsolidatePendingState(uint64 indexed numBatch, bytes32 stateRoot, uint64 indexed pendingStateNum)
-func (_Polygonzkevm *PolygonzkevmFilterer) ParseConsolidatePendingState(log types.Log) (*PolygonzkevmConsolidatePendingState, error) {
-	event := new(PolygonzkevmConsolidatePendingState)
-	if err := _Polygonzkevm.contract.UnpackLog(event, "ConsolidatePendingState", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// PolygonzkevmEmergencyStateActivatedIterator is returned from FilterEmergencyStateActivated and is used to iterate over the raw logs and unpacked data for EmergencyStateActivated events raised by the Polygonzkevm contract.
-type PolygonzkevmEmergencyStateActivatedIterator struct {
-	Event *PolygonzkevmEmergencyStateActivated // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *PolygonzkevmEmergencyStateActivatedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(PolygonzkevmEmergencyStateActivated)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(PolygonzkevmEmergencyStateActivated)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *PolygonzkevmEmergencyStateActivatedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *PolygonzkevmEmergencyStateActivatedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// PolygonzkevmEmergencyStateActivated represents a EmergencyStateActivated event raised by the Polygonzkevm contract.
-type PolygonzkevmEmergencyStateActivated struct {
-	Raw types.Log // Blockchain specific contextual infos
-}
-
-// FilterEmergencyStateActivated is a free log retrieval operation binding the contract event 0x2261efe5aef6fedc1fd1550b25facc9181745623049c7901287030b9ad1a5497.
-//
-// Solidity: event EmergencyStateActivated()
-func (_Polygonzkevm *PolygonzkevmFilterer) FilterEmergencyStateActivated(opts *bind.FilterOpts) (*PolygonzkevmEmergencyStateActivatedIterator, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.FilterLogs(opts, "EmergencyStateActivated")
-	if err != nil {
-		return nil, err
-	}
-	return &PolygonzkevmEmergencyStateActivatedIterator{contract: _Polygonzkevm.contract, event: "EmergencyStateActivated", logs: logs, sub: sub}, nil
-}
-
-// WatchEmergencyStateActivated is a free log subscription operation binding the contract event 0x2261efe5aef6fedc1fd1550b25facc9181745623049c7901287030b9ad1a5497.
-//
-// Solidity: event EmergencyStateActivated()
-func (_Polygonzkevm *PolygonzkevmFilterer) WatchEmergencyStateActivated(opts *bind.WatchOpts, sink chan<- *PolygonzkevmEmergencyStateActivated) (event.Subscription, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.WatchLogs(opts, "EmergencyStateActivated")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(PolygonzkevmEmergencyStateActivated)
-				if err := _Polygonzkevm.contract.UnpackLog(event, "EmergencyStateActivated", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseEmergencyStateActivated is a log parse operation binding the contract event 0x2261efe5aef6fedc1fd1550b25facc9181745623049c7901287030b9ad1a5497.
-//
-// Solidity: event EmergencyStateActivated()
-func (_Polygonzkevm *PolygonzkevmFilterer) ParseEmergencyStateActivated(log types.Log) (*PolygonzkevmEmergencyStateActivated, error) {
-	event := new(PolygonzkevmEmergencyStateActivated)
-	if err := _Polygonzkevm.contract.UnpackLog(event, "EmergencyStateActivated", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// PolygonzkevmEmergencyStateDeactivatedIterator is returned from FilterEmergencyStateDeactivated and is used to iterate over the raw logs and unpacked data for EmergencyStateDeactivated events raised by the Polygonzkevm contract.
-type PolygonzkevmEmergencyStateDeactivatedIterator struct {
-	Event *PolygonzkevmEmergencyStateDeactivated // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *PolygonzkevmEmergencyStateDeactivatedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(PolygonzkevmEmergencyStateDeactivated)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(PolygonzkevmEmergencyStateDeactivated)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *PolygonzkevmEmergencyStateDeactivatedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *PolygonzkevmEmergencyStateDeactivatedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// PolygonzkevmEmergencyStateDeactivated represents a EmergencyStateDeactivated event raised by the Polygonzkevm contract.
-type PolygonzkevmEmergencyStateDeactivated struct {
-	Raw types.Log // Blockchain specific contextual infos
-}
-
-// FilterEmergencyStateDeactivated is a free log retrieval operation binding the contract event 0x1e5e34eea33501aecf2ebec9fe0e884a40804275ea7fe10b2ba084c8374308b3.
-//
-// Solidity: event EmergencyStateDeactivated()
-func (_Polygonzkevm *PolygonzkevmFilterer) FilterEmergencyStateDeactivated(opts *bind.FilterOpts) (*PolygonzkevmEmergencyStateDeactivatedIterator, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.FilterLogs(opts, "EmergencyStateDeactivated")
-	if err != nil {
-		return nil, err
-	}
-	return &PolygonzkevmEmergencyStateDeactivatedIterator{contract: _Polygonzkevm.contract, event: "EmergencyStateDeactivated", logs: logs, sub: sub}, nil
-}
-
-// WatchEmergencyStateDeactivated is a free log subscription operation binding the contract event 0x1e5e34eea33501aecf2ebec9fe0e884a40804275ea7fe10b2ba084c8374308b3.
-//
-// Solidity: event EmergencyStateDeactivated()
-func (_Polygonzkevm *PolygonzkevmFilterer) WatchEmergencyStateDeactivated(opts *bind.WatchOpts, sink chan<- *PolygonzkevmEmergencyStateDeactivated) (event.Subscription, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.WatchLogs(opts, "EmergencyStateDeactivated")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(PolygonzkevmEmergencyStateDeactivated)
-				if err := _Polygonzkevm.contract.UnpackLog(event, "EmergencyStateDeactivated", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseEmergencyStateDeactivated is a log parse operation binding the contract event 0x1e5e34eea33501aecf2ebec9fe0e884a40804275ea7fe10b2ba084c8374308b3.
-//
-// Solidity: event EmergencyStateDeactivated()
-func (_Polygonzkevm *PolygonzkevmFilterer) ParseEmergencyStateDeactivated(log types.Log) (*PolygonzkevmEmergencyStateDeactivated, error) {
-	event := new(PolygonzkevmEmergencyStateDeactivated)
-	if err := _Polygonzkevm.contract.UnpackLog(event, "EmergencyStateDeactivated", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
 // PolygonzkevmForceBatchIterator is returned from FilterForceBatch and is used to iterate over the raw logs and unpacked data for ForceBatch events raised by the Polygonzkevm contract.
 type PolygonzkevmForceBatchIterator struct {
 	Event *PolygonzkevmForceBatch // Event containing the contract specifics and raw log
@@ -2878,6 +1847,142 @@ func (_Polygonzkevm *PolygonzkevmFilterer) ParseForceBatch(log types.Log) (*Poly
 	return event, nil
 }
 
+// PolygonzkevmInitialSequenceBatchesIterator is returned from FilterInitialSequenceBatches and is used to iterate over the raw logs and unpacked data for InitialSequenceBatches events raised by the Polygonzkevm contract.
+type PolygonzkevmInitialSequenceBatchesIterator struct {
+	Event *PolygonzkevmInitialSequenceBatches // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *PolygonzkevmInitialSequenceBatchesIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(PolygonzkevmInitialSequenceBatches)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(PolygonzkevmInitialSequenceBatches)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *PolygonzkevmInitialSequenceBatchesIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *PolygonzkevmInitialSequenceBatchesIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// PolygonzkevmInitialSequenceBatches represents a InitialSequenceBatches event raised by the Polygonzkevm contract.
+type PolygonzkevmInitialSequenceBatches struct {
+	Transactions       []byte
+	LastGlobalExitRoot [32]byte
+	Sequencer          common.Address
+	Raw                types.Log // Blockchain specific contextual infos
+}
+
+// FilterInitialSequenceBatches is a free log retrieval operation binding the contract event 0x060116213bcbf54ca19fd649dc84b59ab2bbd200ab199770e4d923e222a28e7f.
+//
+// Solidity: event InitialSequenceBatches(bytes transactions, bytes32 lastGlobalExitRoot, address sequencer)
+func (_Polygonzkevm *PolygonzkevmFilterer) FilterInitialSequenceBatches(opts *bind.FilterOpts) (*PolygonzkevmInitialSequenceBatchesIterator, error) {
+
+	logs, sub, err := _Polygonzkevm.contract.FilterLogs(opts, "InitialSequenceBatches")
+	if err != nil {
+		return nil, err
+	}
+	return &PolygonzkevmInitialSequenceBatchesIterator{contract: _Polygonzkevm.contract, event: "InitialSequenceBatches", logs: logs, sub: sub}, nil
+}
+
+// WatchInitialSequenceBatches is a free log subscription operation binding the contract event 0x060116213bcbf54ca19fd649dc84b59ab2bbd200ab199770e4d923e222a28e7f.
+//
+// Solidity: event InitialSequenceBatches(bytes transactions, bytes32 lastGlobalExitRoot, address sequencer)
+func (_Polygonzkevm *PolygonzkevmFilterer) WatchInitialSequenceBatches(opts *bind.WatchOpts, sink chan<- *PolygonzkevmInitialSequenceBatches) (event.Subscription, error) {
+
+	logs, sub, err := _Polygonzkevm.contract.WatchLogs(opts, "InitialSequenceBatches")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(PolygonzkevmInitialSequenceBatches)
+				if err := _Polygonzkevm.contract.UnpackLog(event, "InitialSequenceBatches", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseInitialSequenceBatches is a log parse operation binding the contract event 0x060116213bcbf54ca19fd649dc84b59ab2bbd200ab199770e4d923e222a28e7f.
+//
+// Solidity: event InitialSequenceBatches(bytes transactions, bytes32 lastGlobalExitRoot, address sequencer)
+func (_Polygonzkevm *PolygonzkevmFilterer) ParseInitialSequenceBatches(log types.Log) (*PolygonzkevmInitialSequenceBatches, error) {
+	event := new(PolygonzkevmInitialSequenceBatches)
+	if err := _Polygonzkevm.contract.UnpackLog(event, "InitialSequenceBatches", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
 // PolygonzkevmInitializedIterator is returned from FilterInitialized and is used to iterate over the raw logs and unpacked data for Initialized events raised by the Polygonzkevm contract.
 type PolygonzkevmInitializedIterator struct {
 	Event *PolygonzkevmInitialized // Event containing the contract specifics and raw log
@@ -3012,450 +2117,6 @@ func (_Polygonzkevm *PolygonzkevmFilterer) ParseInitialized(log types.Log) (*Pol
 	return event, nil
 }
 
-// PolygonzkevmOverridePendingStateIterator is returned from FilterOverridePendingState and is used to iterate over the raw logs and unpacked data for OverridePendingState events raised by the Polygonzkevm contract.
-type PolygonzkevmOverridePendingStateIterator struct {
-	Event *PolygonzkevmOverridePendingState // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *PolygonzkevmOverridePendingStateIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(PolygonzkevmOverridePendingState)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(PolygonzkevmOverridePendingState)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *PolygonzkevmOverridePendingStateIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *PolygonzkevmOverridePendingStateIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// PolygonzkevmOverridePendingState represents a OverridePendingState event raised by the Polygonzkevm contract.
-type PolygonzkevmOverridePendingState struct {
-	NumBatch   uint64
-	StateRoot  [32]byte
-	Aggregator common.Address
-	Raw        types.Log // Blockchain specific contextual infos
-}
-
-// FilterOverridePendingState is a free log retrieval operation binding the contract event 0xcc1b5520188bf1dd3e63f98164b577c4d75c11a619ddea692112f0d1aec4cf72.
-//
-// Solidity: event OverridePendingState(uint64 indexed numBatch, bytes32 stateRoot, address indexed aggregator)
-func (_Polygonzkevm *PolygonzkevmFilterer) FilterOverridePendingState(opts *bind.FilterOpts, numBatch []uint64, aggregator []common.Address) (*PolygonzkevmOverridePendingStateIterator, error) {
-
-	var numBatchRule []interface{}
-	for _, numBatchItem := range numBatch {
-		numBatchRule = append(numBatchRule, numBatchItem)
-	}
-
-	var aggregatorRule []interface{}
-	for _, aggregatorItem := range aggregator {
-		aggregatorRule = append(aggregatorRule, aggregatorItem)
-	}
-
-	logs, sub, err := _Polygonzkevm.contract.FilterLogs(opts, "OverridePendingState", numBatchRule, aggregatorRule)
-	if err != nil {
-		return nil, err
-	}
-	return &PolygonzkevmOverridePendingStateIterator{contract: _Polygonzkevm.contract, event: "OverridePendingState", logs: logs, sub: sub}, nil
-}
-
-// WatchOverridePendingState is a free log subscription operation binding the contract event 0xcc1b5520188bf1dd3e63f98164b577c4d75c11a619ddea692112f0d1aec4cf72.
-//
-// Solidity: event OverridePendingState(uint64 indexed numBatch, bytes32 stateRoot, address indexed aggregator)
-func (_Polygonzkevm *PolygonzkevmFilterer) WatchOverridePendingState(opts *bind.WatchOpts, sink chan<- *PolygonzkevmOverridePendingState, numBatch []uint64, aggregator []common.Address) (event.Subscription, error) {
-
-	var numBatchRule []interface{}
-	for _, numBatchItem := range numBatch {
-		numBatchRule = append(numBatchRule, numBatchItem)
-	}
-
-	var aggregatorRule []interface{}
-	for _, aggregatorItem := range aggregator {
-		aggregatorRule = append(aggregatorRule, aggregatorItem)
-	}
-
-	logs, sub, err := _Polygonzkevm.contract.WatchLogs(opts, "OverridePendingState", numBatchRule, aggregatorRule)
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(PolygonzkevmOverridePendingState)
-				if err := _Polygonzkevm.contract.UnpackLog(event, "OverridePendingState", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseOverridePendingState is a log parse operation binding the contract event 0xcc1b5520188bf1dd3e63f98164b577c4d75c11a619ddea692112f0d1aec4cf72.
-//
-// Solidity: event OverridePendingState(uint64 indexed numBatch, bytes32 stateRoot, address indexed aggregator)
-func (_Polygonzkevm *PolygonzkevmFilterer) ParseOverridePendingState(log types.Log) (*PolygonzkevmOverridePendingState, error) {
-	event := new(PolygonzkevmOverridePendingState)
-	if err := _Polygonzkevm.contract.UnpackLog(event, "OverridePendingState", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// PolygonzkevmOwnershipTransferredIterator is returned from FilterOwnershipTransferred and is used to iterate over the raw logs and unpacked data for OwnershipTransferred events raised by the Polygonzkevm contract.
-type PolygonzkevmOwnershipTransferredIterator struct {
-	Event *PolygonzkevmOwnershipTransferred // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *PolygonzkevmOwnershipTransferredIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(PolygonzkevmOwnershipTransferred)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(PolygonzkevmOwnershipTransferred)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *PolygonzkevmOwnershipTransferredIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *PolygonzkevmOwnershipTransferredIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// PolygonzkevmOwnershipTransferred represents a OwnershipTransferred event raised by the Polygonzkevm contract.
-type PolygonzkevmOwnershipTransferred struct {
-	PreviousOwner common.Address
-	NewOwner      common.Address
-	Raw           types.Log // Blockchain specific contextual infos
-}
-
-// FilterOwnershipTransferred is a free log retrieval operation binding the contract event 0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0.
-//
-// Solidity: event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
-func (_Polygonzkevm *PolygonzkevmFilterer) FilterOwnershipTransferred(opts *bind.FilterOpts, previousOwner []common.Address, newOwner []common.Address) (*PolygonzkevmOwnershipTransferredIterator, error) {
-
-	var previousOwnerRule []interface{}
-	for _, previousOwnerItem := range previousOwner {
-		previousOwnerRule = append(previousOwnerRule, previousOwnerItem)
-	}
-	var newOwnerRule []interface{}
-	for _, newOwnerItem := range newOwner {
-		newOwnerRule = append(newOwnerRule, newOwnerItem)
-	}
-
-	logs, sub, err := _Polygonzkevm.contract.FilterLogs(opts, "OwnershipTransferred", previousOwnerRule, newOwnerRule)
-	if err != nil {
-		return nil, err
-	}
-	return &PolygonzkevmOwnershipTransferredIterator{contract: _Polygonzkevm.contract, event: "OwnershipTransferred", logs: logs, sub: sub}, nil
-}
-
-// WatchOwnershipTransferred is a free log subscription operation binding the contract event 0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0.
-//
-// Solidity: event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
-func (_Polygonzkevm *PolygonzkevmFilterer) WatchOwnershipTransferred(opts *bind.WatchOpts, sink chan<- *PolygonzkevmOwnershipTransferred, previousOwner []common.Address, newOwner []common.Address) (event.Subscription, error) {
-
-	var previousOwnerRule []interface{}
-	for _, previousOwnerItem := range previousOwner {
-		previousOwnerRule = append(previousOwnerRule, previousOwnerItem)
-	}
-	var newOwnerRule []interface{}
-	for _, newOwnerItem := range newOwner {
-		newOwnerRule = append(newOwnerRule, newOwnerItem)
-	}
-
-	logs, sub, err := _Polygonzkevm.contract.WatchLogs(opts, "OwnershipTransferred", previousOwnerRule, newOwnerRule)
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(PolygonzkevmOwnershipTransferred)
-				if err := _Polygonzkevm.contract.UnpackLog(event, "OwnershipTransferred", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseOwnershipTransferred is a log parse operation binding the contract event 0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0.
-//
-// Solidity: event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
-func (_Polygonzkevm *PolygonzkevmFilterer) ParseOwnershipTransferred(log types.Log) (*PolygonzkevmOwnershipTransferred, error) {
-	event := new(PolygonzkevmOwnershipTransferred)
-	if err := _Polygonzkevm.contract.UnpackLog(event, "OwnershipTransferred", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// PolygonzkevmProveNonDeterministicPendingStateIterator is returned from FilterProveNonDeterministicPendingState and is used to iterate over the raw logs and unpacked data for ProveNonDeterministicPendingState events raised by the Polygonzkevm contract.
-type PolygonzkevmProveNonDeterministicPendingStateIterator struct {
-	Event *PolygonzkevmProveNonDeterministicPendingState // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *PolygonzkevmProveNonDeterministicPendingStateIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(PolygonzkevmProveNonDeterministicPendingState)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(PolygonzkevmProveNonDeterministicPendingState)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *PolygonzkevmProveNonDeterministicPendingStateIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *PolygonzkevmProveNonDeterministicPendingStateIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// PolygonzkevmProveNonDeterministicPendingState represents a ProveNonDeterministicPendingState event raised by the Polygonzkevm contract.
-type PolygonzkevmProveNonDeterministicPendingState struct {
-	StoredStateRoot [32]byte
-	ProvedStateRoot [32]byte
-	Raw             types.Log // Blockchain specific contextual infos
-}
-
-// FilterProveNonDeterministicPendingState is a free log retrieval operation binding the contract event 0x1f44c21118c4603cfb4e1b621dbcfa2b73efcececee2b99b620b2953d33a7010.
-//
-// Solidity: event ProveNonDeterministicPendingState(bytes32 storedStateRoot, bytes32 provedStateRoot)
-func (_Polygonzkevm *PolygonzkevmFilterer) FilterProveNonDeterministicPendingState(opts *bind.FilterOpts) (*PolygonzkevmProveNonDeterministicPendingStateIterator, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.FilterLogs(opts, "ProveNonDeterministicPendingState")
-	if err != nil {
-		return nil, err
-	}
-	return &PolygonzkevmProveNonDeterministicPendingStateIterator{contract: _Polygonzkevm.contract, event: "ProveNonDeterministicPendingState", logs: logs, sub: sub}, nil
-}
-
-// WatchProveNonDeterministicPendingState is a free log subscription operation binding the contract event 0x1f44c21118c4603cfb4e1b621dbcfa2b73efcececee2b99b620b2953d33a7010.
-//
-// Solidity: event ProveNonDeterministicPendingState(bytes32 storedStateRoot, bytes32 provedStateRoot)
-func (_Polygonzkevm *PolygonzkevmFilterer) WatchProveNonDeterministicPendingState(opts *bind.WatchOpts, sink chan<- *PolygonzkevmProveNonDeterministicPendingState) (event.Subscription, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.WatchLogs(opts, "ProveNonDeterministicPendingState")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(PolygonzkevmProveNonDeterministicPendingState)
-				if err := _Polygonzkevm.contract.UnpackLog(event, "ProveNonDeterministicPendingState", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseProveNonDeterministicPendingState is a log parse operation binding the contract event 0x1f44c21118c4603cfb4e1b621dbcfa2b73efcececee2b99b620b2953d33a7010.
-//
-// Solidity: event ProveNonDeterministicPendingState(bytes32 storedStateRoot, bytes32 provedStateRoot)
-func (_Polygonzkevm *PolygonzkevmFilterer) ParseProveNonDeterministicPendingState(log types.Log) (*PolygonzkevmProveNonDeterministicPendingState, error) {
-	event := new(PolygonzkevmProveNonDeterministicPendingState)
-	if err := _Polygonzkevm.contract.UnpackLog(event, "ProveNonDeterministicPendingState", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
 // PolygonzkevmSequenceBatchesIterator is returned from FilterSequenceBatches and is used to iterate over the raw logs and unpacked data for SequenceBatches events raised by the Polygonzkevm contract.
 type PolygonzkevmSequenceBatchesIterator struct {
 	Event *PolygonzkevmSequenceBatches // Event containing the contract specifics and raw log
@@ -3525,13 +2186,14 @@ func (it *PolygonzkevmSequenceBatchesIterator) Close() error {
 
 // PolygonzkevmSequenceBatches represents a SequenceBatches event raised by the Polygonzkevm contract.
 type PolygonzkevmSequenceBatches struct {
-	NumBatch uint64
-	Raw      types.Log // Blockchain specific contextual infos
+	NumBatch   uint64
+	L1InfoRoot [32]byte
+	Raw        types.Log // Blockchain specific contextual infos
 }
 
-// FilterSequenceBatches is a free log retrieval operation binding the contract event 0x303446e6a8cb73c83dff421c0b1d5e5ce0719dab1bff13660fc254e58cc17fce.
+// FilterSequenceBatches is a free log retrieval operation binding the contract event 0x3e54d0825ed78523037d00a81759237eb436ce774bd546993ee67a1b67b6e766.
 //
-// Solidity: event SequenceBatches(uint64 indexed numBatch)
+// Solidity: event SequenceBatches(uint64 indexed numBatch, bytes32 l1InfoRoot)
 func (_Polygonzkevm *PolygonzkevmFilterer) FilterSequenceBatches(opts *bind.FilterOpts, numBatch []uint64) (*PolygonzkevmSequenceBatchesIterator, error) {
 
 	var numBatchRule []interface{}
@@ -3546,9 +2208,9 @@ func (_Polygonzkevm *PolygonzkevmFilterer) FilterSequenceBatches(opts *bind.Filt
 	return &PolygonzkevmSequenceBatchesIterator{contract: _Polygonzkevm.contract, event: "SequenceBatches", logs: logs, sub: sub}, nil
 }
 
-// WatchSequenceBatches is a free log subscription operation binding the contract event 0x303446e6a8cb73c83dff421c0b1d5e5ce0719dab1bff13660fc254e58cc17fce.
+// WatchSequenceBatches is a free log subscription operation binding the contract event 0x3e54d0825ed78523037d00a81759237eb436ce774bd546993ee67a1b67b6e766.
 //
-// Solidity: event SequenceBatches(uint64 indexed numBatch)
+// Solidity: event SequenceBatches(uint64 indexed numBatch, bytes32 l1InfoRoot)
 func (_Polygonzkevm *PolygonzkevmFilterer) WatchSequenceBatches(opts *bind.WatchOpts, sink chan<- *PolygonzkevmSequenceBatches, numBatch []uint64) (event.Subscription, error) {
 
 	var numBatchRule []interface{}
@@ -3588,9 +2250,9 @@ func (_Polygonzkevm *PolygonzkevmFilterer) WatchSequenceBatches(opts *bind.Watch
 	}), nil
 }
 
-// ParseSequenceBatches is a log parse operation binding the contract event 0x303446e6a8cb73c83dff421c0b1d5e5ce0719dab1bff13660fc254e58cc17fce.
+// ParseSequenceBatches is a log parse operation binding the contract event 0x3e54d0825ed78523037d00a81759237eb436ce774bd546993ee67a1b67b6e766.
 //
-// Solidity: event SequenceBatches(uint64 indexed numBatch)
+// Solidity: event SequenceBatches(uint64 indexed numBatch, bytes32 l1InfoRoot)
 func (_Polygonzkevm *PolygonzkevmFilterer) ParseSequenceBatches(log types.Log) (*PolygonzkevmSequenceBatches, error) {
 	event := new(PolygonzkevmSequenceBatches)
 	if err := _Polygonzkevm.contract.UnpackLog(event, "SequenceBatches", log); err != nil {
@@ -3878,542 +2540,6 @@ func (_Polygonzkevm *PolygonzkevmFilterer) ParseSetForceBatchTimeout(log types.L
 	return event, nil
 }
 
-// PolygonzkevmSetMultiplierBatchFeeIterator is returned from FilterSetMultiplierBatchFee and is used to iterate over the raw logs and unpacked data for SetMultiplierBatchFee events raised by the Polygonzkevm contract.
-type PolygonzkevmSetMultiplierBatchFeeIterator struct {
-	Event *PolygonzkevmSetMultiplierBatchFee // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *PolygonzkevmSetMultiplierBatchFeeIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(PolygonzkevmSetMultiplierBatchFee)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(PolygonzkevmSetMultiplierBatchFee)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *PolygonzkevmSetMultiplierBatchFeeIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *PolygonzkevmSetMultiplierBatchFeeIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// PolygonzkevmSetMultiplierBatchFee represents a SetMultiplierBatchFee event raised by the Polygonzkevm contract.
-type PolygonzkevmSetMultiplierBatchFee struct {
-	NewMultiplierBatchFee uint16
-	Raw                   types.Log // Blockchain specific contextual infos
-}
-
-// FilterSetMultiplierBatchFee is a free log retrieval operation binding the contract event 0x7019933d795eba185c180209e8ae8bffbaa25bcef293364687702c31f4d302c5.
-//
-// Solidity: event SetMultiplierBatchFee(uint16 newMultiplierBatchFee)
-func (_Polygonzkevm *PolygonzkevmFilterer) FilterSetMultiplierBatchFee(opts *bind.FilterOpts) (*PolygonzkevmSetMultiplierBatchFeeIterator, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.FilterLogs(opts, "SetMultiplierBatchFee")
-	if err != nil {
-		return nil, err
-	}
-	return &PolygonzkevmSetMultiplierBatchFeeIterator{contract: _Polygonzkevm.contract, event: "SetMultiplierBatchFee", logs: logs, sub: sub}, nil
-}
-
-// WatchSetMultiplierBatchFee is a free log subscription operation binding the contract event 0x7019933d795eba185c180209e8ae8bffbaa25bcef293364687702c31f4d302c5.
-//
-// Solidity: event SetMultiplierBatchFee(uint16 newMultiplierBatchFee)
-func (_Polygonzkevm *PolygonzkevmFilterer) WatchSetMultiplierBatchFee(opts *bind.WatchOpts, sink chan<- *PolygonzkevmSetMultiplierBatchFee) (event.Subscription, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.WatchLogs(opts, "SetMultiplierBatchFee")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(PolygonzkevmSetMultiplierBatchFee)
-				if err := _Polygonzkevm.contract.UnpackLog(event, "SetMultiplierBatchFee", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseSetMultiplierBatchFee is a log parse operation binding the contract event 0x7019933d795eba185c180209e8ae8bffbaa25bcef293364687702c31f4d302c5.
-//
-// Solidity: event SetMultiplierBatchFee(uint16 newMultiplierBatchFee)
-func (_Polygonzkevm *PolygonzkevmFilterer) ParseSetMultiplierBatchFee(log types.Log) (*PolygonzkevmSetMultiplierBatchFee, error) {
-	event := new(PolygonzkevmSetMultiplierBatchFee)
-	if err := _Polygonzkevm.contract.UnpackLog(event, "SetMultiplierBatchFee", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// PolygonzkevmSetPendingStateTimeoutIterator is returned from FilterSetPendingStateTimeout and is used to iterate over the raw logs and unpacked data for SetPendingStateTimeout events raised by the Polygonzkevm contract.
-type PolygonzkevmSetPendingStateTimeoutIterator struct {
-	Event *PolygonzkevmSetPendingStateTimeout // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *PolygonzkevmSetPendingStateTimeoutIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(PolygonzkevmSetPendingStateTimeout)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(PolygonzkevmSetPendingStateTimeout)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *PolygonzkevmSetPendingStateTimeoutIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *PolygonzkevmSetPendingStateTimeoutIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// PolygonzkevmSetPendingStateTimeout represents a SetPendingStateTimeout event raised by the Polygonzkevm contract.
-type PolygonzkevmSetPendingStateTimeout struct {
-	NewPendingStateTimeout uint64
-	Raw                    types.Log // Blockchain specific contextual infos
-}
-
-// FilterSetPendingStateTimeout is a free log retrieval operation binding the contract event 0xc4121f4e22c69632ebb7cf1f462be0511dc034f999b52013eddfb24aab765c75.
-//
-// Solidity: event SetPendingStateTimeout(uint64 newPendingStateTimeout)
-func (_Polygonzkevm *PolygonzkevmFilterer) FilterSetPendingStateTimeout(opts *bind.FilterOpts) (*PolygonzkevmSetPendingStateTimeoutIterator, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.FilterLogs(opts, "SetPendingStateTimeout")
-	if err != nil {
-		return nil, err
-	}
-	return &PolygonzkevmSetPendingStateTimeoutIterator{contract: _Polygonzkevm.contract, event: "SetPendingStateTimeout", logs: logs, sub: sub}, nil
-}
-
-// WatchSetPendingStateTimeout is a free log subscription operation binding the contract event 0xc4121f4e22c69632ebb7cf1f462be0511dc034f999b52013eddfb24aab765c75.
-//
-// Solidity: event SetPendingStateTimeout(uint64 newPendingStateTimeout)
-func (_Polygonzkevm *PolygonzkevmFilterer) WatchSetPendingStateTimeout(opts *bind.WatchOpts, sink chan<- *PolygonzkevmSetPendingStateTimeout) (event.Subscription, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.WatchLogs(opts, "SetPendingStateTimeout")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(PolygonzkevmSetPendingStateTimeout)
-				if err := _Polygonzkevm.contract.UnpackLog(event, "SetPendingStateTimeout", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseSetPendingStateTimeout is a log parse operation binding the contract event 0xc4121f4e22c69632ebb7cf1f462be0511dc034f999b52013eddfb24aab765c75.
-//
-// Solidity: event SetPendingStateTimeout(uint64 newPendingStateTimeout)
-func (_Polygonzkevm *PolygonzkevmFilterer) ParseSetPendingStateTimeout(log types.Log) (*PolygonzkevmSetPendingStateTimeout, error) {
-	event := new(PolygonzkevmSetPendingStateTimeout)
-	if err := _Polygonzkevm.contract.UnpackLog(event, "SetPendingStateTimeout", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// PolygonzkevmSetTrustedAggregatorIterator is returned from FilterSetTrustedAggregator and is used to iterate over the raw logs and unpacked data for SetTrustedAggregator events raised by the Polygonzkevm contract.
-type PolygonzkevmSetTrustedAggregatorIterator struct {
-	Event *PolygonzkevmSetTrustedAggregator // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *PolygonzkevmSetTrustedAggregatorIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(PolygonzkevmSetTrustedAggregator)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(PolygonzkevmSetTrustedAggregator)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *PolygonzkevmSetTrustedAggregatorIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *PolygonzkevmSetTrustedAggregatorIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// PolygonzkevmSetTrustedAggregator represents a SetTrustedAggregator event raised by the Polygonzkevm contract.
-type PolygonzkevmSetTrustedAggregator struct {
-	NewTrustedAggregator common.Address
-	Raw                  types.Log // Blockchain specific contextual infos
-}
-
-// FilterSetTrustedAggregator is a free log retrieval operation binding the contract event 0x61f8fec29495a3078e9271456f05fb0707fd4e41f7661865f80fc437d06681ca.
-//
-// Solidity: event SetTrustedAggregator(address newTrustedAggregator)
-func (_Polygonzkevm *PolygonzkevmFilterer) FilterSetTrustedAggregator(opts *bind.FilterOpts) (*PolygonzkevmSetTrustedAggregatorIterator, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.FilterLogs(opts, "SetTrustedAggregator")
-	if err != nil {
-		return nil, err
-	}
-	return &PolygonzkevmSetTrustedAggregatorIterator{contract: _Polygonzkevm.contract, event: "SetTrustedAggregator", logs: logs, sub: sub}, nil
-}
-
-// WatchSetTrustedAggregator is a free log subscription operation binding the contract event 0x61f8fec29495a3078e9271456f05fb0707fd4e41f7661865f80fc437d06681ca.
-//
-// Solidity: event SetTrustedAggregator(address newTrustedAggregator)
-func (_Polygonzkevm *PolygonzkevmFilterer) WatchSetTrustedAggregator(opts *bind.WatchOpts, sink chan<- *PolygonzkevmSetTrustedAggregator) (event.Subscription, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.WatchLogs(opts, "SetTrustedAggregator")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(PolygonzkevmSetTrustedAggregator)
-				if err := _Polygonzkevm.contract.UnpackLog(event, "SetTrustedAggregator", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseSetTrustedAggregator is a log parse operation binding the contract event 0x61f8fec29495a3078e9271456f05fb0707fd4e41f7661865f80fc437d06681ca.
-//
-// Solidity: event SetTrustedAggregator(address newTrustedAggregator)
-func (_Polygonzkevm *PolygonzkevmFilterer) ParseSetTrustedAggregator(log types.Log) (*PolygonzkevmSetTrustedAggregator, error) {
-	event := new(PolygonzkevmSetTrustedAggregator)
-	if err := _Polygonzkevm.contract.UnpackLog(event, "SetTrustedAggregator", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// PolygonzkevmSetTrustedAggregatorTimeoutIterator is returned from FilterSetTrustedAggregatorTimeout and is used to iterate over the raw logs and unpacked data for SetTrustedAggregatorTimeout events raised by the Polygonzkevm contract.
-type PolygonzkevmSetTrustedAggregatorTimeoutIterator struct {
-	Event *PolygonzkevmSetTrustedAggregatorTimeout // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *PolygonzkevmSetTrustedAggregatorTimeoutIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(PolygonzkevmSetTrustedAggregatorTimeout)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(PolygonzkevmSetTrustedAggregatorTimeout)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *PolygonzkevmSetTrustedAggregatorTimeoutIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *PolygonzkevmSetTrustedAggregatorTimeoutIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// PolygonzkevmSetTrustedAggregatorTimeout represents a SetTrustedAggregatorTimeout event raised by the Polygonzkevm contract.
-type PolygonzkevmSetTrustedAggregatorTimeout struct {
-	NewTrustedAggregatorTimeout uint64
-	Raw                         types.Log // Blockchain specific contextual infos
-}
-
-// FilterSetTrustedAggregatorTimeout is a free log retrieval operation binding the contract event 0x1f4fa24c2e4bad19a7f3ec5c5485f70d46c798461c2e684f55bbd0fc661373a1.
-//
-// Solidity: event SetTrustedAggregatorTimeout(uint64 newTrustedAggregatorTimeout)
-func (_Polygonzkevm *PolygonzkevmFilterer) FilterSetTrustedAggregatorTimeout(opts *bind.FilterOpts) (*PolygonzkevmSetTrustedAggregatorTimeoutIterator, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.FilterLogs(opts, "SetTrustedAggregatorTimeout")
-	if err != nil {
-		return nil, err
-	}
-	return &PolygonzkevmSetTrustedAggregatorTimeoutIterator{contract: _Polygonzkevm.contract, event: "SetTrustedAggregatorTimeout", logs: logs, sub: sub}, nil
-}
-
-// WatchSetTrustedAggregatorTimeout is a free log subscription operation binding the contract event 0x1f4fa24c2e4bad19a7f3ec5c5485f70d46c798461c2e684f55bbd0fc661373a1.
-//
-// Solidity: event SetTrustedAggregatorTimeout(uint64 newTrustedAggregatorTimeout)
-func (_Polygonzkevm *PolygonzkevmFilterer) WatchSetTrustedAggregatorTimeout(opts *bind.WatchOpts, sink chan<- *PolygonzkevmSetTrustedAggregatorTimeout) (event.Subscription, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.WatchLogs(opts, "SetTrustedAggregatorTimeout")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(PolygonzkevmSetTrustedAggregatorTimeout)
-				if err := _Polygonzkevm.contract.UnpackLog(event, "SetTrustedAggregatorTimeout", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseSetTrustedAggregatorTimeout is a log parse operation binding the contract event 0x1f4fa24c2e4bad19a7f3ec5c5485f70d46c798461c2e684f55bbd0fc661373a1.
-//
-// Solidity: event SetTrustedAggregatorTimeout(uint64 newTrustedAggregatorTimeout)
-func (_Polygonzkevm *PolygonzkevmFilterer) ParseSetTrustedAggregatorTimeout(log types.Log) (*PolygonzkevmSetTrustedAggregatorTimeout, error) {
-	event := new(PolygonzkevmSetTrustedAggregatorTimeout)
-	if err := _Polygonzkevm.contract.UnpackLog(event, "SetTrustedAggregatorTimeout", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
 // PolygonzkevmSetTrustedSequencerIterator is returned from FilterSetTrustedSequencer and is used to iterate over the raw logs and unpacked data for SetTrustedSequencer events raised by the Polygonzkevm contract.
 type PolygonzkevmSetTrustedSequencerIterator struct {
 	Event *PolygonzkevmSetTrustedSequencer // Event containing the contract specifics and raw log
@@ -4682,140 +2808,6 @@ func (_Polygonzkevm *PolygonzkevmFilterer) ParseSetTrustedSequencerURL(log types
 	return event, nil
 }
 
-// PolygonzkevmSetVerifyBatchTimeTargetIterator is returned from FilterSetVerifyBatchTimeTarget and is used to iterate over the raw logs and unpacked data for SetVerifyBatchTimeTarget events raised by the Polygonzkevm contract.
-type PolygonzkevmSetVerifyBatchTimeTargetIterator struct {
-	Event *PolygonzkevmSetVerifyBatchTimeTarget // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *PolygonzkevmSetVerifyBatchTimeTargetIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(PolygonzkevmSetVerifyBatchTimeTarget)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(PolygonzkevmSetVerifyBatchTimeTarget)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *PolygonzkevmSetVerifyBatchTimeTargetIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *PolygonzkevmSetVerifyBatchTimeTargetIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// PolygonzkevmSetVerifyBatchTimeTarget represents a SetVerifyBatchTimeTarget event raised by the Polygonzkevm contract.
-type PolygonzkevmSetVerifyBatchTimeTarget struct {
-	NewVerifyBatchTimeTarget uint64
-	Raw                      types.Log // Blockchain specific contextual infos
-}
-
-// FilterSetVerifyBatchTimeTarget is a free log retrieval operation binding the contract event 0x1b023231a1ab6b5d93992f168fb44498e1a7e64cef58daff6f1c216de6a68c28.
-//
-// Solidity: event SetVerifyBatchTimeTarget(uint64 newVerifyBatchTimeTarget)
-func (_Polygonzkevm *PolygonzkevmFilterer) FilterSetVerifyBatchTimeTarget(opts *bind.FilterOpts) (*PolygonzkevmSetVerifyBatchTimeTargetIterator, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.FilterLogs(opts, "SetVerifyBatchTimeTarget")
-	if err != nil {
-		return nil, err
-	}
-	return &PolygonzkevmSetVerifyBatchTimeTargetIterator{contract: _Polygonzkevm.contract, event: "SetVerifyBatchTimeTarget", logs: logs, sub: sub}, nil
-}
-
-// WatchSetVerifyBatchTimeTarget is a free log subscription operation binding the contract event 0x1b023231a1ab6b5d93992f168fb44498e1a7e64cef58daff6f1c216de6a68c28.
-//
-// Solidity: event SetVerifyBatchTimeTarget(uint64 newVerifyBatchTimeTarget)
-func (_Polygonzkevm *PolygonzkevmFilterer) WatchSetVerifyBatchTimeTarget(opts *bind.WatchOpts, sink chan<- *PolygonzkevmSetVerifyBatchTimeTarget) (event.Subscription, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.WatchLogs(opts, "SetVerifyBatchTimeTarget")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(PolygonzkevmSetVerifyBatchTimeTarget)
-				if err := _Polygonzkevm.contract.UnpackLog(event, "SetVerifyBatchTimeTarget", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseSetVerifyBatchTimeTarget is a log parse operation binding the contract event 0x1b023231a1ab6b5d93992f168fb44498e1a7e64cef58daff6f1c216de6a68c28.
-//
-// Solidity: event SetVerifyBatchTimeTarget(uint64 newVerifyBatchTimeTarget)
-func (_Polygonzkevm *PolygonzkevmFilterer) ParseSetVerifyBatchTimeTarget(log types.Log) (*PolygonzkevmSetVerifyBatchTimeTarget, error) {
-	event := new(PolygonzkevmSetVerifyBatchTimeTarget)
-	if err := _Polygonzkevm.contract.UnpackLog(event, "SetVerifyBatchTimeTarget", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
 // PolygonzkevmTransferAdminRoleIterator is returned from FilterTransferAdminRole and is used to iterate over the raw logs and unpacked data for TransferAdminRole events raised by the Polygonzkevm contract.
 type PolygonzkevmTransferAdminRoleIterator struct {
 	Event *PolygonzkevmTransferAdminRole // Event containing the contract specifics and raw log
@@ -4944,142 +2936,6 @@ func (_Polygonzkevm *PolygonzkevmFilterer) WatchTransferAdminRole(opts *bind.Wat
 func (_Polygonzkevm *PolygonzkevmFilterer) ParseTransferAdminRole(log types.Log) (*PolygonzkevmTransferAdminRole, error) {
 	event := new(PolygonzkevmTransferAdminRole)
 	if err := _Polygonzkevm.contract.UnpackLog(event, "TransferAdminRole", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// PolygonzkevmUpdateZkEVMVersionIterator is returned from FilterUpdateZkEVMVersion and is used to iterate over the raw logs and unpacked data for UpdateZkEVMVersion events raised by the Polygonzkevm contract.
-type PolygonzkevmUpdateZkEVMVersionIterator struct {
-	Event *PolygonzkevmUpdateZkEVMVersion // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *PolygonzkevmUpdateZkEVMVersionIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(PolygonzkevmUpdateZkEVMVersion)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(PolygonzkevmUpdateZkEVMVersion)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *PolygonzkevmUpdateZkEVMVersionIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *PolygonzkevmUpdateZkEVMVersionIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// PolygonzkevmUpdateZkEVMVersion represents a UpdateZkEVMVersion event raised by the Polygonzkevm contract.
-type PolygonzkevmUpdateZkEVMVersion struct {
-	NumBatch uint64
-	ForkID   uint64
-	Version  string
-	Raw      types.Log // Blockchain specific contextual infos
-}
-
-// FilterUpdateZkEVMVersion is a free log retrieval operation binding the contract event 0xed7be53c9f1a96a481223b15568a5b1a475e01a74b347d6ca187c8bf0c078cd6.
-//
-// Solidity: event UpdateZkEVMVersion(uint64 numBatch, uint64 forkID, string version)
-func (_Polygonzkevm *PolygonzkevmFilterer) FilterUpdateZkEVMVersion(opts *bind.FilterOpts) (*PolygonzkevmUpdateZkEVMVersionIterator, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.FilterLogs(opts, "UpdateZkEVMVersion")
-	if err != nil {
-		return nil, err
-	}
-	return &PolygonzkevmUpdateZkEVMVersionIterator{contract: _Polygonzkevm.contract, event: "UpdateZkEVMVersion", logs: logs, sub: sub}, nil
-}
-
-// WatchUpdateZkEVMVersion is a free log subscription operation binding the contract event 0xed7be53c9f1a96a481223b15568a5b1a475e01a74b347d6ca187c8bf0c078cd6.
-//
-// Solidity: event UpdateZkEVMVersion(uint64 numBatch, uint64 forkID, string version)
-func (_Polygonzkevm *PolygonzkevmFilterer) WatchUpdateZkEVMVersion(opts *bind.WatchOpts, sink chan<- *PolygonzkevmUpdateZkEVMVersion) (event.Subscription, error) {
-
-	logs, sub, err := _Polygonzkevm.contract.WatchLogs(opts, "UpdateZkEVMVersion")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(PolygonzkevmUpdateZkEVMVersion)
-				if err := _Polygonzkevm.contract.UnpackLog(event, "UpdateZkEVMVersion", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseUpdateZkEVMVersion is a log parse operation binding the contract event 0xed7be53c9f1a96a481223b15568a5b1a475e01a74b347d6ca187c8bf0c078cd6.
-//
-// Solidity: event UpdateZkEVMVersion(uint64 numBatch, uint64 forkID, string version)
-func (_Polygonzkevm *PolygonzkevmFilterer) ParseUpdateZkEVMVersion(log types.Log) (*PolygonzkevmUpdateZkEVMVersion, error) {
-	event := new(PolygonzkevmUpdateZkEVMVersion)
-	if err := _Polygonzkevm.contract.UnpackLog(event, "UpdateZkEVMVersion", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
@@ -5236,162 +3092,6 @@ func (_Polygonzkevm *PolygonzkevmFilterer) WatchVerifyBatches(opts *bind.WatchOp
 func (_Polygonzkevm *PolygonzkevmFilterer) ParseVerifyBatches(log types.Log) (*PolygonzkevmVerifyBatches, error) {
 	event := new(PolygonzkevmVerifyBatches)
 	if err := _Polygonzkevm.contract.UnpackLog(event, "VerifyBatches", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// PolygonzkevmVerifyBatchesTrustedAggregatorIterator is returned from FilterVerifyBatchesTrustedAggregator and is used to iterate over the raw logs and unpacked data for VerifyBatchesTrustedAggregator events raised by the Polygonzkevm contract.
-type PolygonzkevmVerifyBatchesTrustedAggregatorIterator struct {
-	Event *PolygonzkevmVerifyBatchesTrustedAggregator // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *PolygonzkevmVerifyBatchesTrustedAggregatorIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(PolygonzkevmVerifyBatchesTrustedAggregator)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(PolygonzkevmVerifyBatchesTrustedAggregator)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *PolygonzkevmVerifyBatchesTrustedAggregatorIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *PolygonzkevmVerifyBatchesTrustedAggregatorIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// PolygonzkevmVerifyBatchesTrustedAggregator represents a VerifyBatchesTrustedAggregator event raised by the Polygonzkevm contract.
-type PolygonzkevmVerifyBatchesTrustedAggregator struct {
-	NumBatch   uint64
-	StateRoot  [32]byte
-	Aggregator common.Address
-	Raw        types.Log // Blockchain specific contextual infos
-}
-
-// FilterVerifyBatchesTrustedAggregator is a free log retrieval operation binding the contract event 0xcb339b570a7f0b25afa7333371ff11192092a0aeace12b671f4c212f2815c6fe.
-//
-// Solidity: event VerifyBatchesTrustedAggregator(uint64 indexed numBatch, bytes32 stateRoot, address indexed aggregator)
-func (_Polygonzkevm *PolygonzkevmFilterer) FilterVerifyBatchesTrustedAggregator(opts *bind.FilterOpts, numBatch []uint64, aggregator []common.Address) (*PolygonzkevmVerifyBatchesTrustedAggregatorIterator, error) {
-
-	var numBatchRule []interface{}
-	for _, numBatchItem := range numBatch {
-		numBatchRule = append(numBatchRule, numBatchItem)
-	}
-
-	var aggregatorRule []interface{}
-	for _, aggregatorItem := range aggregator {
-		aggregatorRule = append(aggregatorRule, aggregatorItem)
-	}
-
-	logs, sub, err := _Polygonzkevm.contract.FilterLogs(opts, "VerifyBatchesTrustedAggregator", numBatchRule, aggregatorRule)
-	if err != nil {
-		return nil, err
-	}
-	return &PolygonzkevmVerifyBatchesTrustedAggregatorIterator{contract: _Polygonzkevm.contract, event: "VerifyBatchesTrustedAggregator", logs: logs, sub: sub}, nil
-}
-
-// WatchVerifyBatchesTrustedAggregator is a free log subscription operation binding the contract event 0xcb339b570a7f0b25afa7333371ff11192092a0aeace12b671f4c212f2815c6fe.
-//
-// Solidity: event VerifyBatchesTrustedAggregator(uint64 indexed numBatch, bytes32 stateRoot, address indexed aggregator)
-func (_Polygonzkevm *PolygonzkevmFilterer) WatchVerifyBatchesTrustedAggregator(opts *bind.WatchOpts, sink chan<- *PolygonzkevmVerifyBatchesTrustedAggregator, numBatch []uint64, aggregator []common.Address) (event.Subscription, error) {
-
-	var numBatchRule []interface{}
-	for _, numBatchItem := range numBatch {
-		numBatchRule = append(numBatchRule, numBatchItem)
-	}
-
-	var aggregatorRule []interface{}
-	for _, aggregatorItem := range aggregator {
-		aggregatorRule = append(aggregatorRule, aggregatorItem)
-	}
-
-	logs, sub, err := _Polygonzkevm.contract.WatchLogs(opts, "VerifyBatchesTrustedAggregator", numBatchRule, aggregatorRule)
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(PolygonzkevmVerifyBatchesTrustedAggregator)
-				if err := _Polygonzkevm.contract.UnpackLog(event, "VerifyBatchesTrustedAggregator", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseVerifyBatchesTrustedAggregator is a log parse operation binding the contract event 0xcb339b570a7f0b25afa7333371ff11192092a0aeace12b671f4c212f2815c6fe.
-//
-// Solidity: event VerifyBatchesTrustedAggregator(uint64 indexed numBatch, bytes32 stateRoot, address indexed aggregator)
-func (_Polygonzkevm *PolygonzkevmFilterer) ParseVerifyBatchesTrustedAggregator(log types.Log) (*PolygonzkevmVerifyBatchesTrustedAggregator, error) {
-	event := new(PolygonzkevmVerifyBatchesTrustedAggregator)
-	if err := _Polygonzkevm.contract.UnpackLog(event, "VerifyBatchesTrustedAggregator", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
