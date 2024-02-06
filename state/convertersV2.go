@@ -19,6 +19,11 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 )
 
+const (
+	// MaxL2BlockGasLimit is the gas limit allowed per L2 block in a batch
+	MaxL2BlockGasLimit = uint64(1125899906842624)
+)
+
 var (
 	errL2BlockInvalid = errors.New("A L2 block fails, that invalidate totally the batch")
 )
@@ -33,7 +38,7 @@ func (s *State) convertToProcessBatchResponseV2(batchResponse *executor.ProcessB
 	if err != nil {
 		return nil, err
 	}
-
+	isRomOOCError = isRomOOCError || executor.IsROMOutOfCountersError(batchResponse.ErrorRom)
 	readWriteAddresses, err := convertToReadWriteAddressesV2(batchResponse.ReadWriteAddresses)
 	if err != nil {
 		return nil, err
@@ -102,6 +107,7 @@ func (s *State) convertToProcessTransactionResponseV2(responses []*executor.Proc
 	isRomOOCError := false
 
 	results := make([]*ProcessTransactionResponse, 0, len(responses))
+
 	for _, response := range responses {
 		if response.Error != executor.RomError_ROM_ERROR_NO_ERROR {
 			isRomLevelError = true
@@ -168,18 +174,6 @@ func (s *State) convertToProcessTransactionResponseV2(responses []*executor.Proc
 
 		if tx != nil {
 			result.Tx = *tx
-			log.Debugf("ProcessTransactionResponseV2[TxHash]: %v", result.TxHash)
-			if response.Error == executor.RomError_ROM_ERROR_NO_ERROR {
-				log.Debugf("ProcessTransactionResponseV2[Nonce]: %v", result.Tx.Nonce())
-			}
-			log.Debugf("ProcessTransactionResponseV2[StateRoot]: %v", result.StateRoot.String())
-			log.Debugf("ProcessTransactionResponseV2[Error]: %v", result.RomError)
-			log.Debugf("ProcessTransactionResponseV2[GasUsed]: %v", result.GasUsed)
-			log.Debugf("ProcessTransactionResponseV2[GasLeft]: %v", result.GasLeft)
-			log.Debugf("ProcessTransactionResponseV2[GasRefunded]: %v", result.GasRefunded)
-			log.Debugf("ProcessTransactionResponseV2[ChangesStateRoot]: %v", result.ChangesStateRoot)
-			log.Debugf("ProcessTransactionResponseV2[EffectiveGasPrice]: %v", result.EffectiveGasPrice)
-			log.Debugf("ProcessTransactionResponseV2[EffectivePercentage]: %v", result.EffectivePercentage)
 		}
 
 		results = append(results, result)
@@ -358,6 +352,7 @@ func convertProcessingContext(p *ProcessingContextV2) (*ProcessingContext, error
 		ForcedBatchNum: p.ForcedBatchNum,
 		BatchL2Data:    p.BatchL2Data,
 		Timestamp:      tstamp,
+		GlobalExitRoot: p.GlobalExitRoot,
 	}
 	return &result, nil
 }

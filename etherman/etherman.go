@@ -63,7 +63,7 @@ var (
 	// Events new ZkEvm/RollupBase
 	acceptAdminRoleSignatureHash        = crypto.Keccak256Hash([]byte("AcceptAdminRole(address)"))                 // Used in oldZkEvm as well
 	transferAdminRoleSignatureHash      = crypto.Keccak256Hash([]byte("TransferAdminRole(address)"))               // Used in oldZkEvm as well
-	activateForceBatchesSignatureHash   = crypto.Keccak256Hash([]byte("ActivateForceBatches()"))                   // Used in oldZkEvm as well
+	setForceBatchAddressSignatureHash   = crypto.Keccak256Hash([]byte("SetForceBatchAddress(address)"))            // Used in oldZkEvm as well
 	setForceBatchTimeoutSignatureHash   = crypto.Keccak256Hash([]byte("SetForceBatchTimeout(uint64)"))             // Used in oldZkEvm as well
 	setTrustedSequencerURLSignatureHash = crypto.Keccak256Hash([]byte("SetTrustedSequencerURL(string)"))           // Used in oldZkEvm as well
 	setTrustedSequencerSignatureHash    = crypto.Keccak256Hash([]byte("SetTrustedSequencer(address)"))             // Used in oldZkEvm as well
@@ -72,6 +72,7 @@ var (
 	forceBatchSignatureHash             = crypto.Keccak256Hash([]byte("ForceBatch(uint64,bytes32,address,bytes)")) // Used in oldZkEvm as well
 	sequenceBatchesSignatureHash        = crypto.Keccak256Hash([]byte("SequenceBatches(uint64,bytes32)"))          // Used in oldZkEvm as well
 	initialSequenceBatchesSignatureHash = crypto.Keccak256Hash([]byte("InitialSequenceBatches(bytes,bytes32,address)"))
+	updateEtrogSequenceSignatureHash    = crypto.Keccak256Hash([]byte("UpdateEtrogSequence(uint64,bytes,bytes32,address)"))
 
 	// Extra RollupManager
 	initializedSignatureHash               = crypto.Keccak256Hash([]byte("Initialized(uint64)"))                       // Initializable. Used in RollupBase as well
@@ -124,6 +125,8 @@ const (
 	L1InfoTreeOrder EventOrder = "L1InfoTreeOrder"
 	// SequenceBatchesOrder identifies a VerifyBatch event
 	SequenceBatchesOrder EventOrder = "SequenceBatches"
+	// UpdateEtrogSequenceOrder identifies a VerifyBatch event
+	UpdateEtrogSequenceOrder EventOrder = "UpdateEtrogSequence"
 	// ForcedBatchesOrder identifies a ForcedBatches event
 	ForcedBatchesOrder EventOrder = "ForcedBatches"
 	// TrustedVerifyBatchOrder identifies a TrustedVerifyBatch event
@@ -201,22 +204,32 @@ func NewClient(cfg Config, l1Config L1Config) (*Client, error) {
 	// Create smc clients
 	zkevm, err := polygonzkevm.NewPolygonzkevm(l1Config.ZkEVMAddr, ethClient)
 	if err != nil {
+		log.Errorf("error creating Polygonzkevm client (%s). Error: %w", l1Config.ZkEVMAddr.String(), err)
 		return nil, err
 	}
 	oldZkevm, err := oldpolygonzkevm.NewOldpolygonzkevm(l1Config.RollupManagerAddr, ethClient)
 	if err != nil {
+		log.Errorf("error creating NewOldpolygonzkevm client (%s). Error: %w", l1Config.RollupManagerAddr.String(), err)
 		return nil, err
 	}
 	rollupManager, err := polygonrollupmanager.NewPolygonrollupmanager(l1Config.RollupManagerAddr, ethClient)
 	if err != nil {
+		log.Errorf("error creating NewPolygonrollupmanager client (%s). Error: %w", l1Config.RollupManagerAddr.String(), err)
 		return nil, err
 	}
 	globalExitRoot, err := polygonzkevmglobalexitroot.NewPolygonzkevmglobalexitroot(l1Config.GlobalExitRootManagerAddr, ethClient)
 	if err != nil {
+		log.Errorf("error creating NewPolygonzkevmglobalexitroot client (%s). Error: %w", l1Config.GlobalExitRootManagerAddr.String(), err)
+		return nil, err
+	}
+	oldGlobalExitRoot, err := oldpolygonzkevmglobalexitroot.NewOldpolygonzkevmglobalexitroot(l1Config.GlobalExitRootManagerAddr, ethClient)
+	if err != nil {
+		log.Errorf("error creating NewOldpolygonzkevmglobalexitroot client (%s). Error: %w", l1Config.GlobalExitRootManagerAddr.String(), err)
 		return nil, err
 	}
 	pol, err := pol.NewPol(l1Config.PolAddr, ethClient)
 	if err != nil {
+		log.Errorf("error creating NewPol client (%s). Error: %w", l1Config.PolAddr.String(), err)
 		return nil, err
 	}
 	daBridgeRouter, err := dabridgerouter.NewDabridgerouter(l1Config.DABridgeRouterAddr, ethClient)
@@ -240,20 +253,21 @@ func NewClient(cfg Config, l1Config L1Config) (*Client, error) {
 	// Get RollupID
 	rollupID, err := rollupManager.RollupAddressToID(&bind.CallOpts{Pending: false}, l1Config.ZkEVMAddr)
 	if err != nil {
-		return nil, err
+		log.Debugf("error rollupManager.RollupAddressToID(%s). Error: %w", l1Config.RollupManagerAddr, err)
+		// TODO return error after the upgrade
 	}
 	log.Debug("rollupID: ", rollupID)
 
 	return &Client{
-		EthClient:             ethClient,
-		ZkEVM:                 zkevm,
-		OldZkEVM:              oldZkevm,
-		RollupManager:         rollupManager,
-		Pol:                   pol,
-		GlobalExitRootManager: globalExitRoot,
-		DABridgeRouter:        daBridgeRouter,
-		SCAddresses:           scAddresses,
-		RollupID:              rollupID,
+		EthClient:                ethClient,
+		ZkEVM:                    zkevm,
+		OldZkEVM:                 oldZkevm,
+		RollupManager:            rollupManager,
+		Pol:                      pol,
+		GlobalExitRootManager:    globalExitRoot,
+		OldGlobalExitRootManager: oldGlobalExitRoot,
+		SCAddresses:              scAddresses,
+		RollupID:                 rollupID,
 		GasProviders: externalGasProviders{
 			MultiGasProvider: cfg.MultiGasProvider,
 			Providers:        gProviders,
@@ -492,6 +506,8 @@ func (etherMan *Client) processEvent(ctx context.Context, vLog types.Log, blocks
 		return etherMan.forcedBatchEvent(ctx, vLog, blocks, blocksOrder)
 	case initialSequenceBatchesSignatureHash:
 		return etherMan.initialSequenceBatches(ctx, vLog, blocks, blocksOrder)
+	case updateEtrogSequenceSignatureHash:
+		return etherMan.updateEtrogSequence(ctx, vLog, blocks, blocksOrder)
 	case verifyBatchesTrustedAggregatorSignatureHash:
 		log.Debug("VerifyBatchesTrustedAggregator event detected. Ignoring...")
 		return nil
@@ -560,8 +576,8 @@ func (etherMan *Client) processEvent(ctx context.Context, vLog types.Log, blocks
 	case setForceBatchTimeoutSignatureHash:
 		log.Debug("SetForceBatchTimeout event detected. Ignoring...")
 		return nil
-	case activateForceBatchesSignatureHash:
-		log.Debug("ActivateForceBatches event detected. Ignoring...")
+	case setForceBatchAddressSignatureHash:
+		log.Debug("SetForceBatchAddress event detected. Ignoring...")
 		return nil
 	case transferAdminRoleSignatureHash:
 		log.Debug("TransferAdminRole event detected. Ignoring...")
@@ -658,14 +674,79 @@ func (etherMan *Client) addExistingRollup(ctx context.Context, vLog types.Log, b
 	if etherMan.RollupID != addExistingRollup.RollupID {
 		return nil
 	}
+	// TODO Delete after upgrade Get RollupID
+	rollupID, err := etherMan.RollupManager.RollupAddressToID(&bind.CallOpts{Pending: false}, etherMan.SCAddresses[0])
+	if err != nil {
+		log.Error("error getting rollupID. Error: ", err)
+		return err
+	}
+	log.Debug("rollupID: ", rollupID)
+
 	return etherMan.updateForkId(ctx, vLog, blocks, blocksOrder, addExistingRollup.LastVerifiedBatchBeforeUpgrade, addExistingRollup.ForkID, "")
+}
+
+func (etherMan *Client) updateEtrogSequence(ctx context.Context, vLog types.Log, blocks *[]Block, blocksOrder *map[common.Hash][]Order) error {
+	log.Debug("updateEtrogSequence event detected")
+	updateEtrogSequence, err := etherMan.ZkEVM.ParseUpdateEtrogSequence(vLog)
+	if err != nil {
+		log.Error("error parsing updateEtrogSequence event. Error: ", err)
+		return err
+	}
+
+	// Read the tx for this event.
+	tx, err := etherMan.EthClient.TransactionInBlock(ctx, vLog.BlockHash, vLog.TxIndex)
+	if err != nil {
+		return err
+	}
+	if tx.Hash() != vLog.TxHash {
+		return fmt.Errorf("error: tx hash mismatch. want: %s have: %s", vLog.TxHash, tx.Hash().String())
+	}
+	msg, err := core.TransactionToMessage(tx, types.NewLondonSigner(tx.ChainId()), big.NewInt(0))
+	if err != nil {
+		return err
+	}
+	fullBlock, err := etherMan.EthClient.BlockByHash(ctx, vLog.BlockHash)
+	if err != nil {
+		return fmt.Errorf("error getting fullBlockInfo. BlockNumber: %d. Error: %w", vLog.BlockNumber, err)
+	}
+
+	log.Info("update Etrog transaction sequence...")
+	sequence := UpdateEtrogSequence{
+		BatchNumber:   updateEtrogSequence.NumBatch,
+		SequencerAddr: updateEtrogSequence.Sequencer,
+		TxHash:        vLog.TxHash,
+		Nonce:         msg.Nonce,
+		PolygonRollupBaseEtrogBatchData: &polygonzkevm.PolygonRollupBaseEtrogBatchData{
+			Transactions:         updateEtrogSequence.Transactions,
+			ForcedGlobalExitRoot: updateEtrogSequence.LastGlobalExitRoot,
+			ForcedTimestamp:      fullBlock.Time(),
+			ForcedBlockHashL1:    fullBlock.ParentHash(),
+		},
+	}
+
+	if len(*blocks) == 0 || ((*blocks)[len(*blocks)-1].BlockHash != vLog.BlockHash || (*blocks)[len(*blocks)-1].BlockNumber != vLog.BlockNumber) {
+		block := prepareBlock(vLog, time.Unix(int64(fullBlock.Time()), 0), fullBlock)
+		block.UpdateEtrogSequence = sequence
+		*blocks = append(*blocks, block)
+	} else if (*blocks)[len(*blocks)-1].BlockHash == vLog.BlockHash && (*blocks)[len(*blocks)-1].BlockNumber == vLog.BlockNumber {
+		(*blocks)[len(*blocks)-1].UpdateEtrogSequence = sequence
+	} else {
+		log.Error("Error processing UpdateEtrogSequence event. BlockHash:", vLog.BlockHash, ". BlockNumber: ", vLog.BlockNumber)
+		return fmt.Errorf("error processing UpdateEtrogSequence event")
+	}
+	or := Order{
+		Name: UpdateEtrogSequenceOrder,
+		Pos:  0,
+	}
+	(*blocksOrder)[(*blocks)[len(*blocks)-1].BlockHash] = append((*blocksOrder)[(*blocks)[len(*blocks)-1].BlockHash], or)
+	return nil
 }
 
 func (etherMan *Client) initialSequenceBatches(ctx context.Context, vLog types.Log, blocks *[]Block, blocksOrder *map[common.Hash][]Order) error {
 	log.Debug("initialSequenceBatches event detected")
 	initialSequenceBatches, err := etherMan.ZkEVM.ParseInitialSequenceBatches(vLog)
 	if err != nil {
-		log.Error("error parsing createNewRollup event. Error: ", err)
+		log.Error("error parsing initialSequenceBatches event. Error: ", err)
 		return err
 	}
 
@@ -690,7 +771,7 @@ func (etherMan *Client) initialSequenceBatches(ctx context.Context, vLog types.L
 	log.Info("initial transaction sequence...")
 	sequences = append(sequences, SequencedBatch{
 		BatchNumber:   1,
-		SequencerAddr: msg.From,
+		SequencerAddr: initialSequenceBatches.Sequencer,
 		TxHash:        vLog.TxHash,
 		Nonce:         msg.Nonce,
 		PolygonRollupBaseEtrogBatchData: &polygonzkevm.PolygonRollupBaseEtrogBatchData{
@@ -891,9 +972,13 @@ func (etherMan *Client) BuildSequenceBatchesTxData(sender common.Address, sequen
 func (etherMan *Client) sequenceBatches(opts bind.TransactOpts, sequences []ethmanTypes.Sequence, l2Coinbase common.Address) (*types.Transaction, error) {
 	var batches []polygonzkevm.PolygonRollupBaseEtrogBatchData
 	for _, seq := range sequences {
+		var ger common.Hash
+		if seq.ForcedBatchTimestamp > 0 {
+			ger = seq.GlobalExitRoot
+		}
 		batch := polygonzkevm.PolygonRollupBaseEtrogBatchData{
 			Transactions:         seq.BatchL2Data,
-			ForcedGlobalExitRoot: seq.GlobalExitRoot,
+			ForcedGlobalExitRoot: ger,
 			ForcedTimestamp:      uint64(seq.ForcedBatchTimestamp),
 			ForcedBlockHashL1:    seq.PrevBlockHash,
 		}
@@ -1507,19 +1592,29 @@ func (etherMan *Client) EthBlockByNumber(ctx context.Context, blockNumber uint64
 	return block, nil
 }
 
-// GetGapLastBatchTimestamp function allows to retrieve the gaplastTimestamp value in the smc
-// TODO: If nobody uses this function delete
-func (etherMan *Client) GetGapLastBatchTimestamp() (uint64, error) {
-	return etherMan.ZkEVM.GapLastTimestamp(&bind.CallOpts{Pending: false})
-}
-
 // GetLatestBatchNumber function allows to retrieve the latest proposed batch in the smc
 func (etherMan *Client) GetLatestBatchNumber() (uint64, error) {
+	var latestBatchNum uint64
 	rollupData, err := etherMan.RollupManager.RollupIDToRollupData(&bind.CallOpts{Pending: false}, etherMan.RollupID)
 	if err != nil {
-		return 0, err
+		log.Debug("error getting latestBatchNum from rollupManager. Trying old zkevm smc... Error: ", err)
+		latestBatchNum, err = etherMan.OldZkEVM.LastBatchSequenced(&bind.CallOpts{Pending: false})
+		if err != nil {
+			return latestBatchNum, err
+		}
+	} else {
+		latestBatchNum = rollupData.LastBatchSequenced
 	}
-	return rollupData.LastBatchSequenced, nil
+	return latestBatchNum, nil
+}
+
+// GetLatestBlockHeader gets the latest block header from the ethereum
+func (etherMan *Client) GetLatestBlockHeader(ctx context.Context) (*types.Header, error) {
+	header, err := etherMan.EthClient.HeaderByNumber(ctx, big.NewInt(int64(rpc.LatestBlockNumber)))
+	if err != nil || header == nil {
+		return nil, err
+	}
+	return header, nil
 }
 
 // GetLatestBlockNumber gets the latest block number from the ethereum
@@ -1557,11 +1652,18 @@ func (etherMan *Client) GetLatestBlockTimestamp(ctx context.Context) (uint64, er
 
 // GetLatestVerifiedBatchNum gets latest verified batch from ethereum
 func (etherMan *Client) GetLatestVerifiedBatchNum() (uint64, error) {
+	var lastVerifiedBatchNum uint64
 	rollupData, err := etherMan.RollupManager.RollupIDToRollupData(&bind.CallOpts{Pending: false}, etherMan.RollupID)
 	if err != nil {
-		return 0, err
+		log.Debug("error getting lastVerifiedBatchNum from rollupManager. Trying old zkevm smc... Error: ", err)
+		lastVerifiedBatchNum, err = etherMan.OldZkEVM.LastVerifiedBatch(&bind.CallOpts{Pending: false})
+		if err != nil {
+			return lastVerifiedBatchNum, err
+		}
+	} else {
+		lastVerifiedBatchNum = rollupData.LastVerifiedBatch
 	}
-	return rollupData.LastVerifiedBatch, nil
+	return lastVerifiedBatchNum, nil
 }
 
 // GetTx function get ethereum tx
@@ -1596,16 +1698,34 @@ func (etherMan *Client) ApprovePol(ctx context.Context, account common.Address, 
 
 // GetTrustedSequencerURL Gets the trusted sequencer url from rollup smc
 func (etherMan *Client) GetTrustedSequencerURL() (string, error) {
-	return etherMan.ZkEVM.TrustedSequencerURL(&bind.CallOpts{Pending: false})
+	url, err := etherMan.ZkEVM.TrustedSequencerURL(&bind.CallOpts{Pending: false})
+	//TODO: remove this code because is for compatibility with oldZkEVM
+	if err != nil || url == "" {
+		// Getting from oldZkEVM Contract
+		log.Debug("getting trusted sequencer URL from oldZkevm smc")
+		return etherMan.OldZkEVM.TrustedSequencerURL(&bind.CallOpts{Pending: false})
+	}
+	// err is always nil
+	return url, nil
 }
 
 // GetL2ChainID returns L2 Chain ID
 func (etherMan *Client) GetL2ChainID() (uint64, error) {
-	rollupData, err := etherMan.RollupManager.RollupIDToRollupData(&bind.CallOpts{Pending: false}, etherMan.RollupID)
-	if err != nil {
-		return 0, err
+	chainID, err := etherMan.OldZkEVM.ChainID(&bind.CallOpts{Pending: false})
+	log.Debug("chainID read from oldZkevm: ", chainID)
+	if err != nil || chainID == 0 {
+		log.Debug("error from oldZkevm: ", err)
+		rollupData, err := etherMan.RollupManager.RollupIDToRollupData(&bind.CallOpts{Pending: false}, etherMan.RollupID)
+		log.Debugf("ChainID read from rollupManager: %d using rollupID: %d", rollupData.ChainID, etherMan.RollupID)
+		if err != nil {
+			log.Debug("error from rollupManager: ", err)
+			return 0, err
+		} else if rollupData.ChainID == 0 {
+			return rollupData.ChainID, fmt.Errorf("error: chainID received is 0!!")
+		}
+		return rollupData.ChainID, nil
 	}
-	return rollupData.ChainID, nil
+	return chainID, nil
 }
 
 // GetL1GasPrice gets the l1 gas price

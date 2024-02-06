@@ -280,6 +280,7 @@ func Test_RevertOnConstructorTransaction(t *testing.T) {
 
 		err = operations.WaitTxToBeMined(ctx, client, scTx, operations.DefaultTimeoutTxToBeMined)
 		errMsg := err.Error()
+		log.Debugf("Error: %v", errMsg)
 		prefix := "transaction has failed, reason: execution reverted: Today is not juernes"
 		hasPrefix := strings.HasPrefix(errMsg, prefix)
 		require.True(t, hasPrefix)
@@ -581,7 +582,7 @@ func TestEstimateTxWithDataBiggerThanMaxAllowed(t *testing.T) {
 	})
 	rpcErr := err.(rpc.Error)
 	assert.Equal(t, -32000, rpcErr.ErrorCode())
-	assert.Equal(t, "failed to estimate gas: batch_l2_data is invalid", rpcErr.Error())
+	assert.Equal(t, "batch_l2_data is invalid", rpcErr.Error())
 }
 
 func TestEstimateGas(t *testing.T) {

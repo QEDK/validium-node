@@ -8,8 +8,10 @@ import (
 
 	"github.com/0xPolygonHermez/zkevm-node/hex"
 	"github.com/0xPolygonHermez/zkevm-node/log"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/rlp"
+	"golang.org/x/crypto/sha3"
 )
 
 const (
@@ -277,7 +279,7 @@ func DecodeTx(encodedTx string) (*types.Transaction, error) {
 }
 
 // GenerateReceipt generates a receipt from a processed transaction
-func GenerateReceipt(blockNumber *big.Int, processedTx *ProcessTransactionResponse) *types.Receipt {
+func GenerateReceipt(blockNumber *big.Int, processedTx *ProcessTransactionResponse, txIndex uint) *types.Receipt {
 	receipt := &types.Receipt{
 		Type:              uint8(processedTx.Type),
 		PostState:         processedTx.StateRoot.Bytes(),
@@ -285,7 +287,7 @@ func GenerateReceipt(blockNumber *big.Int, processedTx *ProcessTransactionRespon
 		BlockNumber:       blockNumber,
 		GasUsed:           processedTx.GasUsed,
 		TxHash:            processedTx.Tx.Hash(),
-		TransactionIndex:  0,
+		TransactionIndex:  txIndex,
 		ContractAddress:   processedTx.CreateAddress,
 		Logs:              processedTx.Logs,
 	}
@@ -345,4 +347,11 @@ func CheckLogOrder(logs []*types.Log) bool {
 // Ptr returns a pointer for any instance
 func Ptr[T any](v T) *T {
 	return &v
+}
+
+// HashByteArray returns the hash of the given byte array
+func HashByteArray(data []byte) common.Hash {
+	sha := sha3.NewLegacyKeccak256()
+	sha.Write(data)
+	return common.BytesToHash(sha.Sum(nil))
 }

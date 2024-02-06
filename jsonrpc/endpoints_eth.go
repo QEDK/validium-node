@@ -18,6 +18,7 @@ import (
 	"github.com/0xPolygonHermez/zkevm-node/pool"
 	"github.com/0xPolygonHermez/zkevm-node/state"
 	"github.com/0xPolygonHermez/zkevm-node/state/runtime"
+	"github.com/0xPolygonHermez/zkevm-node/state/runtime/executor"
 	"github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/jackc/pgx/v4"
@@ -97,7 +98,7 @@ func (e *EthEndpoints) Call(arg *types.TxArgs, blockArg *types.BlockNumberOrHash
 		}
 
 		defaultSenderAddress := common.HexToAddress(state.DefaultSenderAddress)
-		sender, tx, err := arg.ToTransaction(ctx, e.state, e.cfg.MaxCumulativeGasUsed, block.Root(), defaultSenderAddress, dbTx)
+		sender, tx, err := arg.ToTransaction(ctx, e.state, state.MaxTxGasLimit, block.Root(), defaultSenderAddress, dbTx)
 		if err != nil {
 			return RPCErrorResponse(types.DefaultErrorCode, "failed to convert arguments into an unsigned transaction", err, false)
 		}
@@ -105,7 +106,7 @@ func (e *EthEndpoints) Call(arg *types.TxArgs, blockArg *types.BlockNumberOrHash
 		result, err := e.state.ProcessUnsignedTransaction(ctx, tx, sender, blockToProcess, true, dbTx)
 		if err != nil {
 			errMsg := fmt.Sprintf("failed to execute the unsigned transaction: %v", err.Error())
-			logError := !runtime.IsOutOfCounterError(err) && !errors.Is(err, runtime.ErrOutOfGas)
+			logError := !executor.IsROMOutOfCountersError(executor.RomErrorCode(err)) && !errors.Is(err, runtime.ErrOutOfGas)
 			return RPCErrorResponse(types.DefaultErrorCode, errMsg, nil, logError)
 		}
 
@@ -181,7 +182,7 @@ func (e *EthEndpoints) EstimateGas(arg *types.TxArgs, blockArg *types.BlockNumbe
 		}
 
 		defaultSenderAddress := common.HexToAddress(state.DefaultSenderAddress)
-		sender, tx, err := arg.ToTransaction(ctx, e.state, e.cfg.MaxCumulativeGasUsed, block.Root(), defaultSenderAddress, dbTx)
+		sender, tx, err := arg.ToTransaction(ctx, e.state, state.MaxTxGasLimit, block.Root(), defaultSenderAddress, dbTx)
 		if err != nil {
 			return RPCErrorResponse(types.DefaultErrorCode, "failed to convert arguments into an unsigned transaction", err, false)
 		}
@@ -192,8 +193,7 @@ func (e *EthEndpoints) EstimateGas(arg *types.TxArgs, blockArg *types.BlockNumbe
 			copy(data, returnValue)
 			return nil, types.NewRPCErrorWithData(types.RevertedErrorCode, err.Error(), data)
 		} else if err != nil {
-			errMsg := fmt.Sprintf("failed to estimate gas: %v", err.Error())
-			return nil, types.NewRPCError(types.DefaultErrorCode, errMsg)
+			return nil, types.NewRPCError(types.DefaultErrorCode, err.Error())
 		}
 		return hex.EncodeUint64(gasEstimation), nil
 	})
@@ -228,6 +228,23 @@ func (e *EthEndpoints) getPriceFromSequencerNode() (interface{}, types.Error) {
 		return RPCErrorResponse(types.DefaultErrorCode, "failed to read gas price from sequencer node", err, true)
 	}
 	return gasPrice, nil
+}
+
+func (e *EthEndpoints) getHighestL2BlockFromTrustedNode() (interface{}, types.Error) {
+	res, err := client.JSONRPCCall(e.cfg.SequencerNodeURI, "eth_blockNumber")
+	if err != nil {
+		return RPCErrorResponse(types.DefaultErrorCode, "failed to get gas price from sequencer node", err, true)
+	}
+
+	if res.Error != nil {
+		return RPCErrorResponse(res.Error.Code, res.Error.Message, nil, false)
+	}
+	var highestBlockNum types.ArgUint64
+	err = json.Unmarshal(res.Result, &highestBlockNum)
+	if err != nil {
+		return RPCErrorResponse(types.DefaultErrorCode, "failed to read eth_blockNumber from sequencer node", err, true)
+	}
+	return uint64(highestBlockNum), nil
 }
 
 // GetBalance returns the account's balance at the referenced block
@@ -286,7 +303,7 @@ func (e *EthEndpoints) getBlockByArg(ctx context.Context, blockArg *types.BlockN
 }
 
 // GetBlockByHash returns information about a block by hash
-func (e *EthEndpoints) GetBlockByHash(hash types.ArgHash, fullTx bool) (interface{}, types.Error) {
+func (e *EthEndpoints) GetBlockByHash(hash types.ArgHash, fullTx bool, includeExtraInfo *bool) (interface{}, types.Error) {
 	return e.txMan.NewDbTxScope(e.state, func(ctx context.Context, dbTx pgx.Tx) (interface{}, types.Error) {
 		l2Block, err := e.state.GetL2BlockByHash(ctx, hash.Hash(), dbTx)
 		if errors.Is(err, state.ErrNotFound) {
@@ -305,7 +322,7 @@ func (e *EthEndpoints) GetBlockByHash(hash types.ArgHash, fullTx bool) (interfac
 			receipts = append(receipts, *receipt)
 		}
 
-		rpcBlock, err := types.NewBlock(state.Ptr(l2Block.Hash()), l2Block, receipts, fullTx, false)
+		rpcBlock, err := types.NewBlock(ctx, e.state, state.Ptr(l2Block.Hash()), l2Block, receipts, fullTx, false, includeExtraInfo, dbTx)
 		if err != nil {
 			return RPCErrorResponse(types.DefaultErrorCode, fmt.Sprintf("couldn't build block response for block by hash %v", hash.Hash()), err, true)
 		}
@@ -315,7 +332,7 @@ func (e *EthEndpoints) GetBlockByHash(hash types.ArgHash, fullTx bool) (interfac
 }
 
 // GetBlockByNumber returns information about a block by block number
-func (e *EthEndpoints) GetBlockByNumber(number types.BlockNumber, fullTx bool) (interface{}, types.Error) {
+func (e *EthEndpoints) GetBlockByNumber(number types.BlockNumber, fullTx bool, includeExtraInfo *bool) (interface{}, types.Error) {
 	return e.txMan.NewDbTxScope(e.state, func(ctx context.Context, dbTx pgx.Tx) (interface{}, types.Error) {
 		if number == types.PendingBlockNumber {
 			lastBlock, err := e.state.GetLastL2Block(ctx, dbTx)
@@ -329,7 +346,7 @@ func (e *EthEndpoints) GetBlockByNumber(number types.BlockNumber, fullTx bool) (
 				UncleHash:  ethTypes.EmptyUncleHash,
 			})
 			l2Block := state.NewL2BlockWithHeader(l2Header)
-			rpcBlock, err := types.NewBlock(nil, l2Block, nil, fullTx, false)
+			rpcBlock, err := types.NewBlock(ctx, e.state, nil, l2Block, nil, fullTx, false, includeExtraInfo, dbTx)
 			if err != nil {
 				return RPCErrorResponse(types.DefaultErrorCode, "couldn't build the pending block response", err, true)
 			}
@@ -359,7 +376,7 @@ func (e *EthEndpoints) GetBlockByNumber(number types.BlockNumber, fullTx bool) (
 			receipts = append(receipts, *receipt)
 		}
 
-		rpcBlock, err := types.NewBlock(state.Ptr(l2Block.Hash()), l2Block, receipts, fullTx, false)
+		rpcBlock, err := types.NewBlock(ctx, e.state, state.Ptr(l2Block.Hash()), l2Block, receipts, fullTx, false, includeExtraInfo, dbTx)
 		if err != nil {
 			return RPCErrorResponse(types.DefaultErrorCode, fmt.Sprintf("couldn't build block response for block by number %v", blockNumber), err, true)
 		}
@@ -437,6 +454,10 @@ func (e *EthEndpoints) GetFilterChanges(filterID string) (interface{}, types.Err
 	case FilterTypeLog:
 		{
 			filterParameters := filter.Parameters.(LogFilter)
+			if filterParameters.FromBlock == nil {
+				bn := types.BlockNumber(0)
+				filterParameters.FromBlock = &bn
+			}
 			filterParameters.Since = &filter.LastPoll
 
 			resInterface, err := e.internalGetLogs(context.Background(), nil, filterParameters)
@@ -486,6 +507,11 @@ func (e *EthEndpoints) GetLogs(filter LogFilter) (interface{}, types.Error) {
 }
 
 func (e *EthEndpoints) internalGetLogs(ctx context.Context, dbTx pgx.Tx, filter LogFilter) (interface{}, types.Error) {
+	if filter.FromBlock == nil {
+		l := types.LatestBlockNumber
+		filter.FromBlock = &l
+	}
+
 	fromBlockNumber, toBlockNumber, rpcErr := filter.GetNumericBlockNumbers(ctx, e.cfg, e.state, e.etherman, dbTx)
 	if rpcErr != nil {
 		return nil, rpcErr
@@ -538,7 +564,7 @@ func (e *EthEndpoints) GetStorageAt(address types.ArgAddress, storageKeyStr stri
 
 // GetTransactionByBlockHashAndIndex returns information about a transaction by
 // block hash and transaction index position.
-func (e *EthEndpoints) GetTransactionByBlockHashAndIndex(hash types.ArgHash, index types.Index) (interface{}, types.Error) {
+func (e *EthEndpoints) GetTransactionByBlockHashAndIndex(hash types.ArgHash, index types.Index, includeExtraInfo *bool) (interface{}, types.Error) {
 	return e.txMan.NewDbTxScope(e.state, func(ctx context.Context, dbTx pgx.Tx) (interface{}, types.Error) {
 		tx, err := e.state.GetTransactionByL2BlockHashAndIndex(ctx, hash.Hash(), uint64(index), dbTx)
 		if errors.Is(err, state.ErrNotFound) {
@@ -554,7 +580,16 @@ func (e *EthEndpoints) GetTransactionByBlockHashAndIndex(hash types.ArgHash, ind
 			return RPCErrorResponse(types.DefaultErrorCode, "failed to get transaction receipt", err, true)
 		}
 
-		res, err := types.NewTransaction(*tx, receipt, false)
+		var l2Hash *common.Hash
+		if includeExtraInfo != nil && *includeExtraInfo {
+			l2h, err := e.state.GetL2TxHashByTxHash(ctx, tx.Hash(), dbTx)
+			if err != nil {
+				return RPCErrorResponse(types.DefaultErrorCode, "failed to get l2 transaction hash", err, true)
+			}
+			l2Hash = l2h
+		}
+
+		res, err := types.NewTransaction(*tx, receipt, false, l2Hash)
 		if err != nil {
 			return RPCErrorResponse(types.DefaultErrorCode, "failed to build transaction response", err, true)
 		}
@@ -565,7 +600,7 @@ func (e *EthEndpoints) GetTransactionByBlockHashAndIndex(hash types.ArgHash, ind
 
 // GetTransactionByBlockNumberAndIndex returns information about a transaction by
 // block number and transaction index position.
-func (e *EthEndpoints) GetTransactionByBlockNumberAndIndex(number *types.BlockNumber, index types.Index) (interface{}, types.Error) {
+func (e *EthEndpoints) GetTransactionByBlockNumberAndIndex(number *types.BlockNumber, index types.Index, includeExtraInfo *bool) (interface{}, types.Error) {
 	return e.txMan.NewDbTxScope(e.state, func(ctx context.Context, dbTx pgx.Tx) (interface{}, types.Error) {
 		var err error
 		blockNumber, rpcErr := number.GetNumericBlockNumber(ctx, e.state, e.etherman, dbTx)
@@ -587,7 +622,16 @@ func (e *EthEndpoints) GetTransactionByBlockNumberAndIndex(number *types.BlockNu
 			return RPCErrorResponse(types.DefaultErrorCode, "failed to get transaction receipt", err, true)
 		}
 
-		res, err := types.NewTransaction(*tx, receipt, false)
+		var l2Hash *common.Hash
+		if includeExtraInfo != nil && *includeExtraInfo {
+			l2h, err := e.state.GetL2TxHashByTxHash(ctx, tx.Hash(), dbTx)
+			if err != nil {
+				return RPCErrorResponse(types.DefaultErrorCode, "failed to get l2 transaction hash", err, true)
+			}
+			l2Hash = l2h
+		}
+
+		res, err := types.NewTransaction(*tx, receipt, false, l2Hash)
 		if err != nil {
 			return RPCErrorResponse(types.DefaultErrorCode, "failed to build transaction response", err, true)
 		}
@@ -597,7 +641,7 @@ func (e *EthEndpoints) GetTransactionByBlockNumberAndIndex(number *types.BlockNu
 }
 
 // GetTransactionByHash returns a transaction by his hash
-func (e *EthEndpoints) GetTransactionByHash(hash types.ArgHash) (interface{}, types.Error) {
+func (e *EthEndpoints) GetTransactionByHash(hash types.ArgHash, includeExtraInfo *bool) (interface{}, types.Error) {
 	return e.txMan.NewDbTxScope(e.state, func(ctx context.Context, dbTx pgx.Tx) (interface{}, types.Error) {
 		// try to get tx from state
 		tx, err := e.state.GetTransactionByHash(ctx, hash.Hash(), dbTx)
@@ -612,7 +656,16 @@ func (e *EthEndpoints) GetTransactionByHash(hash types.ArgHash) (interface{}, ty
 				return RPCErrorResponse(types.DefaultErrorCode, "failed to load transaction receipt from state", err, true)
 			}
 
-			res, err := types.NewTransaction(*tx, receipt, false)
+			var l2Hash *common.Hash
+			if includeExtraInfo != nil && *includeExtraInfo {
+				l2h, err := e.state.GetL2TxHashByTxHash(ctx, hash.Hash(), dbTx)
+				if err != nil {
+					return RPCErrorResponse(types.DefaultErrorCode, "failed to get l2 transaction hash", err, true)
+				}
+				l2Hash = l2h
+			}
+
+			res, err := types.NewTransaction(*tx, receipt, false, l2Hash)
 			if err != nil {
 				return RPCErrorResponse(types.DefaultErrorCode, "failed to build transaction response", err, true)
 			}
@@ -622,7 +675,7 @@ func (e *EthEndpoints) GetTransactionByHash(hash types.ArgHash) (interface{}, ty
 
 		// if the tx does not exist in the state, look for it in the pool
 		if e.cfg.SequencerNodeURI != "" {
-			return e.getTransactionByHashFromSequencerNode(hash.Hash())
+			return e.getTransactionByHashFromSequencerNode(hash.Hash(), includeExtraInfo)
 		}
 		poolTx, err := e.pool.GetTransactionByHash(ctx, hash.Hash())
 		if errors.Is(err, pool.ErrNotFound) {
@@ -632,7 +685,7 @@ func (e *EthEndpoints) GetTransactionByHash(hash types.ArgHash) (interface{}, ty
 		}
 		if poolTx.Status == pool.TxStatusPending {
 			tx = &poolTx.Transaction
-			res, err := types.NewTransaction(*tx, nil, false)
+			res, err := types.NewTransaction(*tx, nil, false, nil)
 			if err != nil {
 				return RPCErrorResponse(types.DefaultErrorCode, "failed to build transaction response", err, true)
 			}
@@ -642,8 +695,12 @@ func (e *EthEndpoints) GetTransactionByHash(hash types.ArgHash) (interface{}, ty
 	})
 }
 
-func (e *EthEndpoints) getTransactionByHashFromSequencerNode(hash common.Hash) (interface{}, types.Error) {
-	res, err := client.JSONRPCCall(e.cfg.SequencerNodeURI, "eth_getTransactionByHash", hash.String())
+func (e *EthEndpoints) getTransactionByHashFromSequencerNode(hash common.Hash, includeExtraInfo *bool) (interface{}, types.Error) {
+	extraInfo := false
+	if includeExtraInfo != nil {
+		extraInfo = *includeExtraInfo
+	}
+	res, err := client.JSONRPCCall(e.cfg.SequencerNodeURI, "eth_getTransactionByHash", hash.String(), extraInfo)
 	if err != nil {
 		return RPCErrorResponse(types.DefaultErrorCode, "failed to get tx from sequencer node", err, true)
 	}
@@ -799,7 +856,7 @@ func (e *EthEndpoints) GetTransactionReceipt(hash types.ArgHash) (interface{}, t
 			return RPCErrorResponse(types.DefaultErrorCode, "failed to get tx receipt from state", err, true)
 		}
 
-		receipt, err := types.NewReceipt(*tx, r)
+		receipt, err := types.NewReceipt(*tx, r, nil)
 		if err != nil {
 			return RPCErrorResponse(types.DefaultErrorCode, "failed to build the receipt response", err, true)
 		}
@@ -952,10 +1009,23 @@ func (e *EthEndpoints) Syncing() (interface{}, types.Error) {
 			return RPCErrorResponse(types.DefaultErrorCode, "failed to get syncing info from state", err, true)
 		}
 
-		if syncInfo.CurrentBlockNumber >= syncInfo.LastBlockNumberSeen {
+		if !syncInfo.IsSynchronizing {
 			return false, nil
 		}
-
+		if e.cfg.SequencerNodeURI != "" {
+			// If we have a trusted node we ask it for the highest l2 block
+			res, err := e.getHighestL2BlockFromTrustedNode()
+			if err != nil {
+				log.Warnf("failed to get highest l2 block from trusted node: %v", err)
+			} else {
+				highestL2BlockInTrusted := res.(uint64)
+				if highestL2BlockInTrusted > syncInfo.CurrentBlockNumber {
+					syncInfo.EstimatedHighestBlock = highestL2BlockInTrusted
+				} else {
+					log.Warnf("highest l2 block in trusted node (%d) is lower than the current block number in the state (%d)", highestL2BlockInTrusted, syncInfo.CurrentBlockNumber)
+				}
+			}
+		}
 		return struct {
 			S types.ArgUint64 `json:"startingBlock"`
 			C types.ArgUint64 `json:"currentBlock"`
@@ -963,7 +1033,7 @@ func (e *EthEndpoints) Syncing() (interface{}, types.Error) {
 		}{
 			S: types.ArgUint64(syncInfo.InitialSyncingBlock),
 			C: types.ArgUint64(syncInfo.CurrentBlockNumber),
-			H: types.ArgUint64(syncInfo.LastBlockNumberSeen),
+			H: types.ArgUint64(syncInfo.EstimatedHighestBlock),
 		}, nil
 	})
 }
@@ -1076,7 +1146,7 @@ func (e *EthEndpoints) notifyNewHeads(wg *sync.WaitGroup, event state.NewL2Block
 	defer wg.Done()
 	start := time.Now()
 
-	b, err := types.NewBlock(state.Ptr(event.Block.Hash()), &event.Block, nil, false, false)
+	b, err := types.NewBlock(context.Background(), e.state, state.Ptr(event.Block.Hash()), &event.Block, nil, false, false, state.Ptr(false), nil)
 	if err != nil {
 		log.Errorf("failed to build block response to subscription: %v", err)
 		return

@@ -33,7 +33,7 @@ type syncTrustedBatchesStateInterface interface {
 	OpenBatch(ctx context.Context, processingContext state.ProcessingContext, dbTx pgx.Tx) error
 	CloseBatch(ctx context.Context, receipt state.ProcessingReceipt, dbTx pgx.Tx) error
 	ProcessBatch(ctx context.Context, request state.ProcessRequest, updateMerkleTree bool) (*state.ProcessBatchResponse, error)
-	StoreTransaction(ctx context.Context, batchNumber uint64, processedTx *state.ProcessTransactionResponse, coinbase common.Address, timestamp uint64, egpLog *state.EffectiveGasPriceLog, dbTx pgx.Tx) (*state.L2Header, error)
+	StoreTransaction(ctx context.Context, batchNumber uint64, processedTx *state.ProcessTransactionResponse, coinbase common.Address, timestamp uint64, egpLog *state.EffectiveGasPriceLog, globalExitRoot, blockInfoRoot common.Hash, dbTx pgx.Tx) (*state.L2Header, error)
 	GetBatchByNumber(ctx context.Context, batchNumber uint64, dbTx pgx.Tx) (*state.Batch, error)
 	GetForkIDByBatchNumber(batchNumber uint64) uint64
 	ResetTrustedState(ctx context.Context, batchNumber uint64, dbTx pgx.Tx) error
@@ -68,21 +68,35 @@ func NewSyncTrustedStateExecutor(zkEVMClient zkEVMClientInterface, state syncTru
 	}
 }
 
+// GetCachedBatch implements syncinterfaces.SyncTrustedStateExecutor. Returns a cached batch
+func (s *SyncTrustedBatchesAction) GetCachedBatch(batchNumber uint64) *state.Batch {
+	if s.TrustedState.LastTrustedBatches == nil {
+		return nil
+	}
+	for _, batch := range s.TrustedState.LastTrustedBatches {
+		if batch.BatchNumber == batchNumber {
+			return batch
+		}
+	}
+	return nil
+}
+
 // SyncTrustedState synchronizes information from the trusted sequencer
 // related to the trusted state when the node has all the information from
 // l1 synchronized
-func (s *SyncTrustedBatchesAction) SyncTrustedState(ctx context.Context, latestSyncedBatch uint64) error {
+func (s *SyncTrustedBatchesAction) SyncTrustedState(ctx context.Context, latestSyncedBatch uint64, maximumBatchNumberToProcess uint64) error {
 	log.Info("syncTrustedState: Getting trusted state info")
 	start := time.Now()
-	lastTrustedStateBatchNumber, err := s.zkEVMClient.BatchNumber(ctx)
+	lastTrustedStateBatchNumberSeen, err := s.zkEVMClient.BatchNumber(ctx)
 	metrics.GetTrustedBatchNumberTime(time.Since(start))
 	if err != nil {
 		log.Warn("syncTrustedState: error syncing trusted state. Error: ", err)
 		return err
 	}
-
+	lastTrustedStateBatchNumber := min(lastTrustedStateBatchNumberSeen, maximumBatchNumberToProcess)
 	log.Debug("syncTrustedState: lastTrustedStateBatchNumber ", lastTrustedStateBatchNumber)
 	log.Debug("syncTrustedState: latestSyncedBatch ", latestSyncedBatch)
+	log.Debug("syncTrustedState: lastTrustedStateBatchNumberSeen ", lastTrustedStateBatchNumberSeen)
 	if lastTrustedStateBatchNumber < latestSyncedBatch {
 		return nil
 	}
@@ -449,7 +463,7 @@ func (s *SyncTrustedBatchesAction) processAndStoreTxs(ctx context.Context, trust
 			if state.IsStateRootChanged(executor.RomErrorCode(tx.RomError)) {
 				log.Infof("TrustedBatch info: %+v", processBatchResp)
 				log.Infof("Storing trusted tx %+v", tx)
-				if _, err = s.state.StoreTransaction(ctx, uint64(trustedBatch.Number), tx, trustedBatch.Coinbase, uint64(trustedBatch.Timestamp), nil, dbTx); err != nil {
+				if _, err = s.state.StoreTransaction(ctx, uint64(trustedBatch.Number), tx, trustedBatch.Coinbase, uint64(trustedBatch.Timestamp), nil, block.GlobalExitRoot, block.BlockInfoRoot, dbTx); err != nil {
 					log.Errorf("failed to store transactions for batch: %v. Tx: %s", trustedBatch.Number, tx.TxHash.String())
 					return nil, err
 				}

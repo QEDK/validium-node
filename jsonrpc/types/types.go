@@ -63,7 +63,7 @@ func (b *ArgBytes) UnmarshalText(input []byte) error {
 		return nil
 	}
 	aux := make([]byte, len(hh))
-	copy(aux[:], hh[:])
+	copy(aux, hh)
 	*b = aux
 	return nil
 }
@@ -259,12 +259,12 @@ type Block struct {
 	Hash            *common.Hash        `json:"hash"`
 	Transactions    []TransactionOrHash `json:"transactions"`
 	Uncles          []common.Hash       `json:"uncles"`
-	GlobalExitRoot  common.Hash         `json:"globalExitRoot"`
-	BlockInfoRoot   common.Hash         `json:"blockInfoRoot"`
+	GlobalExitRoot  *common.Hash        `json:"globalExitRoot,omitempty"`
+	BlockInfoRoot   *common.Hash        `json:"blockInfoRoot,omitempty"`
 }
 
 // NewBlock creates a Block instance
-func NewBlock(hash *common.Hash, b *state.L2Block, receipts []types.Receipt, fullTx, includeReceipts bool) (*Block, error) {
+func NewBlock(ctx context.Context, st StateInterface, hash *common.Hash, b *state.L2Block, receipts []types.Receipt, fullTx, includeReceipts bool, includeExtraInfo *bool, dbTx pgx.Tx) (*Block, error) {
 	h := b.Header()
 
 	var miner *common.Address
@@ -304,8 +304,11 @@ func NewBlock(hash *common.Hash, b *state.L2Block, receipts []types.Receipt, ful
 		Hash:            hash,
 		Transactions:    []TransactionOrHash{},
 		Uncles:          []common.Hash{},
-		GlobalExitRoot:  h.GlobalExitRoot,
-		BlockInfoRoot:   h.BlockInfoRoot,
+	}
+
+	if includeExtraInfo != nil && *includeExtraInfo {
+		res.GlobalExitRoot = &h.GlobalExitRoot
+		res.BlockInfoRoot = &h.BlockInfoRoot
 	}
 
 	receiptsMap := make(map[common.Hash]types.Receipt, len(receipts))
@@ -320,7 +323,16 @@ func NewBlock(hash *common.Hash, b *state.L2Block, receipts []types.Receipt, ful
 				receiptPtr = &receipt
 			}
 
-			rpcTx, err := NewTransaction(*tx, receiptPtr, includeReceipts)
+			var l2Hash *common.Hash
+			if includeExtraInfo != nil && *includeExtraInfo {
+				l2h, err := st.GetL2TxHashByTxHash(ctx, tx.Hash(), dbTx)
+				if err != nil {
+					return nil, err
+				}
+				l2Hash = l2h
+			}
+
+			rpcTx, err := NewTransaction(*tx, receiptPtr, includeReceipts, l2Hash)
 			if err != nil {
 				return nil, err
 			}
@@ -365,7 +377,7 @@ type Batch struct {
 }
 
 // NewBatch creates a Batch instance
-func NewBatch(batch *state.Batch, virtualBatch *state.VirtualBatch, verifiedBatch *state.VerifiedBatch, blocks []state.L2Block, receipts []types.Receipt, fullTx, includeReceipts bool, ger *state.GlobalExitRoot) (*Batch, error) {
+func NewBatch(ctx context.Context, st StateInterface, batch *state.Batch, virtualBatch *state.VirtualBatch, verifiedBatch *state.VerifiedBatch, blocks []state.L2Block, receipts []types.Receipt, fullTx, includeReceipts bool, ger *state.GlobalExitRoot, dbTx pgx.Tx) (*Batch, error) {
 	batchL2Data := batch.BatchL2Data
 	closed := !batch.WIP
 	res := &Batch{
@@ -406,7 +418,11 @@ func NewBatch(batch *state.Batch, virtualBatch *state.VirtualBatch, verifiedBatc
 			if receipt, found := receiptsMap[tx.Hash()]; found {
 				receiptPtr = &receipt
 			}
-			rpcTx, err := NewTransaction(tx, receiptPtr, includeReceipts)
+			l2Hash, err := st.GetL2TxHashByTxHash(ctx, tx.Hash(), dbTx)
+			if err != nil {
+				return nil, err
+			}
+			rpcTx, err := NewTransaction(tx, receiptPtr, includeReceipts, l2Hash)
 			if err != nil {
 				return nil, err
 			}
@@ -420,7 +436,7 @@ func NewBatch(batch *state.Batch, virtualBatch *state.VirtualBatch, verifiedBatc
 	for _, b := range blocks {
 		b := b
 		if fullTx {
-			block, err := NewBlock(state.Ptr(b.Hash()), &b, nil, false, false)
+			block, err := NewBlock(ctx, st, state.Ptr(b.Hash()), &b, nil, false, false, state.Ptr(true), dbTx)
 			if err != nil {
 				return nil, err
 			}
@@ -525,7 +541,7 @@ type Transaction struct {
 	ChainID     ArgBig          `json:"chainId"`
 	Type        ArgUint64       `json:"type"`
 	Receipt     *Receipt        `json:"receipt,omitempty"`
-	L2Hash      common.Hash     `json:"l2Hash"`
+	L2Hash      *common.Hash    `json:"l2Hash,omitempty"`
 }
 
 // CoreTx returns a geth core type Transaction
@@ -547,11 +563,10 @@ func (t Transaction) CoreTx() *types.Transaction {
 func NewTransaction(
 	tx types.Transaction,
 	receipt *types.Receipt,
-	includeReceipt bool,
+	includeReceipt bool, l2Hash *common.Hash,
 ) (*Transaction, error) {
 	v, r, s := tx.RawSignatureValues()
 	from, _ := state.GetSender(tx)
-	l2Hash, _ := state.GetL2Hash(tx)
 
 	res := &Transaction{
 		Nonce:    ArgUint64(tx.Nonce()),
@@ -576,7 +591,7 @@ func NewTransaction(
 		res.BlockHash = &receipt.BlockHash
 		ti := ArgUint64(receipt.TransactionIndex)
 		res.TxIndex = &ti
-		rpcReceipt, err := NewReceipt(tx, receipt)
+		rpcReceipt, err := NewReceipt(tx, receipt, l2Hash)
 		if err != nil {
 			return nil, err
 		}
@@ -596,7 +611,6 @@ type Receipt struct {
 	Logs              []*types.Log    `json:"logs"`
 	Status            ArgUint64       `json:"status"`
 	TxHash            common.Hash     `json:"transactionHash"`
-	TxL2Hash          common.Hash     `json:"transactionL2Hash"`
 	TxIndex           ArgUint64       `json:"transactionIndex"`
 	BlockHash         common.Hash     `json:"blockHash"`
 	BlockNumber       ArgUint64       `json:"blockNumber"`
@@ -606,10 +620,11 @@ type Receipt struct {
 	ContractAddress   *common.Address `json:"contractAddress"`
 	Type              ArgUint64       `json:"type"`
 	EffectiveGasPrice *ArgBig         `json:"effectiveGasPrice,omitempty"`
+	TxL2Hash          *common.Hash    `json:"transactionL2Hash,omitempty"`
 }
 
 // NewReceipt creates a new Receipt instance
-func NewReceipt(tx types.Transaction, r *types.Receipt) (Receipt, error) {
+func NewReceipt(tx types.Transaction, r *types.Receipt, l2Hash *common.Hash) (Receipt, error) {
 	to := tx.To()
 	logs := r.Logs
 	if logs == nil {
@@ -628,10 +643,6 @@ func NewReceipt(tx types.Transaction, r *types.Receipt) (Receipt, error) {
 	}
 
 	from, err := state.GetSender(tx)
-	if err != nil {
-		return Receipt{}, err
-	}
-	l2Hash, err := state.GetL2Hash(tx)
 	if err != nil {
 		return Receipt{}, err
 	}
@@ -656,6 +667,7 @@ func NewReceipt(tx types.Transaction, r *types.Receipt) (Receipt, error) {
 		egp := ArgBig(*r.EffectiveGasPrice)
 		receipt.EffectiveGasPrice = &egp
 	}
+
 	return receipt, nil
 }
 

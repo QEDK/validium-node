@@ -5,13 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
-	"strings"
 	"time"
 
 	"github.com/0xPolygonHermez/zkevm-node/event"
 	"github.com/0xPolygonHermez/zkevm-node/hex"
 	"github.com/0xPolygonHermez/zkevm-node/log"
-	"github.com/0xPolygonHermez/zkevm-node/merkletree"
 	"github.com/0xPolygonHermez/zkevm-node/state/runtime"
 	"github.com/0xPolygonHermez/zkevm-node/state/runtime/executor"
 	"github.com/ethereum/go-ethereum/common"
@@ -23,67 +21,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
-
-// TestGetL2Hash computes the l2 hash of a transaction for testing purposes
-func TestGetL2Hash(tx types.Transaction, sender common.Address) (common.Hash, error) {
-	return getL2Hash(tx, sender)
-}
-
-// GetL2Hash computes the l2 hash of a transaction
-func GetL2Hash(tx types.Transaction) (common.Hash, error) {
-	sender, err := GetSender(tx)
-	if err != nil {
-		log.Debugf("error getting sender: %v", err)
-	}
-
-	return getL2Hash(tx, sender)
-}
-
-func getL2Hash(tx types.Transaction, sender common.Address) (common.Hash, error) {
-	var input string
-	input += formatL2TxHashParam(fmt.Sprintf("%x", tx.Nonce()))
-	input += formatL2TxHashParam(fmt.Sprintf("%x", tx.GasPrice()))
-	input += formatL2TxHashParam(fmt.Sprintf("%x", tx.Gas()))
-	input += pad20Bytes(formatL2TxHashParam(fmt.Sprintf("%x", tx.To())))
-	input += formatL2TxHashParam(fmt.Sprintf("%x", tx.Value()))
-	if len(tx.Data()) > 0 {
-		input += formatL2TxHashParam(fmt.Sprintf("%x", tx.Data()))
-	}
-	if sender != ZeroAddress {
-		input += pad20Bytes(formatL2TxHashParam(fmt.Sprintf("%x", sender)))
-	}
-
-	h4Hash, err := merkletree.HashContractBytecode(common.Hex2Bytes(input))
-	if err != nil {
-		return common.Hash{}, err
-	}
-
-	return common.HexToHash(merkletree.H4ToString(h4Hash)), nil
-}
-
-// pad20Bytes pads the given address with 0s to make it 20 bytes long
-func pad20Bytes(address string) string {
-	const addressLength = 40
-
-	if len(address) < addressLength {
-		address = strings.Repeat("0", addressLength-len(address)) + address
-	}
-	return address
-}
-
-func formatL2TxHashParam(param string) string {
-	param = strings.TrimLeft(param, "0x")
-
-	if param == "00" || param == "" {
-		return "00"
-	}
-
-	if len(param)%2 != 0 {
-		param = "0" + param
-	}
-
-	return param
-}
 
 // GetSender gets the sender from the transaction's signature
 func GetSender(tx types.Transaction) (common.Address, error) {
@@ -165,9 +102,7 @@ func RlpFieldsToLegacyTx(fields [][]byte, v, r, s []byte) (tx *types.LegacyTx, e
 	}, nil
 }
 
-// StoreTransactions is used by the sequencer to add processed transactions into
-// an open batch. If the batch already has txs, the processedTxs must be a super
-// set of the existing ones, preserving order.
+// StoreTransactions is used by the synchronizer through the method ProcessAndStoreClosedBatch.
 func (s *State) StoreTransactions(ctx context.Context, batchNumber uint64, processedBlocks []*ProcessBlockResponse, txsEGPLog []*EffectiveGasPriceLog, dbTx pgx.Tx) error {
 	if dbTx == nil {
 		return ErrDBTxNil
@@ -205,9 +140,7 @@ func (s *State) StoreTransactions(ctx context.Context, batchNumber uint64, proce
 
 		// firstTxToInsert := len(existingTxs)
 
-		firstTxToInsert := 0
-
-		for i := firstTxToInsert; i < len(processedTxs); i++ {
+		for i := 0; i < len(processedTxs); i++ {
 			processedTx := processedTxs[i]
 			// if the transaction has an intrinsic invalid tx error it means
 			// the transaction has not changed the state, so we don't store it
@@ -227,19 +160,22 @@ func (s *State) StoreTransactions(ctx context.Context, batchNumber uint64, proce
 				Coinbase:   processingContext.Coinbase,
 				Root:       processedTx.StateRoot,
 				GasUsed:    processedTx.GasUsed,
-				GasLimit:   s.cfg.MaxCumulativeGasUsed,
+				GasLimit:   processedBlock.GasLimit,
 				Time:       uint64(processingContext.Timestamp.Unix()),
 			})
+			header.GlobalExitRoot = processedBlock.GlobalExitRoot
+			header.BlockInfoRoot = processedBlock.BlockInfoRoot
 			transactions := []*types.Transaction{&processedTx.Tx}
 
-			receipt := GenerateReceipt(header.Number, processedTx)
+			receipt := GenerateReceipt(header.Number, processedTx, uint(i))
 			if !CheckLogOrder(receipt.Logs) {
 				return fmt.Errorf("error: logs received from executor are not in order")
 			}
 			receipts := []*types.Receipt{receipt}
 
 			// Create l2Block to be able to calculate its hash
-			l2Block := NewL2Block(header, transactions, []*L2Header{}, receipts, &trie.StackTrie{})
+			st := trie.NewStackTrie(nil)
+			l2Block := NewL2Block(header, transactions, []*L2Header{}, receipts, st)
 			l2Block.ReceivedAt = processingContext.Timestamp
 
 			receipt.BlockHash = l2Block.Hash()
@@ -248,9 +184,10 @@ func (s *State) StoreTransactions(ctx context.Context, batchNumber uint64, proce
 			if txsEGPLog != nil {
 				storeTxsEGPData[0].EGPLog = txsEGPLog[i]
 			}
+			txsL2Hash := []common.Hash{processedTx.TxHashL2_V2}
 
 			// Store L2 block and its transaction
-			if err := s.AddL2Block(ctx, batchNumber, l2Block, receipts, storeTxsEGPData, dbTx); err != nil {
+			if err := s.AddL2Block(ctx, batchNumber, l2Block, receipts, txsL2Hash, storeTxsEGPData, dbTx); err != nil {
 				return err
 			}
 		}
@@ -267,13 +204,23 @@ func (s *State) StoreL2Block(ctx context.Context, batchNumber uint64, l2Block *P
 	log.Debugf("storing l2 block %d, txs %d, hash %s", l2Block.BlockNumber, len(l2Block.TransactionResponses), l2Block.BlockHash.String())
 	start := time.Now()
 
+	prevL2BlockHash, err := s.GetL2BlockHashByNumber(ctx, l2Block.BlockNumber-1, dbTx)
+	if err != nil {
+		return err
+	}
+
+	gasLimit := l2Block.GasLimit
+	if gasLimit > MaxL2BlockGasLimit {
+		gasLimit = MaxL2BlockGasLimit
+	}
+
 	header := &types.Header{
 		Number:     new(big.Int).SetUint64(l2Block.BlockNumber),
-		ParentHash: l2Block.ParentHash,
+		ParentHash: prevL2BlockHash,
 		Coinbase:   l2Block.Coinbase,
-		Root:       l2Block.BlockHash, //BlockHash is the StateRoot in Etrog
+		Root:       l2Block.BlockHash, //BlockHash returned by the executor is the StateRoot in Etrog
 		GasUsed:    l2Block.GasUsed,
-		GasLimit:   s.cfg.MaxCumulativeGasUsed,
+		GasLimit:   gasLimit,
 		Time:       l2Block.Timestamp,
 	}
 
@@ -282,9 +229,11 @@ func (s *State) StoreL2Block(ctx context.Context, batchNumber uint64, l2Block *P
 	l2Header.GlobalExitRoot = l2Block.GlobalExitRoot
 	l2Header.BlockInfoRoot = l2Block.BlockInfoRoot
 
-	transactions := []*types.Transaction{}
-	storeTxsEGPData := []StoreTxEGPData{}
-	receipts := []*types.Receipt{}
+	numTxs := len(l2Block.TransactionResponses)
+	transactions := make([]*types.Transaction, 0, numTxs)
+	storeTxsEGPData := make([]StoreTxEGPData, 0, numTxs)
+	receipts := make([]*types.Receipt, 0, numTxs)
+	txsL2Hash := make([]common.Hash, 0, numTxs)
 
 	for i, txResponse := range l2Block.TransactionResponses {
 		// if the transaction has an intrinsic invalid tx error it means
@@ -298,18 +247,22 @@ func (s *State) StoreL2Block(ctx context.Context, batchNumber uint64, l2Block *P
 
 		txResp := *txResponse
 		transactions = append(transactions, &txResp.Tx)
+		txsL2Hash = append(txsL2Hash, txResp.TxHashL2_V2)
 
-		storeTxsEGPData = append(storeTxsEGPData, StoreTxEGPData{EGPLog: nil, EffectivePercentage: uint8(txResponse.EffectivePercentage)})
+		storeTxEGPData := StoreTxEGPData{EGPLog: nil, EffectivePercentage: uint8(txResponse.EffectivePercentage)}
 		if txsEGPLog != nil {
-			storeTxsEGPData[i].EGPLog = txsEGPLog[i]
+			storeTxEGPData.EGPLog = txsEGPLog[i]
 		}
 
-		receipt := GenerateReceipt(header.Number, txResponse)
+		storeTxsEGPData = append(storeTxsEGPData, storeTxEGPData)
+
+		receipt := GenerateReceipt(header.Number, txResponse, uint(i))
 		receipts = append(receipts, receipt)
 	}
 
 	// Create block to be able to calculate its hash
-	block := NewL2Block(l2Header, transactions, []*L2Header{}, receipts, &trie.StackTrie{})
+	st := trie.NewStackTrie(nil)
+	block := NewL2Block(l2Header, transactions, []*L2Header{}, receipts, st)
 	block.ReceivedAt = time.Unix(int64(l2Block.Timestamp), 0)
 
 	for _, receipt := range receipts {
@@ -317,7 +270,7 @@ func (s *State) StoreL2Block(ctx context.Context, batchNumber uint64, l2Block *P
 	}
 
 	// Store L2 block and its transactions
-	if err := s.AddL2Block(ctx, batchNumber, block, receipts, storeTxsEGPData, dbTx); err != nil {
+	if err := s.AddL2Block(ctx, batchNumber, block, receipts, txsL2Hash, storeTxsEGPData, dbTx); err != nil {
 		return err
 	}
 
@@ -413,7 +366,7 @@ func (s *State) internalProcessUnsignedTransactionV1(ctx context.Context, tx *ty
 		timestamp = uint64(time.Now().Unix())
 	}
 
-	loadedNonce, err := s.tree.GetNonce(ctx, senderAddress, batch.StateRoot.Bytes())
+	loadedNonce, err := s.tree.GetNonce(ctx, senderAddress, l2Block.Root().Bytes())
 	if err != nil {
 		return nil, err
 	}
@@ -633,6 +586,12 @@ func (s *State) internalProcessUnsignedTransactionV2(ctx context.Context, tx *ty
 		return nil, err
 	}
 
+	if processBatchResponseV2.ErrorRom != executor.RomError_ROM_ERROR_NO_ERROR {
+		err = executor.RomErr(processBatchResponseV2.ErrorRom)
+		s.eventLog.LogExecutorErrorV2(ctx, processBatchResponseV2.Error, processBatchRequestV2)
+		return nil, err
+	}
+
 	response, err := s.convertToProcessBatchResponseV2(processBatchResponseV2)
 	if err != nil {
 		return nil, err
@@ -653,8 +612,8 @@ func (s *State) isContractCreation(tx *types.Transaction) bool {
 	return tx.To() == nil && len(tx.Data()) > 0
 }
 
-// StoreTransaction is used by the sequencer and trusted state synchronizer to add process a transaction.
-func (s *State) StoreTransaction(ctx context.Context, batchNumber uint64, processedTx *ProcessTransactionResponse, coinbase common.Address, timestamp uint64, egpLog *EffectiveGasPriceLog, dbTx pgx.Tx) (*L2Header, error) {
+// StoreTransaction is used by the trusted state synchronizer to add process a transaction.
+func (s *State) StoreTransaction(ctx context.Context, batchNumber uint64, processedTx *ProcessTransactionResponse, coinbase common.Address, timestamp uint64, egpLog *EffectiveGasPriceLog, globalExitRoot, blockInfoRoot common.Hash, dbTx pgx.Tx) (*L2Header, error) {
 	if dbTx == nil {
 		return nil, ErrDBTxNil
 	}
@@ -676,24 +635,28 @@ func (s *State) StoreTransaction(ctx context.Context, batchNumber uint64, proces
 		Coinbase:   coinbase,
 		Root:       processedTx.StateRoot,
 		GasUsed:    processedTx.GasUsed,
-		GasLimit:   s.cfg.MaxCumulativeGasUsed,
+		GasLimit:   MaxTxGasLimit,
 		Time:       timestamp,
 	})
+	header.GlobalExitRoot = globalExitRoot
+	header.BlockInfoRoot = blockInfoRoot
 	transactions := []*types.Transaction{&processedTx.Tx}
 
-	receipt := GenerateReceipt(header.Number, processedTx)
+	receipt := GenerateReceipt(header.Number, processedTx, 0)
 	receipts := []*types.Receipt{receipt}
 
 	// Create l2Block to be able to calculate its hash
-	l2Block := NewL2Block(header, transactions, []*L2Header{}, receipts, &trie.StackTrie{})
+	st := trie.NewStackTrie(nil)
+	l2Block := NewL2Block(header, transactions, []*L2Header{}, receipts, st)
 	l2Block.ReceivedAt = time.Unix(int64(timestamp), 0)
 
 	receipt.BlockHash = l2Block.Hash()
 
 	storeTxsEGPData := []StoreTxEGPData{{EGPLog: egpLog, EffectivePercentage: uint8(processedTx.EffectivePercentage)}}
+	txsL2Hash := []common.Hash{processedTx.TxHashL2_V2}
 
 	// Store L2 block and its transaction
-	if err := s.AddL2Block(ctx, batchNumber, l2Block, receipts, storeTxsEGPData, dbTx); err != nil {
+	if err := s.AddL2Block(ctx, batchNumber, l2Block, receipts, txsL2Hash, storeTxsEGPData, dbTx); err != nil {
 		return nil, err
 	}
 
@@ -749,7 +712,7 @@ func (s *State) EstimateGas(transaction *types.Transaction, senderAddress common
 	}
 	nonce := loadedNonce.Uint64()
 
-	highEnd := s.cfg.MaxCumulativeGasUsed
+	highEnd := MaxTxGasLimit
 
 	// if gas price is set, set the highEnd to the max amount
 	// of the account afford
@@ -1045,20 +1008,27 @@ func (s *State) internalTestGasEstimationTransactionV2(ctx context.Context, batc
 	log.Debugf("EstimateGas[processBatchRequestV2.SkipWriteBlockInfoRoot]: %v", processBatchRequestV2.SkipWriteBlockInfoRoot)
 
 	txExecutionOnExecutorTime := time.Now()
-	processBatchResponse, err := s.executorClient.ProcessBatchV2(ctx, processBatchRequestV2)
+	processBatchResponseV2, err := s.executorClient.ProcessBatchV2(ctx, processBatchRequestV2)
 	log.Debugf("executor time: %vms", time.Since(txExecutionOnExecutorTime).Milliseconds())
 	if err != nil {
 		log.Errorf("error estimating gas: %v", err)
 		return false, false, gasUsed, nil, err
 	}
-	if processBatchResponse.Error != executor.ExecutorError_EXECUTOR_ERROR_NO_ERROR {
-		err = executor.ExecutorErr(processBatchResponse.Error)
-		s.eventLog.LogExecutorErrorV2(ctx, processBatchResponse.Error, processBatchRequestV2)
+	if processBatchResponseV2.Error != executor.ExecutorError_EXECUTOR_ERROR_NO_ERROR {
+		err = executor.ExecutorErr(processBatchResponseV2.Error)
+		s.eventLog.LogExecutorErrorV2(ctx, processBatchResponseV2.Error, processBatchRequestV2)
 		return false, false, gasUsed, nil, err
 	}
-	gasUsed = processBatchResponse.BlockResponses[0].GasUsed
 
-	txResponse := processBatchResponse.BlockResponses[0].Responses[0]
+	if processBatchResponseV2.ErrorRom != executor.RomError_ROM_ERROR_NO_ERROR {
+		err = executor.RomErr(processBatchResponseV2.ErrorRom)
+		s.eventLog.LogExecutorErrorV2(ctx, processBatchResponseV2.Error, processBatchRequestV2)
+		return false, false, gasUsed, nil, err
+	}
+
+	gasUsed = processBatchResponseV2.BlockResponses[0].GasUsed
+
+	txResponse := processBatchResponseV2.BlockResponses[0].Responses[0]
 	// Check if an out of gas error happened during EVM execution
 	if txResponse.Error != executor.RomError_ROM_ERROR_NO_ERROR {
 		err := executor.RomErr(txResponse.Error)

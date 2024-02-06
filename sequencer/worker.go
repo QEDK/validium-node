@@ -65,19 +65,19 @@ func (w *Worker) AddTxTracker(ctx context.Context, tx *TxTracker) (replacedTx *T
 
 		root, err := w.state.GetLastStateRoot(ctx, nil)
 		if err != nil {
-			dropReason = fmt.Errorf("error getting last state root from hashdb service, error: %w", err)
+			dropReason = fmt.Errorf("error getting last state root from hashdb service, error: %v", err)
 			log.Error(dropReason)
 			return nil, dropReason
 		}
 		nonce, err := w.state.GetNonceByStateRoot(ctx, tx.From, root)
 		if err != nil {
-			dropReason = fmt.Errorf("error getting nonce for address %s from hashdb service, error: %w", tx.From, err)
+			dropReason = fmt.Errorf("error getting nonce for address %s from hashdb service, error: %v", tx.From, err)
 			log.Error(dropReason)
 			return nil, dropReason
 		}
 		balance, err := w.state.GetBalanceByStateRoot(ctx, tx.From, root)
 		if err != nil {
-			dropReason = fmt.Errorf("error getting balance for address %s from hashdb service, error: %w", tx.From, err)
+			dropReason = fmt.Errorf("error getting balance for address %s from hashdb service, error: %v", tx.From, err)
 			log.Error(dropReason)
 			return nil, dropReason
 		}
@@ -318,8 +318,8 @@ func (w *Worker) GetBestFittingTx(resources state.BatchResources) (*TxTracker, e
 				foundMutex.RUnlock()
 
 				txCandidate := w.txSortedList.getByIndex(i)
-				err := bresources.Sub(txCandidate.BatchResources)
-				if err != nil {
+				overflow, _ := bresources.Sub(txCandidate.BatchResources)
+				if overflow {
 					// We don't add this Tx
 					continue
 				}
@@ -338,7 +338,7 @@ func (w *Worker) GetBestFittingTx(resources state.BatchResources) (*TxTracker, e
 	wg.Wait()
 
 	if foundAt != -1 {
-		log.Debugf("best fitting tx found: tx %s at index %d with gasPrice %d", tx.HashStr, foundAt, tx.GasPrice)
+		log.Debugf("best fitting tx %s found at index %d with gasPrice %d", tx.HashStr, foundAt, tx.GasPrice)
 		return tx, nil
 	} else {
 		return nil, ErrNoFittingTransaction
@@ -365,7 +365,7 @@ func (w *Worker) ExpireTransactions(maxTime time.Duration) []*TxTracker {
 			delete(w.pool, addrQueue.fromStr)
 		}
 	}
-	log.Debug("expire transactions ended, addrQueue length: %d, delete count: %d ", len(w.pool), len(txs))
+	log.Debugf("expire transactions ended, addrQueue length: %d, delete count: %d ", len(w.pool), len(txs))
 
 	return txs
 }
